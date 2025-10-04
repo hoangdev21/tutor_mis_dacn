@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Học Sinh - Gia Sư | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span>TutorMis</span>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item active" data-page="students">
+                        <i class="fas fa-users"></i>
+                        <span>Học Sinh</span>
+                    </div>
+                    <div class="menu-item" data-page="requests">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Yêu Cầu Mới</span>
+                    </div>
+                    <div class="menu-item" data-page="schedule">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Lịch Dạy</span>
+                    </div>
+                    <div class="menu-item" data-page="income">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Thu Nhập</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item" data-page="messages">
+                        <i class="fas fa-comments"></i>
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <i class="fas fa-blog"></i>
+                        <span>Blog</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item" data-page="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Quản Lý Học Sinh</h1>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Tìm kiếm học sinh...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=Tutor&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-users"></i>
+                            Học Sinh Của Tôi
+                        </h2>
+                    </div>
+
+                    <div id="studentsContainer">
+                        <div class="empty-state">
+                            <i class="fas fa-user-graduate"></i>
+                            <h3>Chưa có học sinh</h3>
+                            <p>Bạn chưa có học sinh nào. Hãy chấp nhận yêu cầu từ học sinh!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+</body>
+</html>

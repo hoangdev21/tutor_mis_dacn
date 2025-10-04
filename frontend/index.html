@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TutorMis - Nền tảng gia sư hàng đầu</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/icon/favicon.ico">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/otp.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav__brand">
+            <button class="sidebar__toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h2>🎓 TutorMis</h2>
+        </div>
+        <div class="nav__actions">
+            <button class="btn btn--outline" onclick="showLoginModal()">Đăng Nhập</button>
+            <button class="btn btn--primary" onclick="showRegisterModal()">Đăng Ký</button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar__overlay" id="sidebar-overlay"></div>
+        <div class="sidebar__content">
+            <div class="sidebar__header">
+                <div class="sidebar__brand">
+                    <h2>🎓 TutorMis</h2>
+                </div>
+                <button class="sidebar__close" id="sidebar-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="sidebar__menu">
+                <ul class="sidebar__list">
+                    <li class="sidebar__item">
+                        <a href="#home" class="sidebar__link">
+                            <i class="fas fa-home"></i>
+                            <span>Trang Chủ</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#features" class="sidebar__link">
+                            <i class="fas fa-star"></i>
+                            <span>Tính Năng</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#how-it-works" class="sidebar__link">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Cách Hoạt Động</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#contact" class="sidebar__link">
+                            <i class="fas fa-envelope"></i>
+                            <span>Liên Hệ</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar__footer">
+                <div class="sidebar__actions">
+                    <button class="btn btn--outline btn--full" onclick="showLoginModal()">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Đăng Nhập
+                    </button>
+                    <button class="btn btn--primary btn--full" onclick="showRegisterModal()">
+                        <i class="fas fa-user-plus"></i>
+                        Đăng Ký
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main>
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero__content">
+                    <div class="hero__text">
+                        <h1 class="hero__title">
+                            Kết nối <span class="highlight">Gia sư</span> và 
+                            <span class="highlight">Học sinh</span> 
+                            hiệu quả nhất
+                        </h1>
+                        <p class="hero__description">
+                            TutorMis là nền tảng gia sư trực tuyến hàng đầu, giúp bạn tìm kiếm gia sư chất lượng 
+                            hoặc chia sẻ kiến thức của mình một cách dễ dàng và an toàn.
+                        </p>
+                        <div class="hero__buttons">
+                            <button class="btn btn--primary btn--large" onclick="showRegisterModal('student')">
+                                <i class="fas fa-graduation-cap"></i>
+                                Tôi cần gia sư
+                            </button>
+                            <button class="btn btn--outline btn--large" onclick="showRegisterModal('tutor')">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                Tôi là gia sư
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hero__image">
+                        <div class="hero__illustration">
+                            <div class="floating-card card-1">
+                                <i class="fas fa-book"></i>
+                                <span>Toán học</span>
+                            </div>
+                            <div class="floating-card card-2">
+                                <i class="fas fa-flask"></i>
+                                <span>Hóa học</span>
+                            </div>
+                            <div class="floating-card card-3">
+                                <i class="fas fa-globe"></i>
+                                <span>Tiếng Anh</span>
+                            </div>
+                            <div class="hero__main-image">
+                                <i class="fas fa-users" style="font-size: 8rem; color: var(--primary-color);"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Tại sao chọn TutorMis?</h2>
+                    <p class="section__subtitle">Những tính năng vượt trội giúp việc học tập hiệu quả hơn</p>
+                </div>
+                <div class="features__grid">
+                    <div class="feature__card">
+                        <div class="feature__icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="feature__title">Tìm kiếm thông minh</h3>
+                        <p class="feature__description">
+                            Hệ thống lọc và tìm kiếm gia sư theo môn học, địa điểm, giá cả và đánh giá một cách nhanh chóng.
+                        </p>
+                    </div>
+                    <div class="feature__card">
+                        <div class="feature__icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature__title">An toàn & Tin cậy</h3>
+                        <p class="feature__description">
+                            Tất cả gia sư đều được xác minh danh tính và bằng cấp. Hệ thống đánh giá minh bạch từ học sinh.
+                        </p>
+                    </div>
+                    <div class="feature__card">
+                        <div class="feature__icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="feature__title">Giao tiếp trực tiếp</h3>
+                        <p class="feature__description">
+                            Chat trực tiếp với gia sư, thảo luận về nhu cầu học tập và lên kế hoạch học tập phù hợp.
+                        </p>
+                    </div>
+                    <div class="feature__card">
+                        <div class="feature__icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3 class="feature__title">Quản lý lịch học</h3>
+                        <p class="feature__description">
+                            Hệ thống quản lý lịch học thông minh, nhắc nhở và theo dõi tiến độ học tập hiệu quả.
+                        </p>
+                    </div>
+                    <div class="feature__card">
+                        <div class="feature__icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature__title">Theo dõi tiến độ</h3>
+                        <p class="feature__description">
+                            Báo cáo chi tiết về quá trình học tập, thành tích và những cải thiện cần thiết.
+                        </p>
+                    </div>
+                    <div class="feature__card">
+                        <div class="feature__icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h3 class="feature__title">Thanh toán linh hoạt</h3>
+                        <p class="feature__description">
+                            Nhiều hình thức thanh toán an toàn, minh bạch. Hoàn tiền nếu không hài lòng.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works Section -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Cách hoạt động</h2>
+                    <p class="section__subtitle">3 bước đơn giản để bắt đầu hành trình học tập</p>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step__number">1</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Đăng ký tài khoản</h3>
+                            <p class="step__description">
+                                Tạo tài khoản miễn phí và hoàn thiện hồ sơ cá nhân. Xác minh email để đảm bảo bảo mật.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step__number">2</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Tìm kiếm gia sư</h3>
+                            <p class="step__description">
+                                Sử dụng bộ lọc thông minh để tìm gia sư phù hợp. Xem profile, đánh giá và liên hệ trực tiếp.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step__number">3</div>
+                        <div class="step__content">
+                            <h3 class="step__title">Bắt đầu học</h3>
+                            <p class="step__description">
+                                Thống nhất lịch học, phương thức thanh toán và bắt đầu hành trình học tập hiệu quả.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modals -->
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal__overlay" onclick="closeModal('loginModal')"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">Đăng nhập</h2>
+                <button class="modal__close" onclick="closeModal('loginModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="auth__form" id="loginForm">
+                <div class="form__group">
+                    <label class="form__label">Email</label>
+                    <input type="email" class="form__input" name="email" required>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Mật khẩu</label>
+                    <div class="form__input-group">
+                        <input type="password" class="form__input" name="password" required>
+                        <button type="button" class="form__input-button" onclick="togglePassword(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form__options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember">
+                        <span class="checkbox__checkmark"></span>
+                        Ghi nhớ đăng nhập
+                    </label>
+                    <a href="#" class="form__link">Quên mật khẩu?</a>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full">
+                    <span class="btn__text">Đăng nhập</span>
+                    <span class="btn__loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+                <div class="form__divider">
+                    <span>Hoặc</span>
+                </div>
+                <p class="form__switch">
+                    Chưa có tài khoản? 
+                    <a href="#" onclick="switchModal('loginModal', 'registerModal')">Đăng ký ngay</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal__overlay" onclick="closeModal('registerModal')"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">Đăng ký tài khoản</h2>
+                <button class="modal__close" onclick="closeModal('registerModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="auth__form" id="registerForm">
+                <div class="form__group">
+                    <label class="form__label">Bạn là:</label>
+                    <div class="role__selector">
+                        <label class="role__option">
+                            <input type="radio" name="role" value="student" checked>
+                            <div class="role__card">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Học sinh/Phụ huynh</span>
+                            </div>
+                        </label>
+                        <label class="role__option">
+                            <input type="radio" name="role" value="tutor">
+                            <div class="role__card">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Gia sư</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Họ và tên</label>
+                    <input type="text" class="form__input" name="fullName" required>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Email</label>
+                    <input type="email" class="form__input" name="email" required>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Số điện thoại</label>
+                    <input type="tel" class="form__input" name="phone">
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Mật khẩu</label>
+                    <div class="form__input-group">
+                        <input type="password" class="form__input" name="password" required>
+                        <button type="button" class="form__input-button" onclick="togglePassword(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password__strength" id="passwordStrength"></div>
+                </div>
+                <div class="form__group">
+                    <label class="form__label">Xác nhận mật khẩu</label>
+                    <div class="form__input-group">
+                        <input type="password" class="form__input" name="confirmPassword" required>
+                        <button type="button" class="form__input-button" onclick="togglePassword(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form__group">
+                    <label class="checkbox">
+                        <input type="checkbox" name="terms" required>
+                        <span class="checkbox__checkmark"></span>
+                        Tôi đồng ý với <a href="#" class="form__link">Điều khoản sử dụng</a> và <a href="#" class="form__link">Chính sách bảo mật</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full">
+                    <span class="btn__text">Đăng ký</span>
+                    <span class="btn__loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+                <div class="form__divider">
+                    <span>Hoặc</span>
+                </div>
+                <p class="form__switch">
+                    Đã có tài khoản? 
+                    <a href="#" onclick="switchModal('registerModal', 'loginModal')">Đăng nhập ngay</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal__overlay" onclick="closeModal('successModal')"></div>
+        <div class="modal__content modal__content--small">
+            <div class="success__content">
+                <div class="success__icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="success__title">Thành công!</h3>
+                <p class="success__message" id="successMessage"></p>
+                <button class="btn btn--primary" onclick="closeModal('successModal')">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__section">
+                    <h3 class="footer__title">🎓 TutorMis</h3>
+                    <p class="footer__description">
+                        Nền tảng gia sư trực tuyến hàng đầu Việt Nam, kết nối tri thức và tương lai.
+                    </p>
+                </div>
+                <div class="footer__section">
+                    <h4 class="footer__heading">Liên kết nhanh</h4>
+                    <ul class="footer__links">
+                        <li><a href="#home">Trang chủ</a></li>
+                        <li><a href="#features">Tính năng</a></li>
+                        <li><a href="#how-it-works">Cách hoạt động</a></li>
+                        <li><a href="#contact">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="footer__section">
+                    <h4 class="footer__heading">Hỗ trợ</h4>
+                    <ul class="footer__links">
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer__section">
+                    <h4 class="footer__heading">Liên hệ</h4>
+                    <div class="footer__contact">
+                        <p><i class="fas fa-envelope"></i> support@tutornis.com</p>
+                        <p><i class="fas fa-phone"></i> 1900 xxxx</p>
+                        <div class="footer__social">
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <p>&copy; 2024 TutorMis. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/otp.js"></script>
+    <script src="assets/js/auth.js"></script>
+</body>
+</html>

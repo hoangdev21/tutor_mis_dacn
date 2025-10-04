@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ Sơ Gia Sư - Gia Sư | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/profile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Dashboard Layout -->
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span>TutorMis</span>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="students">
+                        <i class="fas fa-users"></i>
+                        <span>Học Sinh</span>
+                    </div>
+                    <div class="menu-item" data-page="requests">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Yêu Cầu Mới</span>
+                    </div>
+                    <div class="menu-item" data-page="schedule">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Lịch Dạy</span>
+                    </div>
+                    <div class="menu-item" data-page="income">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Thu Nhập</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item" data-page="messages">
+                        <i class="fas fa-comments"></i>
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <i class="fas fa-blog"></i>
+                        <span>Blog</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item active" data-page="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+        <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Hồ sơ cá nhân</h1>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=User&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Profile Content -->
+            <div class="dashboard-content">
+                <!-- Profile Card -->
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img src="../../assets/images/avatar/default-avatar.png" alt="Avatar" id="profileAvatar">
+                            <button class="change-avatar-btn" id="changeAvatarBtn">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profileName">Tên gia sư</h2>
+                            <span class="role-badge tutor">Gia Sư</span>
+                            <p class="email" id="profileEmail">email@example.com</p>
+                            <div class="approval-status" id="approvalStatus">
+                                <span class="status-badge pending">Đang chờ duyệt</span>
+                            </div>
+                        </div>
+                        <div class="university-image-section">
+                            <div class="university-image-container">
+                                <img src="../../assets/images/icon/university-placeholder.svg" alt="Trường học" id="universityImage" style="width: 500px; height: auto; object-fit: cover; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3);">
+                                <button class="change-university-img-btn" id="changeUniversityImgBtn" title="Tải ảnh trường học">
+                                    <i class="fas fa-university"></i>
+                                </button>
+                                <input type="file" id="universityImageInput" accept="image/*" style="display: none;">
+                            </div>
+                            <p style="font-size: 12px; color: #ffffff; margin-top: 8px; text-align: center;">Ảnh trường học</p>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode Toggle -->
+                    <div class="profile-actions">
+                        <button class="btn btn--primary" id="editProfileBtn">
+                            <i class="fas fa-edit"></i> Chỉnh Sửa Hồ Sơ
+                        </button>
+                        <button class="btn btn--success" id="saveProfileBtn" style="display: none; background-color: #28a745; color: white;">
+                            <i class="fas fa-save"></i> Lưu Thay Đổi
+                        </button>
+                        <button class="btn btn--secondary" id="cancelEditBtn" style="display: none; background-color: #dc3545; color: white;">
+                            <i class="fas fa-times"></i> Hủy
+                        </button>
+                    </div>
+
+                    <!-- Profile Form -->
+                    <form id="profileForm" class="profile-form">
+                        <!-- Thông tin cơ bản -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-user"></i>
+                                Thông Tin Cơ Bản
+                            </h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="fullName">Họ và tên *</label>
+                                    <input type="text" id="fullName" name="fullName" class="form-control" required disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dateOfBirth">Ngày sinh *</label>
+                                    <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control" required disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="gender">Giới tính *</label>
+                                    <select id="gender" name="gender" class="form-control" required disabled>
+                                        <option value="">Chọn giới tính</option>
+                                        <option value="male">Nam</option>
+                                        <option value="female">Nữ</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Số điện thoại *</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" required disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="idCard">CCCD/CMND</label>
+                                    <input type="text" id="idCard" name="idCard" class="form-control" placeholder="Số CCCD/CMND" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hourlyRate">Học phí (VNĐ/giờ) *</label>
+                                    <input type="number" id="hourlyRate" name="hourlyRate" class="form-control" min="0" step="10000" required disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Địa Chỉ
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label for="address">Địa chỉ chi tiết</label>
+                                <input type="text" id="address" name="address" class="form-control" placeholder="Số nhà, tên đường" disabled>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">Tỉnh/Thành phố</label>
+                                    <select id="city" name="city" class="form-control" disabled>
+                                        <option value="">Chọn tỉnh/thành phố</option>
+                                        <option value="Hà Nội">Hà Nội</option>
+                                        <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                                        <option value="Đà Nẵng">Đà Nẵng</option>
+                                        <option value="Hải Phòng">Hải Phòng</option>
+                                        <option value="Cần Thơ">Cần Thơ</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="district">Quận/Huyện</label>
+                                    <input type="text" id="district" name="district" class="form-control" placeholder="Nhập quận/huyện" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trình độ học vấn -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-graduation-cap"></i>
+                                Trình Độ Học Vấn
+                            </h3>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="highestDegree">Bằng cấp cao nhất *</label>
+                                    <select id="highestDegree" name="highestDegree" class="form-control" required disabled>
+                                        <option value="">Chọn bằng cấp</option>
+                                        <option value="Tốt nghiệp THPT">Tốt nghiệp THPT</option>
+                                        <option value="Cao đẳng">Cao đẳng</option>
+                                        <option value="Đại học">Đại học</option>
+                                        <option value="Thạc sĩ">Thạc sĩ</option>
+                                        <option value="Tiến sĩ">Tiến sĩ</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="major">Chuyên ngành</label>
+                                    <input type="text" id="major" name="major" class="form-control" placeholder="Ví dụ: Toán học, Vật lý..." disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="university">Trường học/Đại học</label>
+                                    <input type="text" id="university" name="university" class="form-control" placeholder="Tên trường" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="graduationYear">Năm tốt nghiệp</label>
+                                    <input type="number" id="graduationYear" name="graduationYear" class="form-control" min="1950" max="2025" placeholder="Năm" disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gpa">GPA/Điểm trung bình</label>
+                                <input type="text" id="gpa" name="gpa" class="form-control" placeholder="Ví dụ: 3.5/4.0 hoặc 8.5/10" disabled>
+                            </div>
+                        </div>
+
+                        <!-- Chứng chỉ -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-certificate"></i>
+                                Chứng Chỉ & Giải Thưởng
+                            </h3>
+
+                            <div id="certificatesContainer">
+                                <!-- Certificates will be rendered here -->
+                            </div>
+
+                            <button type="button" class="btn btn--outline" id="addCertificateBtn" disabled>
+                                <i class="fas fa-plus"></i> Thêm Chứng Chỉ
+                            </button>
+                        </div>
+
+                        <!-- Kinh nghiệm giảng dạy -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-briefcase"></i>
+                                Kinh Nghiệm Giảng Dạy
+                            </h3>
+
+                            <div class="form-group">
+                                <label for="yearsOfExperience">Số năm kinh nghiệm *</label>
+                                <select id="yearsOfExperience" name="yearsOfExperience" class="form-control" required disabled>
+                                    <option value="">Chọn số năm</option>
+                                    <option value="0-1">Dưới 1 năm</option>
+                                    <option value="1-2">1-2 năm</option>
+                                    <option value="2-3">2-3 năm</option>
+                                    <option value="3-5">3-5 năm</option>
+                                    <option value="5+">Trên 5 năm</option>
+                                </select>
+                            </div>
+
+                            <div id="experiencesContainer">
+                                <!-- Experiences will be rendered here -->
+                            </div>
+
+                            <button type="button" class="btn btn--outline" id="addExperienceBtn" disabled>
+                                <i class="fas fa-plus"></i> Thêm Kinh Nghiệm
+                            </button>
+                        </div>
+
+                        <!-- Môn dạy -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-book"></i>
+                                Môn Dạy
+                            </h3>
+
+                            <div id="subjectsContainer">
+                                <!-- Subjects will be rendered here -->
+                            </div>
+
+                            <button type="button" class="btn btn--outline" id="addSubjectBtn" disabled>
+                                <i class="fas fa-plus"></i> Thêm Môn Dạy
+                            </button>
+                        </div>
+
+                        <!-- Lịch dạy khả dụng -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Lịch Dạy Khả Dụng
+                            </h3>
+
+                            <div id="availabilityContainer">
+                                <div class="availability-day" data-day="monday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="monday" disabled>
+                                            <span>Thứ 2</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="monday-slots"></div>
+                                </div>
+
+                                <div class="availability-day" data-day="tuesday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="tuesday" disabled>
+                                            <span>Thứ 3</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="tuesday-slots"></div>
+                                </div>
+
+                                <div class="availability-day" data-day="wednesday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="wednesday" disabled>
+                                            <span>Thứ 4</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="wednesday-slots"></div>
+                                </div>
+
+                                <div class="availability-day" data-day="thursday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="thursday" disabled>
+                                            <span>Thứ 5</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="thursday-slots"></div>
+                                </div>
+
+                                <div class="availability-day" data-day="friday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="friday" disabled>
+                                            <span>Thứ 6</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="friday-slots"></div>
+                                </div>
+
+                                <div class="availability-day" data-day="saturday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="saturday" disabled>
+                                            <span>Thứ 7</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="saturday-slots"></div>
+                                </div>
+
+                                <div class="availability-day" data-day="sunday">
+                                    <div class="day-header">
+                                        <label>
+                                            <input type="checkbox" name="availability" value="sunday" disabled>
+                                            <span>Chủ nhật</span>
+                                        </label>
+                                    </div>
+                                    <div class="time-slots" id="sunday-slots"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Giới thiệu bản thân -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-info-circle"></i>
+                                Giới Thiệu Bản Thân
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label for="bio">Tiểu sử/Giới thiệu *</label>
+                                <textarea id="bio" name="bio" class="form-control" rows="5" placeholder="Viết vài dòng giới thiệu về bản thân, phong cách giảng dạy, thành tích..." required disabled></textarea>
+                                <small class="form-text">Tối thiểu 100 ký tự</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teachingStyle">Phương pháp giảng dạy</label>
+                                <textarea id="teachingStyle" name="teachingStyle" class="form-control" rows="3" placeholder="Mô tả phương pháp giảng dạy của bạn..." disabled></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="achievements">Thành tích nổi bật</label>
+                                <textarea id="achievements" name="achievements" class="form-control" rows="3" placeholder="Các thành tích, giải thưởng đáng chú ý..." disabled></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Phương thức dạy -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                Phương Thức Dạy
+                            </h3>
+                            
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="teachingMethods" value="Dạy tại nhà học sinh" disabled>
+                                    <span>Dạy tại nhà học sinh</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="teachingMethods" value="Dạy tại nhà gia sư" disabled>
+                                    <span>Dạy tại nhà gia sư</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="teachingMethods" value="Dạy online" disabled>
+                                    <span>Dạy online</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="notification-toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/profile-tutor.js"></script>
+</body>
+</html>

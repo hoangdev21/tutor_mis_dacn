@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Gia Sư - Học Sinh | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/find-tutor.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span>TutorMis</span>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="courses">
+                        <i class="fas fa-book"></i>
+                        <span>Khóa Học</span>
+                    </div>
+                    <div class="menu-item" data-page="requests">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Yêu Cầu Gia Sư</span>
+                    </div>
+                    <div class="menu-item active" data-page="find-tutor">
+                        <i class="fas fa-search"></i>
+                        <span>Tìm Gia Sư</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item" data-page="messages">
+                        <i class="fas fa-comments"></i>
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <i class="fas fa-blog"></i>
+                        <span>Blog</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item" data-page="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Tìm Gia Sư</h1>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Tìm kiếm gia sư...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=Student&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Filters and Search -->
+                <div class="filters-bar">
+                    <div class="search-group">
+                        <div class="search-box-large">
+                            <input type="text" id="searchInput" placeholder="Tìm kiếm gia sư theo tên, môn học...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Sắp xếp:</label>
+                        <select id="sortSelect">
+                            <option value="newest">Mới nhất</option>
+                            <option value="rating">Đánh giá cao nhất</option>
+                            <option value="price-asc">Giá thấp đến cao</option>
+                            <option value="price-desc">Giá cao đến thấp</option>
+                            <option value="experience">Kinh nghiệm nhiều nhất</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Subject Filters -->
+                <div class="subject-filters">
+                    <button class="subject-filter active" data-subject="all">
+                        <i class="fas fa-th"></i>
+                        Tất Cả
+                    </button>
+                    <button class="subject-filter" data-subject="toán">
+                        <i class="fas fa-calculator"></i>
+                        Toán
+                    </button>
+                    <button class="subject-filter" data-subject="lý">
+                        <i class="fas fa-atom"></i>
+                        Vật Lý
+                    </button>
+                    <button class="subject-filter" data-subject="hóa">
+                        <i class="fas fa-flask"></i>
+                        Hóa Học
+                    </button>
+                    <button class="subject-filter" data-subject="anh">
+                        <i class="fas fa-language"></i>
+                        Tiếng Anh
+                    </button>
+                    <button class="subject-filter" data-subject="văn">
+                        <i class="fas fa-book-open"></i>
+                        Ngữ Văn
+                    </button>
+                    <button class="subject-filter" data-subject="sinh">
+                        <i class="fas fa-dna"></i>
+                        Sinh Học
+                    </button>
+                </div>
+
+                <!-- Tutors Container -->
+                <div id="tutorsContainer">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Đang tải danh sách gia sư...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/find-tutor.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+</body>
+</html>

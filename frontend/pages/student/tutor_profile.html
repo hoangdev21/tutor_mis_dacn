@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ Sơ Gia Sư - TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/tutor-profile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a href="../../index.html">
+                    <span class="logo-icon">🎓</span>
+                    <span class="logo-text">TutorMis</span>
+                </a>
+            </div>
+            
+            <div class="navbar-menu">
+                <button class="btn btn-outline" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay Lại
+                </button>
+                <a href="../messages.html" class="btn btn-primary">
+                    <i class="fas fa-comment"></i>
+                    Nhắn Tin
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="profile-page">
+        <div class="container">
+            <div id="profileContainer">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Đang tải hồ sơ gia sư...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/tutor-profile-student.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin Nhắn - Gia Sư | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/messages.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span>TutorMis</span>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="students">
+                        <i class="fas fa-users"></i>
+                        <span>Học Sinh</span>
+                    </div>
+                    <div class="menu-item" data-page="requests">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Yêu Cầu Mới</span>
+                    </div>
+                    <div class="menu-item" data-page="schedule">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Lịch Dạy</span>
+                    </div>
+                    <div class="menu-item" data-page="income">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Thu Nhập</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item active" data-page="messages">
+                        <i class="fas fa-comments"></i>
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <i class="fas fa-blog"></i>
+                        <span>Blog</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item" data-page="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Tin Nhắn</h1>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=User&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Messages Content -->
+            <div class="messages-container">
+                <!-- Conversations List -->
+                <div class="conversations-sidebar">
+                    <div class="sidebar-header">
+                        <h2>Tin Nhắn</h2>
+                        <button class="new-message-btn" onclick="startNewConversation()">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="search-conversations">
+                        <input type="text" id="searchConversations" placeholder="Tìm kiếm cuộc trò chuyện...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    
+                    <div class="conversation-list" id="conversationList">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="chat-area" id="chatArea">
+                    <!-- Empty State -->
+                    <div class="empty-chat no-conversation">
+                        <i class="fas fa-comments"></i>
+                        <h3>Chọn một cuộc trò chuyện</h3>
+                        <p>Chọn cuộc trò chuyện từ danh bên trái để bắt đầu nhắn tin</p>
+                    </div>
+
+                    <!-- Active Conversation -->
+                    <div id="activeConversation" style="display: none; flex-direction: column; height: 100%;">
+                        <!-- Chat Header -->
+                        <div class="chat-header">
+                            <div class="chat-user-info">
+                                <img id="chatUserAvatar" src="https://ui-avatars.com/api/?name=User" alt="User" class="chat-user-avatar">
+                                <div class="chat-user-details">
+                                    <h3 id="chatUserName">Người dùng</h3>
+                                    <span id="chatUserStatus" class="user-status offline">Không hoạt động</span>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="icon-btn" title="Tìm kiếm">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button class="icon-btn" title="Thêm">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Messages Area -->
+                        <div class="messages-area" id="messagesArea">
+                            <!-- Messages will be rendered here -->
+                        </div>
+
+                        <!-- Message Input -->
+                        <div class="message-input-area">
+                            <button class="icon-btn" title="Đính kèm">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." autocomplete="off" onkeypress="if(event.key==='Enter') sendMessage()">
+                            <button class="send-btn" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Conversation Modal -->
+    <div class="modal" id="newConversationModal">
+        <div class="modal-overlay" onclick="closeNewConversationModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tin Nhắn Mới</h3>
+                <button class="modal-close" onclick="closeNewConversationModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newConversationForm">
+                    <div class="form-group">
+                        <label>Người nhận <span class="required">*</span></label>
+                        <input type="text" id="recipientSearch" placeholder="Tìm kiếm người dùng..." autocomplete="off">
+                        <div id="recipientResults" class="search-results"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tin nhắn <span class="required">*</span></label>
+                        <textarea name="message" rows="4" required placeholder="Nhập tin nhắn..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Gửi
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeNewConversationModal()">
+                            Hủy
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/messages.js"></script>
+</body>
+</html>

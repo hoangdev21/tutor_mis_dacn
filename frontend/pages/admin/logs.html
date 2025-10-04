@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs Hệ Thống - Admin | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span>TutorMis</span>
+                </div>
+                <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="users">
+                        <i class="fas fa-users"></i>
+                        <span>Người Dùng</span>
+                    </div>
+                    <div class="menu-item" data-page="tutors">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Duyệt Gia Sư</span>
+                    </div>
+                    <div class="menu-item" data-page="courses">
+                        <i class="fas fa-book"></i>
+                        <span>Khóa Học</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <i class="fas fa-blog"></i>
+                        <span>Quản Lý Blog</span>
+                    </div>
+                    <div class="menu-item" data-page="reports">
+                        <i class="fas fa-flag"></i>
+                        <span>Báo Cáo</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Tài Chính</div>
+                    <div class="menu-item" data-page="finance">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Thống Kê Tài Chính</span>
+                    </div>
+                    <div class="menu-item" data-page="transactions">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Giao Dịch</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Hệ Thống</div>
+                    <div class="menu-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item active" data-page="logs">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Logs</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Logs Hệ Thống</h1>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Tìm kiếm logs...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="Admin" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            Hoạt Động Hệ Thống
+                        </h2>
+                    </div>
+
+                    <div id="logsContainer">
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <h3>Chưa có logs</h3>
+                            <p>Lịch sử hoạt động hệ thống sẽ hiển thị ở đây.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+</body>
+</html>
