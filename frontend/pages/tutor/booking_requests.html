@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Lịch Dạy - Tutornis</title>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/booking.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span>🎓</span>
+          <span>Tutornis</span>
+        </div>
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <div class="menu-section-title">Menu Chính</div>
+          <div class="menu-item" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </div>
+          <div class="menu-item active" data-page="bookings">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Lịch Dạy</span>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="menu-section-title">Giao Tiếp</div>
+          <div class="menu-item" data-page="messages">
+            <i class="fas fa-comments"></i>
+            <span>Tin Nhắn</span>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="menu-section-title">Cài Đặt</div>
+          <div class="menu-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Hồ Sơ</span>
+          </div>
+          <div class="menu-item" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Đăng Xuất</span>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="page-title">
+            <h1>Quản Lý Lịch Dạy</h1>
+            <p id="currentDate"></p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationBadge">0</span>
+          </button>
+          <button class="user-menu-btn">
+            <img src="https://ui-avatars.com/api/?name=Tutor&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-icon pending">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-details">
+              <h3 id="pendingCount">0</h3>
+              <p>Yêu cầu mới</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon accepted">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-details">
+              <h3 id="acceptedCount">0</h3>
+              <p>Đã chấp nhận</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon completed">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-details">
+              <h3 id="completedCount">0</h3>
+              <p>Hoàn thành</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-details">
+              <h3 id="totalRevenue">0đ</h3>
+              <p>Tổng thu nhập</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="booking-tabs">
+          <button class="tab-btn active" data-status="all">
+            <i class="fas fa-list"></i>
+            Tất cả
+          </button>
+          <button class="tab-btn" data-status="pending">
+            <i class="fas fa-clock"></i>
+            Chờ xử lý
+          </button>
+          <button class="tab-btn" data-status="accepted">
+            <i class="fas fa-check-circle"></i>
+            Đã chấp nhận
+          </button>
+          <button class="tab-btn" data-status="rejected">
+            <i class="fas fa-times-circle"></i>
+            Từ chối
+          </button>
+          <button class="tab-btn" data-status="completed">
+            <i class="fas fa-star"></i>
+            Hoàn thành
+          </button>
+        </div>
+
+        <!-- Bookings List -->
+        <div class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-calendar-alt"></i>
+              <span id="listTitle">Tất cả yêu cầu</span>
+            </h2>
+          </div>
+
+          <div id="bookingsContainer">
+            <div class="loading-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Đang tải...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Booking Detail Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h2>Chi tiết yêu cầu</h2>
+        <button class="modal-close" onclick="closeDetailModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="detailModalBody">
+        <!-- Content will be loaded dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Modal (Accept/Reject) -->
+  <div id="actionModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="actionModalTitle">Xác nhận</h2>
+        <button class="modal-close" onclick="closeActionModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="actionMessage">Tin nhắn cho học sinh</label>
+          <textarea id="actionMessage" rows="4" placeholder="Nhập tin nhắn của bạn..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeActionModal()">Hủy</button>
+        <button class="btn btn-primary" id="confirmActionBtn" onclick="confirmAction()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/dashboard-common.js"></script>
+  <script src="../../assets/js/booking-requests.js"></script>
+</body>
+</html>

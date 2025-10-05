@@ -7,6 +7,8 @@ const Course = require('./Course');
 const Message = require('./Message');
 const TutorRequest = require('./TutorRequest');
 const BlogPost = require('./BlogPost');
+const BookingRequest = require('./BookingRequest');
+const Notification = require('./Notification');
 
 module.exports = {
   User,
@@ -16,5 +18,7 @@ module.exports = {
   Course,
   Message,
   TutorRequest,
-  BlogPost
+  BlogPost,
+  BookingRequest,
+  Notification
 };

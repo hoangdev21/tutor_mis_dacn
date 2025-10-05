@@ -24,13 +24,13 @@ function loadDynamicSidebar(activePage) {
             {
                 title: 'Giao Tiếp',
                 items: [
-                    { icon: 'fas fa-comments', text: 'Tin Nhắn', page: 'messages', path: '/pages/messages.html' }
+                    { icon: 'fas fa-comments', text: 'Tin Nhắn', page: 'messages', path: '/pages/student/messages.html' }
                 ]
             },
             {
                 title: 'Nội Dung',
                 items: [
-                    { icon: 'fas fa-blog', text: 'Blog', page: 'blog', path: '/pages/blog.html' }
+                    { icon: 'fas fa-blog', text: 'Blog', page: 'blog', path: '/pages/student/blog.html' }
                 ]
             },
             {
@@ -56,13 +56,13 @@ function loadDynamicSidebar(activePage) {
             {
                 title: 'Giao Tiếp',
                 items: [
-                    { icon: 'fas fa-comments', text: 'Tin Nhắn', page: 'messages', path: 'messages.html' }
+                    { icon: 'fas fa-comments', text: 'Tin Nhắn', page: 'messages', path: 'tutor/messages.html' }
                 ]
             },
             {
                 title: 'Nội Dung',
                 items: [
-                    { icon: 'fas fa-blog', text: 'Blog', page: 'blog', path: 'blog.html' }
+                    { icon: 'fas fa-blog', text: 'Blog', page: 'blog', path: 'tutor/blog.html' }
                 ]
             },
             {

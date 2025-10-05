@@ -434,6 +434,8 @@ function contactTutor() {
     return;
   }
   
+  console.log('💬 Redirecting to messages with tutorId:', tutorId);
+  
   // Redirect to messages page with tutor ID and tutor info
   const tutorName = currentTutor?.profile?.fullName || 'Gia sư';
   const tutorAvatar = currentTutor?.profile?.avatar || currentTutor?.avatar || '';
@@ -446,23 +448,48 @@ function contactTutor() {
     role: 'tutor'
   }));
   
-  // Redirect to messages page
-  window.location.href = `messages.html?recipientId=${tutorId}`;
+  // Redirect to messages page (relative path from pages/student/)
+  window.location.href = `./messages.html?recipientId=${tutorId}`;
 }
 
-// Request tutor - redirect to tutor request page
+// Request tutor - redirect to booking request page
 function requestTutor() {
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  console.log('🔥 requestTutor() called - VERSION 2.0');
+  console.log('📍 Current location:', window.location.href);
   
-  if (!userData.id) {
+  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+  console.log('🔑 Token exists:', !!token);
+  
+  if (!token) {
+    console.error('❌ No token found');
     alert('Vui lòng đăng nhập để gửi yêu cầu');
     window.location.href = '../../index.html';
     return;
   }
   
-  // Store tutor ID for the request form
+  console.log('👨‍🏫 Current tutorId:', tutorId);
+  if (!tutorId) {
+    console.error('❌ No tutorId found');
+    alert('Không tìm thấy thông tin gia sư');
+    return;
+  }
+  
+  // Store tutor ID and tutor info for the booking form
   localStorage.setItem('selectedTutorId', tutorId);
-  window.location.href = 'tutor_request.html';
+  console.log('💾 Stored tutorId to localStorage:', tutorId);
+  
+  // Store complete tutor data for reference
+  if (currentTutor) {
+    localStorage.setItem('selectedTutorData', JSON.stringify(currentTutor));
+    console.log('� Stored tutor data:', currentTutor.profile?.fullName);
+  }
+  
+  const targetUrl = `./tutor_request.html?tutorId=${tutorId}`;
+  console.log('🚀 REDIRECTING TO:', targetUrl);
+  console.log('🔗 Full URL will be:', new URL(targetUrl, window.location.href).href);
+  
+  // Force redirect
+  window.location.href = targetUrl;
 }
 
 // Helper functions

@@ -1,4 +1,4 @@
-const { StudentProfile, TutorRequest, Course, Message, BlogPost } = require('../models');
+const { StudentProfile, TutorRequest, Course, Message, BlogPost, BookingRequest, User, TutorProfile } = require('../models');
 
 // @desc    Lấy thông tin dashboard học sinh
 // @route   GET /api/student/dashboard
@@ -7,66 +7,186 @@ const getDashboard = async (req, res) => {
   try {
     const studentId = req.user._id;
     
-    // Thống kê tổng quan
+    // Thống kê tổng quan với BookingRequest
     const [
-      totalRequests,
-      activeCourses,
-      completedCourses,
+      totalBookings,
+      activeBookings,
+      completedBookings,
+      pendingRequests,
+      totalTutors,
       unreadMessages
     ] = await Promise.all([
-      TutorRequest.countDocuments({ studentId }),
-      Course.countDocuments({ studentId, status: 'active' }),
-      Course.countDocuments({ studentId, status: 'completed' }),
+      BookingRequest.countDocuments({ student: studentId }),
+      BookingRequest.countDocuments({ student: studentId, status: 'accepted' }),
+      BookingRequest.countDocuments({ student: studentId, status: 'completed' }),
+      TutorRequest.countDocuments({ studentId, status: { $in: ['open', 'reviewing'] } }),
+      BookingRequest.distinct('tutor', { student: studentId, status: { $in: ['accepted', 'completed'] } }).then(tutors => tutors.length),
       Message.countDocuments({ receiverId: studentId, isRead: false })
     ]);
     
-    // Khóa học gần đây
-    const recentCourses = await Course.find({ studentId })
-      .sort({ updatedAt: -1 })
+    // Khóa học đang học (Booking accepted)
+    const activeCourses = await BookingRequest.find({ 
+      student: studentId, 
+      status: 'accepted' 
+    })
+      .sort({ 'schedule.startDate': -1 })
       .limit(5)
-      .populate('tutorId', 'email')
       .populate({
-        path: 'tutorId',
+        path: 'tutor',
+        select: 'email role',
         populate: {
           path: 'profile',
-          select: 'fullName avatar stats.averageRating'
+          select: 'fullName avatar phone stats'
         }
-      });
+      })
+      .lean();
     
-    // Yêu cầu gần đây
-    const recentRequests = await TutorRequest.find({ studentId })
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select('title subject level status totalApplications createdAt');
-    
-    // Tin nhắn mới
-    const recentMessages = await Message.find({ 
-      receiverId: studentId,
-      isRead: false 
+    // Khóa học gần đây (tất cả booking) - sort by most recent
+    const recentCourses = await BookingRequest.find({ 
+      student: studentId 
     })
       .sort({ createdAt: -1 })
       .limit(5)
-      .populate('senderId', 'email')
       .populate({
-        path: 'senderId',
+        path: 'tutor',
+        select: 'email role',
         populate: {
           path: 'profile',
-          select: 'fullName avatar'
+          model: 'TutorProfile',
+          select: 'fullName avatar phone stats'
         }
-      });
+      })
+      .lean();
+    
+    // Yêu cầu hoạt động (TutorRequest)
+    const activeRequests = await TutorRequest.find({ 
+      studentId,
+      status: { $in: ['open', 'in_progress'] }
+    })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('title subject level status totalApplications applications createdAt expiryDate budgetRange location')
+      .lean();
+    
+    console.log(`📋 [Student ${studentId}] Found ${activeRequests.length} active requests`);
+    
+    // Tin nhắn gần đây - lấy conversations
+    const conversations = await Message.aggregate([
+      {
+        $match: {
+          $or: [
+            { senderId: studentId },
+            { receiverId: studentId }
+          ]
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $eq: ['$senderId', studentId] },
+              '$receiverId',
+              '$senderId'
+            ]
+          },
+          lastMessage: { $first: '$$ROOT' },
+          unreadCount: {
+            $sum: {
+              $cond: [
+                { 
+                  $and: [
+                    { $eq: ['$receiverId', studentId] },
+                    { $eq: ['$isRead', false] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
+          }
+        }
+      },
+      {
+        $sort: { 'lastMessage.createdAt': -1 }
+      },
+      {
+        $limit: 5
+      }
+    ]);
+    
+    // Populate user info cho conversations
+    const recentMessages = await Promise.all(
+      conversations.map(async (conv) => {
+        const otherUser = await User.findById(conv._id)
+          .select('email role')
+          .populate('profile', 'fullName avatar')
+          .lean();
+        
+        return {
+          ...conv.lastMessage,
+          otherUser,
+          unreadCount: conv.unreadCount
+        };
+      })
+    );
     
     res.status(200).json({
       success: true,
       data: {
         stats: {
-          totalRequests,
-          activeCourses,
-          completedCourses,
+          totalBookings,
+          activeBookings,
+          completedBookings,
+          pendingRequests,
+          totalTutors,
           unreadMessages
         },
-        recentCourses,
-        recentRequests,
-        recentMessages
+        recentCourses: recentCourses.map(booking => ({
+          _id: booking._id,
+          tutorId: booking.tutor?._id,
+          tutorName: booking.tutor?.profile?.fullName || booking.tutor?.email || 'N/A',
+          tutorAvatar: booking.tutor?.profile?.avatar,
+          tutorRating: booking.tutor?.profile?.stats?.averageRating || 0,
+          subject: booking.subject?.name || booking.subject,
+          level: booking.subject?.level,
+          status: booking.status,
+          startDate: booking.schedule?.startDate,
+          endDate: booking.schedule?.endDate,
+          totalAmount: booking.pricing?.totalAmount,
+          hourlyRate: booking.pricing?.hourlyRate,
+          hoursPerSession: booking.schedule?.hoursPerSession,
+          daysPerWeek: booking.schedule?.daysPerWeek,
+          duration: booking.schedule?.duration,
+          createdAt: booking.createdAt,
+          updatedAt: booking.updatedAt
+        })),
+        activeRequests: activeRequests.map(req => ({
+          _id: req._id,
+          title: req.title,
+          subject: req.subject,
+          level: req.level,
+          status: req.status,
+          totalApplications: req.applications?.length || req.totalApplications || 0,
+          applications: req.applications || [],
+          budget: req.budgetRange || { min: 0, max: 0 },
+          location: req.location,
+          createdAt: req.createdAt,
+          expiryDate: req.expiryDate
+        })),
+        recentMessages: recentMessages.map(msg => ({
+          _id: msg._id,
+          otherUserId: msg.otherUser?._id,
+          otherUserName: msg.otherUser?.profile?.fullName || msg.otherUser?.email || 'Unknown',
+          otherUserAvatar: msg.otherUser?.profile?.avatar,
+          otherUserRole: msg.otherUser?.role,
+          content: msg.content,
+          createdAt: msg.createdAt,
+          isRead: msg.isRead,
+          unreadCount: msg.unreadCount || 0
+        }))
       }
     });
     

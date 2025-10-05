@@ -6,11 +6,12 @@
     <title>Blog - Gia Sư | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
-    <link rel="stylesheet" href="../../assets/css/blog.css">
+    <link rel="stylesheet" href="../../assets/css/blog-social.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Dashboard Layout -->
     <div class="dashboard">
         <!-- Sidebar -->
         <aside class="dashboard-sidebar" id="dashboardSidebar">
@@ -28,23 +29,23 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
                     <div class="menu-item" data-page="dashboard">
-                        <i class="fas fa-home"></i>
+                        <img src="../../assets/images/dashboard-tutor/dashboard.png" alt="dashboard">
                         <span>Dashboard</span>
                     </div>
                     <div class="menu-item" data-page="students">
-                        <i class="fas fa-users"></i>
+                        <img src="../../assets/images/dashboard-tutor/students.png" alt="students">
                         <span>Học Sinh</span>
                     </div>
                     <div class="menu-item" data-page="requests">
-                        <i class="fas fa-clipboard-list"></i>
+                        <img src="../../assets/images/dashboard-tutor/requests.png" alt="requests">
                         <span>Yêu Cầu Mới</span>
                     </div>
                     <div class="menu-item" data-page="schedule">
-                        <i class="fas fa-calendar-alt"></i>
+                        <img src="../../assets/images/dashboard-tutor/schedule.png" alt="schedule">
                         <span>Lịch Dạy</span>
                     </div>
                     <div class="menu-item" data-page="income">
-                        <i class="fas fa-chart-line"></i>
+                        <img src="../../assets/images/dashboard-tutor/income.png" alt="income">
                         <span>Thu Nhập</span>
                     </div>
                 </div>
@@ -52,7 +53,7 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Giao Tiếp</div>
                     <div class="menu-item" data-page="messages">
-                        <i class="fas fa-comments"></i>
+                        <img src="../../assets/images/dashboard-tutor/messages.png" alt="messages">
                         <span>Tin Nhắn</span>
                     </div>
                 </div>
@@ -60,7 +61,7 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
                     <div class="menu-item active" data-page="blog">
-                        <i class="fas fa-blog"></i>
+                        <img src="../../assets/images/dashboard-tutor/blog.png" alt="blog">
                         <span>Blog</span>
                     </div>
                 </div>
@@ -68,15 +69,15 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Cài Đặt</div>
                     <div class="menu-item" data-page="profile">
-                        <i class="fas fa-user"></i>
+                        <img src="../../assets/images/dashboard-tutor/profile.png" alt="profile">
                         <span>Hồ Sơ</span>
                     </div>
                     <div class="menu-item" data-page="settings">
-                        <i class="fas fa-cog"></i>
+                        <img src="../../assets/images/dashboard-tutor/settings.png" alt="settings">
                         <span>Cài Đặt</span>
                     </div>
                     <div class="menu-item" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <img src="../../assets/images/dashboard-tutor/log-out.png" alt="logout">
                         <span>Đăng Xuất</span>
                     </div>
                 </div>
@@ -85,137 +86,224 @@
 
         <!-- Main Content -->
         <main class="dashboard-main">
-            <!-- Header -->
-            <header class="dashboard-header">
-                <div class="header-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="page-title">
-                        <h1>Blog</h1>
-                        <p id="currentDate"></p>
+            <!-- Blog Container -->
+            <div class="blog-container">
+                <!-- Main Feed -->
+                <div class="blog-main">
+                    <!-- Create Post Card -->
+                    <div class="create-post-card">
+                        <div class="create-post-header">
+                            <div class="create-post-avatar">
+                                <img src="https://ui-avatars.com/api/?name=User&background=667eea&color=fff&size=200" alt="Your avatar">
+                            </div>
+                            <div class="create-post-input" id="createPostInput">
+                                Chia sẻ kinh nghiệm giảng dạy của bạn...
+                            </div>
+                        </div>
+                        <div class="create-post-actions">
+                            <button class="create-post-btn photo" id="createPhotoBtn">
+                                <i class="fas fa-image"></i>
+                                <span>Ảnh</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="blog-filters">
+                        <span class="filter-label">Lọc:</span>
+                        <button class="filter-btn active" data-filter="all">Tất cả</button>
+                        <button class="filter-btn" data-filter="education">Giáo dục</button>
+                        <button class="filter-btn" data-filter="experience">Kinh nghiệm</button>
+                        <button class="filter-btn" data-filter="tips">Mẹo hay</button>
+                        <button class="filter-btn" data-filter="announcement">Thông báo</button>
+                        <button class="filter-btn" data-filter="general">Chung</button>
+                    </div>
+
+                    <!-- Blog Feed -->
+                    <div id="blogFeed">
+                        <!-- Posts will be loaded here dynamically -->
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="createNewPost()">
-                        <i class="fas fa-plus"></i>
-                        Viết Bài
-                    </button>
-                    <button class="notification-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge" id="notificationBadge">0</span>
-                    </button>
-                    <button class="user-menu-btn">
-                        <img src="https://ui-avatars.com/api/?name=User&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
-                    </button>
-                </div>
-            </header>
+                <!-- Sidebar -->
+                <aside class="blog-sidebar">
+                    <!-- User Menu -->
+                    <div class="sidebar-card">
+                        <h3 class="sidebar-card-title">Menu</h3>
+                        <ul class="sidebar-menu">
+                            <li class="sidebar-menu-item active">
+                                <i class="fas fa-home"></i>
+                                <span>Bảng tin</span>
+                            </li>
+                            <li class="sidebar-menu-item">
+                                <i class="fas fa-user-friends"></i>
+                                <span>Bài viết của tôi</span>
+                            </li>
+                            <li class="sidebar-menu-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Bài viết chờ duyệt</span>
+                            </li>
+                            <li class="sidebar-menu-item">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Đã lưu</span>
+                            </li>
+                        </ul>
+                    </div>
 
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Blog filters -->
-                <div class="blog-filters">
-                    <div class="filter-group">
-                        <button class="filter-btn active" data-filter="all">
-                            <i class="fas fa-th"></i>
-                            Tất Cả
-                        </button>
-                        <button class="filter-btn" data-filter="education">
-                            <i class="fas fa-graduation-cap"></i>
-                            Giáo Dục
-                        </button>
-                        <button class="filter-btn" data-filter="tips">
-                            <i class="fas fa-lightbulb"></i>
-                            Mẹo Học Tập
-                        </button>
-                        <button class="filter-btn" data-filter="news">
-                            <i class="fas fa-newspaper"></i>
-                            Tin Tức
-                        </button>
-                        <button class="filter-btn" data-filter="experience">
-                            <i class="fas fa-star"></i>
-                            Kinh Nghiệm
-                        </button>
+                    <!-- Trending Tags -->
+                    <div class="sidebar-card">
+                        <h3 class="sidebar-card-title">Thẻ phổ biến</h3>
+                        <div class="trending-tags">
+                            <div class="trending-tag">
+                                <span>#GiảngDạy</span>
+                                <span class="trending-tag-count">156</span>
+                            </div>
+                            <div class="trending-tag">
+                                <span>#KinhNghiệm</span>
+                                <span class="trending-tag-count">98</span>
+                            </div>
+                            <div class="trending-tag">
+                                <span>#PhươngPhápHọc</span>
+                                <span class="trending-tag-count">73</span>
+                            </div>
+                            <div class="trending-tag">
+                                <span>#MẹoGiảngDạy</span>
+                                <span class="trending-tag-count">52</span>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Tìm kiếm bài viết...">
-                        <i class="fas fa-search"></i>
-                    </div>
-                </div>
-
-                <!-- Blog posts -->
-                <div id="blogPostsContainer">
-                    <div class="loading-spinner">
-                        <div class="spinner"></div>
-                        <p>Đang tải bài viết...</p>
-                    </div>
-                </div>
+                </aside>
             </div>
         </main>
     </div>
 
-    <!-- Create Post Modal -->
-    <div class="modal" id="createPostModal">
-        <div class="modal-overlay" onclick="closeCreatePostModal()"></div>
-        <div class="modal-content modal-large">
+    <!-- Create Post Modal - Facebook Style -->
+    <div class="create-post-modal" id="createPostModal">
+        <div class="create-post-modal-content">
+            <!-- Modal Header -->
             <div class="modal-header">
-                <h3>Viết Bài Mới</h3>
-                <button class="modal-close" onclick="closeCreatePostModal()">
+                <h3 class="modal-title">Tạo bài viết</h3>
+                <button class="modal-close-btn" id="closeModalBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body">
-                <form id="createPostForm">
-                    <div class="form-group">
-                        <label>Tiêu đề <span class="required">*</span></label>
-                        <input type="text" name="title" required placeholder="Nhập tiêu đề bài viết...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Danh mục <span class="required">*</span></label>
-                        <select name="category" required>
-                            <option value="">-- Chọn danh mục --</option>
-                            <option value="education">Giáo Dục</option>
-                            <option value="tips">Mẹo Học Tập</option>
-                            <option value="news">Tin Tức</option>
-                            <option value="experience">Kinh Nghiệm</option>
+            
+            <!-- User Info -->
+            <div class="modal-user-info">
+                <div class="modal-user-avatar">
+                    <img id="modalUserAvatar" src="https://ui-avatars.com/api/?name=User&background=667eea&color=fff&size=200" alt="Avatar">
+                </div>
+                <div class="modal-user-details">
+                    <div class="modal-user-name" id="modalUserName">Đang tải...</div>
+                    <div class="modal-post-privacy">
+                        <select id="postPrivacy" class="privacy-select">
+                            <option value="public">🌐 Công khai</option>
+                            <option value="friends">👥 Bạn bè</option>
+                            <option value="private">🔒 Chỉ mình tôi</option>
                         </select>
                     </div>
-                    
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="createPostForm">
+                    <!-- Content Textarea -->
                     <div class="form-group">
-                        <label>Tóm tắt</label>
-                        <textarea name="summary" rows="3" placeholder="Tóm tắt ngắn về bài viết..."></textarea>
+                        <textarea id="postContent" class="post-content-input" placeholder="Chia sẻ kinh nghiệm giảng dạy của bạn..." required></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Nội dung <span class="required">*</span></label>
-                        <textarea name="content" rows="10" required placeholder="Nội dung bài viết..."></textarea>
+
+                    <!-- Title (Optional) -->
+                    <div class="form-group collapsible" id="titleGroup" style="display: none;">
+                        <input type="text" id="postTitle" class="post-title-input" placeholder="📝 Thêm tiêu đề cho bài viết...">
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Tags</label>
-                        <input type="text" name="tags" placeholder="Thêm tags, cách nhau bằng dấu phẩy">
-                        <small>VD: học tập, giáo dục, kinh nghiệm</small>
+
+                    <!-- Image Preview -->
+                    <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
+                        <div id="imagePreviewGrid" class="image-preview-grid"></div>
                     </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                            Đăng Bài
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="closeCreatePostModal()">
-                            Hủy
-                        </button>
+
+                    <!-- Tags Display -->
+                    <div id="tagsDisplay" class="tags-display" style="display: none;"></div>
+
+                    <!-- Add to Post Section -->
+                    <div class="add-to-post">
+                        <span class="add-to-post-label">Thêm vào bài viết</span>
+                        <div class="add-to-post-actions">
+                            <button type="button" class="add-btn" id="addPhotoBtn" title="Ảnh/Video">
+                                <i class="fas fa-images" style="color: #45bd62;"></i>
+                            </button>
+                            <button type="button" class="add-btn" id="addTitleBtn" title="Tiêu đề">
+                                <i class="fas fa-heading" style="color: #f3425f;"></i>
+                            </button>
+                            <button type="button" class="add-btn" id="addTagBtn" title="Thẻ tag">
+                                <i class="fas fa-hashtag" style="color: #f7b928;"></i>
+                            </button>
+                            <button type="button" class="add-btn" id="addEmojiBtn" title="Cảm xúc">
+                                <i class="fas fa-smile" style="color: #f7b928;"></i>
+                            </button>
+                            <button type="button" class="add-btn" id="addLocationBtn" title="Vị trí">
+                                <i class="fas fa-map-marker-alt" style="color: #e0245e;"></i>
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Category & Type (Hidden until needed) -->
+                    <div class="form-group" style="display: none;">
+                        <select id="postCategory">
+                            <option value="general">Chung</option>
+                            <option value="education">Giáo dục</option>
+                            <option value="experience">Kinh nghiệm</option>
+                            <option value="tips">Mẹo hay</option>
+                            <option value="announcement">Thông báo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="display: none;">
+                        <select id="postType">
+                            <option value="status">Trạng thái</option>
+                            <option value="article">Bài viết</option>
+                            <option value="photo">Ảnh</option>
+                        </select>
+                    </div>
+
+                    <!-- Hidden file input -->
+                    <input type="file" id="postImagesInput" accept="image/*" multiple style="display: none;">
                 </form>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn-post" id="submitPostBtn" disabled>
+                    <i class="fas fa-paper-plane"></i> Đăng bài
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Tag Input Modal -->
+    <div class="tag-modal" id="tagModal" style="display: none;">
+        <div class="tag-modal-content">
+            <div class="tag-modal-header">
+                <h4>Thêm thẻ tag</h4>
+                <button class="modal-close-btn" onclick="closeTagModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tag-modal-body">
+                <input type="text" id="tagInput" placeholder="Nhập tag và nhấn Enter..." class="tag-input">
+                <div id="tagsList" class="tags-list"></div>
+            </div>
+            <div class="tag-modal-footer">
+                <button class="btn-secondary" onclick="closeTagModal()">Xong</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../../assets/js/dashboard-common.js"></script>
-    <script src="../../assets/js/blog.js"></script>
+    <script src="../../assets/js/blog-social.js"></script>
 </body>
 </html>

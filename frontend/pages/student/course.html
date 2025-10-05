@@ -6,7 +6,8 @@
     <title>Khóa Học - Học Sinh | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/student-courses.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -27,19 +28,20 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
                     <div class="menu-item" data-page="dashboard">
-                        <i class="fas fa-home"></i>
+                        <img src="../../assets/images/dashboard-student/dashboard.png" alt="home">
                         <span>Dashboard</span>
                     </div>
                     <div class="menu-item active" data-page="courses">
-                        <i class="fas fa-book"></i>
+                        <img src="../../assets/images/dashboard-student/courses.png" alt="courses">
                         <span>Khóa Học</span>
+                        <span class="badge" id="coursesCount">0</span>
                     </div>
                     <div class="menu-item" data-page="requests">
-                        <i class="fas fa-paper-plane"></i>
+                        <img src="../../assets/images/dashboard-student/requests.png" alt="requests">
                         <span>Yêu Cầu Gia Sư</span>
                     </div>
                     <div class="menu-item" data-page="find-tutor">
-                        <i class="fas fa-search"></i>
+                        <img src="../../assets/images/dashboard-student/find-tutor.png" alt="find-tutor">
                         <span>Tìm Gia Sư</span>
                     </div>
                 </div>
@@ -47,31 +49,32 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Giao Tiếp</div>
                     <div class="menu-item" data-page="messages">
-                        <i class="fas fa-comments"></i>
+                        <img src="../../assets/images/dashboard-student/messages.png" alt="messages">
                         <span>Tin Nhắn</span>
+                        <span class="badge" id="messagesCount">0</span>
                     </div>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
-                    <div class="menu-item" data-page="blog">
-                        <i class="fas fa-blog"></i>
+                    <a href="./blog.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-student/blog.png" alt="blog">
                         <span>Blog</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Cài Đặt</div>
                     <div class="menu-item" data-page="profile">
-                        <i class="fas fa-user"></i>
+                        <img src="../../assets/images/dashboard-student/profile.png" alt="profile">
                         <span>Hồ Sơ</span>
                     </div>
                     <div class="menu-item" data-page="settings">
-                        <i class="fas fa-cog"></i>
+                        <img src="../../assets/images/dashboard-student/settings.png" alt="settings">
                         <span>Cài Đặt</span>
                     </div>
                     <div class="menu-item" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <img src="../../assets/images/dashboard-student/log-out.png" alt="logout">
                         <span>Đăng Xuất</span>
                     </div>
                 </div>
@@ -86,7 +89,7 @@
                     <button class="menu-toggle" id="menuToggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <div class="page-title">
+                    <div class="page-title" style="color: black;">
                         <h1>Khóa Học Của Tôi</h1>
                         <p id="currentDate"></p>
                     </div>
@@ -113,15 +116,69 @@
                     <div class="section-header">
                         <h2 class="section-title">
                             <i class="fas fa-book"></i>
-                            Tất Cả Khóa Học
+                            Khóa Học Của Tôi
                         </h2>
+                        <div class="header-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Tổng khóa học</span>
+                                <span class="stat-value" id="totalCourses">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Đang học</span>
+                                <span class="stat-value ongoing" id="ongoingCourses">0</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="coursesContainer">
-                        <div class="empty-state">
-                            <i class="fas fa-book-open"></i>
-                            <h3>Chưa có khóa học</h3>
-                            <p>Bạn chưa tham gia khóa học nào. Hãy tìm gia sư phù hợp!</p>
+                    <!-- Course Tabs -->
+                    <div class="course-tabs">
+                        <button class="course-tab active" data-tab="upcoming">
+                            <i class="fas fa-clock"></i>
+                            Sắp Tới
+                            <span id="countUpcoming">0</span>
+                        </button>
+                        <button class="course-tab" data-tab="ongoing">
+                            <i class="fas fa-play-circle"></i>
+                            Đang Học
+                            <span id="countOngoing">0</span>
+                        </button>
+                        <button class="course-tab" data-tab="completed">
+                            <i class="fas fa-check-circle"></i>
+                            Đã Kết Thúc
+                            <span id="countCompleted">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Course Content Panels -->
+                    <div class="course-content">
+                        <!-- Upcoming Panel -->
+                        <div class="course-panel active" id="upcomingPanel">
+                            <div id="upcomingContainer" class="courses-grid">
+                                <div class="loading-state">
+                                    <div class="spinner"></div>
+                                    <p>Đang tải khóa học...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ongoing Panel -->
+                        <div class="course-panel" id="ongoingPanel">
+                            <div id="ongoingContainer" class="courses-grid">
+                                <div class="loading-state">
+                                    <div class="spinner"></div>
+                                    <p>Đang tải khóa học...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Completed Panel -->
+                        <div class="course-panel" id="completedPanel">
+                            <div id="completedContainer" class="courses-grid">
+                                <div class="loading-state">
+                                    <div class="spinner"></div>
+                                    <p>Đang tải khóa học...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -130,7 +187,9 @@
     </div>
 
     <!-- Scripts -->
+    <script src="../../assets/js/token-manager.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/student-courses.js"></script>
 </body>
 </html>

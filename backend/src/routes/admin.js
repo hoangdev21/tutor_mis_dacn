@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+  getProfile,
   getDashboard,
   getUsers,
   getUserById,
@@ -7,7 +8,14 @@ const {
   toggleUserStatus,
   getBlogPosts,
   moderateBlogPost,
-  getFinanceStats
+  updateBlogPost,
+  deleteBlogPost,
+  getFinanceStats,
+  getCourses,
+  getCourseById,
+  updateCourse,
+  deleteCourse,
+  getCourseStats
 } = require('../controllers/adminController');
 const {
   authenticateToken,
@@ -22,6 +30,22 @@ const router = express.Router();
 router.use(authenticateToken);
 router.use(authorizeRoles('admin'));
 router.use(adminLimiter);
+
+/**
+ * @swagger
+ * /admin/profile:
+ *   get:
+ *     summary: Lấy thông tin profile admin
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thông tin profile admin
+ *       404:
+ *         description: Không tìm thấy profile
+ */
+router.get('/profile', getProfile);
 
 /**
  * @swagger
@@ -537,6 +561,8 @@ router.get('/content/blogs', authorizeAdminPermission('manageContent'), getBlogP
  *               $ref: '#/components/schemas/Error'
  */
 router.put('/content/blogs/:postId/moderate', authorizeAdminPermission('manageContent'), moderateBlogPost);
+router.put('/content/blogs/:postId', authorizeAdminPermission('manageContent'), updateBlogPost);
+router.delete('/content/blogs/:postId', authorizeAdminPermission('manageContent'), deleteBlogPost);
 
 /**
  * @swagger
@@ -637,5 +663,128 @@ router.put('/content/blogs/:postId/moderate', authorizeAdminPermission('manageCo
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/finance', authorizeAdminPermission('manageFinance'), getFinanceStats);
+
+// ===== COURSE MANAGEMENT ROUTES =====
+
+/**
+ * @swagger
+ * /admin/courses/stats:
+ *   get:
+ *     summary: Lấy thống kê khóa học
+ *     tags: [Admin - Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thống kê khóa học
+ */
+router.get('/courses/stats', authorizeAdminPermission('manageUsers'), getCourseStats);
+
+/**
+ * @swagger
+ * /admin/courses:
+ *   get:
+ *     summary: Lấy danh sách khóa học với pagination và filters
+ *     tags: [Admin - Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, active, paused, completed, cancelled]
+ *       - in: query
+ *         name: subject
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: level
+ *         schema:
+ *           type: string
+ *           enum: [elementary, middle_school, high_school, university]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Danh sách khóa học
+ */
+router.get('/courses', authorizeAdminPermission('manageUsers'), getCourses);
+
+/**
+ * @swagger
+ * /admin/courses/{id}:
+ *   get:
+ *     summary: Lấy thông tin chi tiết khóa học
+ *     tags: [Admin - Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Thông tin chi tiết khóa học
+ *   put:
+ *     summary: Cập nhật khóa học
+ *     tags: [Admin - Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, active, paused, completed, cancelled]
+ *               notes:
+ *                 type: string
+ *               cancellationReason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ *   delete:
+ *     summary: Xóa khóa học
+ *     tags: [Admin - Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Xóa thành công
+ */
+router.get('/courses/:id', authorizeAdminPermission('manageUsers'), getCourseById);
+router.put('/courses/:id', authorizeAdminPermission('manageUsers'), updateCourse);
+router.delete('/courses/:id', authorizeAdminPermission('manageUsers'), deleteCourse);
 
 module.exports = router;

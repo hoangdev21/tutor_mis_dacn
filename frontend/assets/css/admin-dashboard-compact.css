@@ -1,0 +1,325 @@
+/* ===== ADMIN DASHBOARD COMPACT STYLES ===== */
+/* Optimize for 100% zoom display */
+
+/* Reduce overall padding and margins */
+.dashboard-content {
+  padding: 16px;
+}
+
+.dashboard-header {
+  padding: 12px 20px;
+  min-height: 60px;
+}
+
+.page-title h1 {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.page-title p {
+  font-size: 12px;
+}
+
+/* Compact stat cards */
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px !important;
+  margin-bottom: 20px !important;
+}
+
+.stat-card {
+  padding: 16px !important;
+}
+
+.stat-card .stat-icon {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.stat-card .stat-icon img {
+  height: 40px !important;
+  width: auto !important;
+}
+
+.stat-card h3 {
+  font-size: 26px !important;
+  margin-bottom: 4px !important;
+}
+
+.stat-card p {
+  font-size: 13px !important;
+  margin-bottom: 6px !important;
+}
+
+.stat-card .stat-change {
+  font-size: 11px !important;
+}
+
+/* Content sections */
+.content-section {
+  padding: 16px !important;
+  margin-bottom: 20px !important;
+}
+
+.section-header {
+  margin-bottom: 12px !important;
+}
+
+.section-title {
+  font-size: 16px !important;
+}
+
+.section-title i {
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+/* Charts */
+.chart-container {
+  height: 280px !important;
+}
+
+/* Tables */
+.data-table {
+  font-size: 13px;
+}
+
+.data-table th {
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.data-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.table-user {
+  gap: 10px;
+}
+
+.table-avatar {
+  width: 35px;
+  height: 35px;
+}
+
+.table-user-info h4 {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.table-user-info p {
+  font-size: 11px;
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+}
+
+.action-btn i {
+  font-size: 12px;
+}
+
+.action-buttons {
+  gap: 6px;
+}
+
+.action-buttons .action-btn {
+  padding: 6px 10px !important;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* Empty state */
+.empty-state {
+  padding: 30px 20px;
+}
+
+.empty-state i {
+  font-size: 40px;
+}
+
+.empty-state h3 {
+  font-size: 15px;
+  margin: 12px 0 6px 0;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+/* Modal adjustments */
+.modal-container {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+}
+
+.modal-body {
+  font-size: 14px;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+/* Info items in modals */
+.info-item {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.info-item strong {
+  font-size: 13px;
+}
+
+/* Sidebar compact */
+.dashboard-sidebar {
+  width: 240px;
+}
+
+.sidebar-brand {
+  font-size: 20px;
+  padding: 15px 20px;
+}
+
+.menu-item {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.menu-item i {
+  font-size: 16px;
+  width: 20px;
+}
+
+.menu-section-title {
+  font-size: 11px;
+  padding: 10px 20px 6px 20px;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 1400px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .chart-container {
+    height: 250px !important;
+  }
+  
+  /* Stack charts vertically */
+  .dashboard-content > div[style*="grid-template-columns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  /* Stack two-column sections */
+  .dashboard-content > div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .table-user {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Better spacing for activity items */
+.activity-item {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.activity-item:hover {
+  background: #f9fafb;
+}
+
+.activity-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-icon i {
+  font-size: 14px;
+}
+
+.activity-content p {
+  margin: 0 0 4px 0;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.activity-content small {
+  color: #999;
+  font-size: 11px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Print optimization */
+@media print {
+  .dashboard-sidebar,
+  .dashboard-header,
+  .action-buttons,
+  .section-actions {
+    display: none !important;
+  }
+  
+  .dashboard-main {
+    margin-left: 0 !important;
+  }
+  
+  .content-section {
+    page-break-inside: avoid;
+  }
+}

@@ -30,15 +30,28 @@ const initializeSocket = (io) => {
   // Apply authentication middleware
   io.use(authenticateSocket);
 
-  io.on('connection', (socket) => {
+  io.on('connection', async (socket) => {
     const userId = socket.userId;
     console.log(`✅ User connected: ${userId} (Socket: ${socket.id})`);
 
     // Add user to online users
     onlineUsers.set(userId, socket.id);
 
+    // Update lastSeen in database to current time (user is now online)
+    try {
+      await User.findByIdAndUpdate(userId, { 
+        lastSeen: new Date(),
+        lastLogin: new Date()
+      });
+    } catch (error) {
+      console.error('Error updating user lastSeen on connect:', error);
+    }
+
     // Broadcast user online status to all clients
-    io.emit('user_online', { userId });
+    io.emit('user_online', { 
+      userId,
+      lastSeen: new Date()
+    });
 
     // Join user's personal room
     socket.join(`user:${userId}`);
@@ -218,14 +231,33 @@ const initializeSocket = (io) => {
     });
 
     // Handle disconnect
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
+      // Check if userId exists (socket might disconnect before authentication completes)
+      if (!userId) {
+        console.log(`❌ Socket disconnected before authentication: ${socket.id}`);
+        return;
+      }
+      
       console.log(`❌ User disconnected: ${userId} (Socket: ${socket.id})`);
       
       // Remove from online users
       onlineUsers.delete(userId);
 
-      // Broadcast user offline status
-      io.emit('user_offline', { userId });
+      // Update lastSeen in database to current time (user just went offline)
+      const lastSeenTime = new Date();
+      try {
+        await User.findByIdAndUpdate(userId, { 
+          lastSeen: lastSeenTime
+        });
+      } catch (error) {
+        console.error('Error updating user lastSeen on disconnect:', error);
+      }
+
+      // Broadcast user offline status with lastSeen time
+      io.emit('user_offline', { 
+        userId,
+        lastSeen: lastSeenTime
+      });
     });
 
     // Handle errors

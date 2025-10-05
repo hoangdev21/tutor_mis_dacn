@@ -2,7 +2,8 @@
 
 // Check authentication
 function checkAuth() {
-  const token = localStorage.getItem('accessToken');
+  // Support both 'token' and 'accessToken' for backward compatibility
+  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
   const userData = localStorage.getItem('userData');
 
   if (!token || !userData) {
@@ -46,8 +47,8 @@ document.querySelectorAll('.menu-item[data-page]').forEach(item => {
         courses: '/pages/student/course.html',
         requests: '/pages/student/tutor_request.html',
         'find-tutor': '/pages/student/find_tutor.html',
-        messages: '/pages/messages.html',
-        blog: '/pages/blog.html',
+        messages: '/pages/student/messages.html',
+        blog: '/pages/student/blog.html',
         profile: '/pages/student/profile_student.html',
         settings: '/pages/setting.html'
       },
@@ -57,8 +58,8 @@ document.querySelectorAll('.menu-item[data-page]').forEach(item => {
         requests: '/pages/tutor/new_request.html',
         schedule: '/pages/tutor/schedule.html',
         income: '/pages/tutor/income.html',
-        messages: '/pages/messages.html',
-        blog: '/pages/blog.html',
+        messages: '/pages/tutor/messages.html',
+        blog: '/pages/tutor/blog.html',
         profile: '/pages/tutor/profile_tutor.html',
         settings: '/pages/setting.html'
       },
@@ -121,9 +122,10 @@ async function updateUserAvatar() {
       
       if (role) {
         // Fetch fresh profile data
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         const response = await fetch(`http://localhost:5000/api/${role}/profile`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            'Authorization': `Bearer ${token}`
           }
         });
         
@@ -195,7 +197,8 @@ async function logout() {
   } catch (error) {
     console.error('Logout error:', error);
   } finally {
-    // Clear local storage
+    // Clear local storage - remove both token keys for backward compatibility
+    localStorage.removeItem('token');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('userProfile');
@@ -475,7 +478,7 @@ async function toggleUserStatus(userId, currentStatus) {
 
 // Close sidebar on mobile when clicking outside
 document.addEventListener('click', (e) => {
-  if (window.innerWidth <= 1024) {
+  if (window.innerWidth <= 1024 && dashboardSidebar && menuToggle) {
     if (!dashboardSidebar.contains(e.target) && 
         !menuToggle.contains(e.target) && 
         dashboardSidebar.classList.contains('active')) {

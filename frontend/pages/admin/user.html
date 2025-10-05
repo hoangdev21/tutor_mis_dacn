@@ -6,6 +6,7 @@
     <title>Quản Lý Người Dùng - Admin | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/auth.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -27,19 +28,21 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
                     <div class="menu-item" data-page="dashboard">
-                        <i class="fas fa-chart-line"></i>
+                        <img src="../../assets/images/dashboard-admin/dashboard.png" alt="Dashboard">
                         <span>Dashboard</span>
                     </div>
                     <div class="menu-item active" data-page="users">
-                        <i class="fas fa-users"></i>
+                        <img src="../../assets/images/dashboard-admin/users.png" alt="users">
                         <span>Người Dùng</span>
+                        <span class="badge" id="usersCount">0</span>
                     </div>
                     <div class="menu-item" data-page="tutors">
-                        <i class="fas fa-user-graduate"></i>
+                        <img src="../../assets/images/dashboard-admin/tutors.png" alt="tutors">
                         <span>Duyệt Gia Sư</span>
+                        <span class="badge" id="pendingTutorsCount">0</span>
                     </div>
                     <div class="menu-item" data-page="courses">
-                        <i class="fas fa-book"></i>
+                        <img src="../../assets/images/dashboard-admin/courses.png" alt="courses">
                         <span>Khóa Học</span>
                     </div>
                 </div>
@@ -47,11 +50,12 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
                     <div class="menu-item" data-page="blog">
-                        <i class="fas fa-blog"></i>
+                        <img src="../../assets/images/dashboard-admin/blog.png" alt="blog">
                         <span>Quản Lý Blog</span>
+                        <span class="badge" id="pendingBlogsCount">0</span>
                     </div>
                     <div class="menu-item" data-page="reports">
-                        <i class="fas fa-flag"></i>
+                        <img src="../../assets/images/dashboard-admin/reports.png" alt="reports">
                         <span>Báo Cáo</span>
                     </div>
                 </div>
@@ -59,11 +63,11 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Tài Chính</div>
                     <div class="menu-item" data-page="finance">
-                        <i class="fas fa-dollar-sign"></i>
+                        <img src="../../assets/images/dashboard-admin/finance.png" alt="finance">
                         <span>Thống Kê Tài Chính</span>
                     </div>
                     <div class="menu-item" data-page="transactions">
-                        <i class="fas fa-exchange-alt"></i>
+                        <img src="../../assets/images/dashboard-admin/transactions.png" alt="transactions">
                         <span>Giao Dịch</span>
                     </div>
                 </div>
@@ -71,15 +75,15 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Hệ Thống</div>
                     <div class="menu-item" data-page="settings">
-                        <i class="fas fa-cog"></i>
+                        <img src="../../assets/images/dashboard-admin/settings.png" alt="settings">
                         <span>Cài Đặt</span>
                     </div>
                     <div class="menu-item" data-page="logs">
-                        <i class="fas fa-file-alt"></i>
+                        <img src="../../assets/images/dashboard-admin/logs.png" alt="logs">
                         <span>Logs</span>
                     </div>
                     <div class="menu-item" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <img src="../../assets/images/dashboard-admin/logout.png" alt="logout">
                         <span>Đăng Xuất</span>
                     </div>
                 </div>
@@ -117,6 +121,72 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
+                <!-- Stats Summary -->
+                <div id="usersStats" class="stats-container">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="content-section">
+                    <div class="filters-bar">
+                        <div class="filters-group">
+                            <div class="filter-item">
+                                <label for="searchInput">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </label>
+                                <input type="text" 
+                                       id="searchInput" 
+                                       class="filter-input" 
+                                       placeholder="Tìm theo tên, email...">
+                            </div>
+
+                            <div class="filter-item">
+                                <label for="roleFilter">
+                                    <i class="fas fa-user-tag"></i> Vai trò
+                                </label>
+                                <select id="roleFilter" class="filter-select">
+                                    <option value="">Tất cả vai trò</option>
+                                    <option value="student">Học sinh</option>
+                                    <option value="tutor">Gia sư</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-item">
+                                <label for="statusFilter">
+                                    <i class="fas fa-toggle-on"></i> Trạng thái
+                                </label>
+                                <select id="statusFilter" class="filter-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="active">Hoạt động</option>
+                                    <option value="inactive">Vô hiệu hóa</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-item">
+                                <label for="approvalFilter">
+                                    <i class="fas fa-check-circle"></i> Duyệt
+                                </label>
+                                <select id="approvalFilter" class="filter-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="pending">Chờ duyệt</option>
+                                    <option value="approved">Đã duyệt</option>
+                                    <option value="rejected">Từ chối</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-item">
+                                <button id="resetFilters" class="btn btn-secondary">
+                                    <i class="fas fa-redo"></i> Đặt lại
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
                 <div class="content-section">
                     <div class="section-header">
                         <h2 class="section-title">
@@ -125,19 +195,430 @@
                         </h2>
                     </div>
 
-                    <div id="recentUsersContainer">
+                    <div id="usersContainer">
                         <div class="loading-spinner">
                             <div class="spinner"></div>
                         </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="paginationContainer" class="pagination-wrapper">
+                        <!-- Pagination will be generated here -->
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- Styles for new components -->
+    <style>
+        .filters-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .filters-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-item label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-item label i {
+            color: #667eea;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .pagination-wrapper {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .pagination-btn {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+        }
+
+        .pagination-btn:hover:not(.disabled):not(.active) {
+            background: #f5f5f5;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-ellipsis {
+            padding: 0 8px;
+            color: #999;
+        }
+
+        .pagination-info {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stats-container {
+            margin-bottom: 20px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .stat-icon.info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .stat-content h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .stat-content p {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0 0;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .modal-close:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-footer .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .user-detail-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .user-detail-avatar img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-detail-info h2 {
+            margin: 0 0 5px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .user-detail-info p {
+            margin: 0 0 10px;
+            color: #666;
+        }
+
+        .user-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge.primary {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .user-detail-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 15px;
+            font-size: 16px;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-item strong {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .detail-item span {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .subjects-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .subject-badge {
+            padding: 8px 16px;
+            background: #e8f4f8;
+            color: #0066cc;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .filters-group {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .user-detail-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
     <!-- Scripts -->
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
-    <script src="../../assets/js/admin-dashboard.js"></script>
+    <script src="../../assets/js/admin-users.js"></script>
 </body>
 </html>

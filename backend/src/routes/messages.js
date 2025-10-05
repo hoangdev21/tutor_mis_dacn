@@ -5,7 +5,9 @@ const {
   sendMessage,
   markAsRead,
   searchUsers,
-  createConversation
+  createConversation,
+  getUserStatus,
+  getUsersStatus
 } = require('../controllers/messageController');
 const { authenticateToken } = require('../middleware/auth');
 
@@ -19,6 +21,16 @@ router.use(authenticateToken);
 // @access  Private
 // NOTE: Must be before /:conversationId to avoid route conflict
 router.get('/search/users', searchUsers);
+
+// @route   GET /api/messages/user-status/:userId
+// @desc    Get user online status and lastSeen
+// @access  Private
+router.get('/user-status/:userId', getUserStatus);
+
+// @route   POST /api/messages/users-status
+// @desc    Get multiple users status (batch request)
+// @access  Private
+router.post('/users-status', getUsersStatus);
 
 // @route   GET /api/messages/conversations
 // @desc    Get all conversations for logged in user

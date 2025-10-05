@@ -164,7 +164,7 @@ function renderTutorCard(tutor) {
     
     return `
         <div class="tutor-card">
-            <div class="tutor-card-header">
+            <div class="tutor-card-header" style="background: linear-gradient(135deg, #64c0e1ff 0%, #ae5780ff 100%); position: relative;">
                 <img src="${avatarUrl}" 
                      alt="${profile.fullName || 'Tutor'}" 
                      class="tutor-avatar"
@@ -205,13 +205,13 @@ function renderTutorCard(tutor) {
                     <span class="price-value">${formatCurrency(hourlyRate)}/giờ</span>
                 </div>
             </div>
-            
+
             <div class="tutor-card-footer">
                 <button class="btn btn-outline" onclick="viewTutorProfile('${tutor._id}')">
                     <i class="fas fa-eye"></i>
                     Xem Hồ Sơ
                 </button>
-                <button class="btn btn-primary" onclick="sendMessage('${tutor._id}')">
+                <button class="btn btn-primary" onclick="sendMessage('${tutor._id}')" style="background: linear-gradient(135deg, #3a9286ff 0%, #4ebd62ff 100%);">
                     <i class="fas fa-comment"></i>
                     Nhắn Tin
                 </button>
@@ -385,7 +385,7 @@ function viewTutorProfile(tutorId) {
 
 // Send message
 function sendMessage(tutorId) {
-    window.location.href = `../messages.html?recipientId=${tutorId}`;
+    window.location.href = `messages.html?recipientId=${tutorId}`;
 }
 
 // Format currency

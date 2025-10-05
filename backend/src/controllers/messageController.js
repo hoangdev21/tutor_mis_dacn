@@ -414,12 +414,117 @@ const searchUsers = async (req, res) => {
   }
 };
 
+// @desc    Get user online status and lastSeen
+// @route   GET /api/messages/user-status/:userId
+// @access  Private
+const getUserStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID'
+      });
+    }
+
+    // Get user's lastSeen from database
+    const user = await User.findById(userId).select('lastSeen name avatar');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Import isUserOnline from socketHandler
+    const { isUserOnline } = require('../socket/socketHandler');
+    const isOnline = isUserOnline(userId);
+
+    res.json({
+      success: true,
+      data: {
+        userId: user._id,
+        name: user.name,
+        avatar: user.avatar,
+        isOnline,
+        lastSeen: user.lastSeen
+      }
+    });
+  } catch (error) {
+    console.error('Get user status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user status',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get multiple users status (batch request)
+// @route   POST /api/messages/users-status
+// @access  Private
+const getUsersStatus = async (req, res) => {
+  try {
+    const { userIds } = req.body;
+    
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user IDs array'
+      });
+    }
+
+    // Validate all userIds
+    const validUserIds = userIds.filter(id => mongoose.Types.ObjectId.isValid(id));
+    
+    if (validUserIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid user IDs provided'
+      });
+    }
+
+    // Get users' lastSeen from database
+    const users = await User.find({ _id: { $in: validUserIds } })
+      .select('lastSeen name avatar');
+
+    // Import isUserOnline from socketHandler
+    const { isUserOnline } = require('../socket/socketHandler');
+
+    // Map users with their online status
+    const usersStatus = users.map(user => ({
+      userId: user._id,
+      name: user.name,
+      avatar: user.avatar,
+      isOnline: isUserOnline(user._id.toString()),
+      lastSeen: user.lastSeen
+    }));
+
+    res.json({
+      success: true,
+      data: usersStatus
+    });
+  } catch (error) {
+    console.error('Get users status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get users status',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getConversations,
   getMessages,
   sendMessage,
   markAsRead,
   searchUsers,
-  createConversation
+  createConversation,
+  getUserStatus,
+  getUsersStatus
 };
 

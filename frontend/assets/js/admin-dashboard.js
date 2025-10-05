@@ -6,14 +6,17 @@ let userDistributionChart = null;
 // Load dashboard data
 async function loadDashboard() {
   try {
-    const response = await apiRequest('/admin/dashboard');
+    const period = document.getElementById('userChartPeriod')?.value || 'month';
+    const response = await apiRequest(`/admin/dashboard?period=${period}`);
     
     if (response.success) {
-      updateStats(response.data);
+      // Backend trả về data.stats chứa các thống kê
+      updateStats(response.data.stats || response.data);
       loadPendingTutors();
       loadRecentUsers();
       loadPendingBlogs();
       loadUserCharts(response.data.userStats);
+      loadSystemActivities(response.data.systemActivities || []);
     }
   } catch (error) {
     console.error('Load dashboard error:', error);
@@ -29,6 +32,18 @@ function updateStats(data) {
     totalUsersEl.textContent = data.totalUsers || 0;
   }
 
+  // Total students display
+  const totalStudentsEl = document.getElementById('totalStudents');
+  if (totalStudentsEl) {
+    totalStudentsEl.textContent = data.totalStudents || 0;
+  }
+
+  // Total tutors display in stat card
+  const totalTutorsDisplayEl = document.getElementById('totalTutorsDisplay');
+  if (totalTutorsDisplayEl) {
+    totalTutorsDisplayEl.textContent = data.totalTutors || 0;
+  }
+
   // Total tutors
   const totalTutorsEl = document.getElementById('totalTutors');
   if (totalTutorsEl) {
@@ -41,10 +56,22 @@ function updateStats(data) {
     pendingTutorsEl.textContent = data.pendingTutors || 0;
   }
 
+  // Pending tutors count display
+  const pendingTutorsCountDisplayEl = document.getElementById('pendingTutorsCountDisplay');
+  if (pendingTutorsCountDisplayEl) {
+    pendingTutorsCountDisplayEl.textContent = data.pendingTutors || 0;
+  }
+
   // Total courses
   const totalCoursesEl = document.getElementById('totalCourses');
   if (totalCoursesEl) {
     totalCoursesEl.textContent = data.totalCourses || 0;
+  }
+
+  // Total courses 2 (for revenue card)
+  const totalCourses2El = document.getElementById('totalCourses2');
+  if (totalCourses2El) {
+    totalCourses2El.textContent = data.totalCourses || 0;
   }
 
   // Active courses
@@ -59,7 +86,7 @@ function updateStats(data) {
     totalRevenueEl.textContent = formatCurrency(data.totalRevenue || 0);
   }
 
-  // Update badges
+  // Update badges in sidebar
   const usersCountEl = document.getElementById('usersCount');
   if (usersCountEl) {
     usersCountEl.textContent = data.totalUsers || 0;
@@ -72,7 +99,13 @@ function updateStats(data) {
 
   const pendingBlogsCountEl = document.getElementById('pendingBlogsCount');
   if (pendingBlogsCountEl) {
-    pendingBlogsCountEl.textContent = data.pendingBlogs || 0;
+    pendingBlogsCountEl.textContent = data.pendingBlogs || data.pendingBlogPosts || 0;
+  }
+
+  // Pending blogs count display
+  const pendingBlogsCountDisplayEl = document.getElementById('pendingBlogsCountDisplay');
+  if (pendingBlogsCountDisplayEl) {
+    pendingBlogsCountDisplayEl.textContent = data.pendingBlogs || data.pendingBlogPosts || 0;
   }
 }
 
@@ -105,7 +138,7 @@ function loadUserGrowthChart(userStats) {
           label: 'Học sinh',
           data: studentsData,
           borderColor: 'rgb(102, 126, 234)',
-          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          backgroundColor: 'rgba(0, 225, 255, 0.2)',
           tension: 0.4,
           fill: true
         },
@@ -113,7 +146,7 @@ function loadUserGrowthChart(userStats) {
           label: 'Gia sư',
           data: tutorsData,
           borderColor: 'rgb(255, 153, 102)',
-          backgroundColor: 'rgba(255, 153, 102, 0.1)',
+          backgroundColor: 'rgba(255, 85, 0, 0.2)',
           tension: 0.4,
           fill: true
         }
@@ -872,20 +905,359 @@ async function toggleUserStatus(userId, currentStatus) {
   );
 }
 
+// Load system activities
+function loadSystemActivities(activities) {
+  const container = document.getElementById('systemActivityContainer');
+  
+  if (!activities || activities.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-clock"></i>
+        <h3>Chưa có hoạt động</h3>
+        <p>Các hoạt động gần đây sẽ hiển thị ở đây</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const activitiesHTML = activities.map(activity => {
+    const timeAgo = formatTimeAgo(activity.time);
+    return `
+      <div class="activity-item" style="display: flex; align-items: start; gap: 15px; padding: 15px; border-bottom: 1px solid #f0f0f0; transition: background 0.2s;">
+        <div class="activity-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${activity.color}15; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fas ${activity.icon}" style="color: ${activity.color}; font-size: 16px;"></i>
+        </div>
+        <div class="activity-content" style="flex: 1; min-width: 0;">
+          <p style="margin: 0 0 5px 0; color: #333; font-size: 14px; line-height: 1.5;">${activity.message}</p>
+          <small style="color: #999; font-size: 12px;">
+            <i class="fas fa-clock" style="margin-right: 4px;"></i>${timeAgo}
+          </small>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  container.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${activitiesHTML}</div>`;
+}
+
+// Format time ago helper
+function formatTimeAgo(date) {
+  const now = new Date();
+  const diff = Math.floor((now - new Date(date)) / 1000); // seconds
+  
+  if (diff < 60) return 'Vừa xong';
+  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} ngày trước`;
+  
+  return new Date(date).toLocaleDateString('vi-VN');
+}
+
+// View blog post detail
+function viewBlogPost(postId) {
+  viewBlogPostDetail(postId);
+}
+
+// View blog post detail modal
+async function viewBlogPostDetail(postId) {
+  try {
+    const response = await apiRequest(`/admin/content/blogs?limit=100`);
+    
+    if (response.success) {
+      const post = response.data.blogPosts.find(p => p._id === postId);
+      
+      if (!post) {
+        showNotification('Không tìm thấy bài viết', 'error');
+        return;
+      }
+      
+      showBlogPostModal(post);
+    }
+  } catch (error) {
+    console.error('Load blog post error:', error);
+    showNotification('Không thể tải bài viết', 'error');
+  }
+}
+
+// Show blog post modal
+function showBlogPostModal(post) {
+  const authorName = post.authorProfile?.fullName || post.author?.email || 'N/A';
+  const authorAvatar = post.authorProfile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=667eea&color=fff`;
+  
+  const modalHTML = `
+    <div class="modal-overlay" id="blogPostModal" onclick="closeModal('blogPostModal')">
+      <div class="modal-container" onclick="event.stopPropagation()" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <h2><i class="fas fa-blog"></i> Chi Tiết Bài Viết</h2>
+          <button class="modal-close" onclick="closeModal('blogPostModal')" style="color: white;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Author Info -->
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+            <img src="${authorAvatar}" 
+                 alt="${authorName}" 
+                 style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #667eea;">
+            <div>
+              <h4 style="margin: 0 0 4px 0; font-size: 15px; color: #333;">${authorName}</h4>
+              <p style="margin: 0; font-size: 13px; color: #666;">
+                <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i>
+                ${formatDate(post.createdAt)}
+              </p>
+            </div>
+            <span class="status-badge ${post.status === 'approved' ? 'approved' : post.status === 'rejected' ? 'cancelled' : 'pending'}" style="margin-left: auto;">
+              ${post.status === 'approved' ? '✓ Đã duyệt' : post.status === 'rejected' ? '✗ Từ chối' : '⏳ Chờ duyệt'}
+            </span>
+          </div>
+          
+          <!-- Post Image -->
+          ${post.image ? `
+            <div style="margin-bottom: 20px;">
+              <img src="${post.image}" alt="${post.title}" style="width: 100%; border-radius: 8px; max-height: 300px; object-fit: cover;">
+            </div>
+          ` : ''}
+          
+          <!-- Post Content -->
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #333; margin-bottom: 10px;">${post.title}</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <span style="background: #f3f4f6; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: #667eea;">
+                <i class="fas fa-folder"></i> ${post.category}
+              </span>
+              ${post.type ? `
+                <span style="background: #f3f4f6; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: #10b981;">
+                  <i class="fas fa-file-alt"></i> ${post.type}
+                </span>
+              ` : ''}
+            </div>
+            <div style="color: #555; line-height: 1.8; font-size: 14px;">
+              ${post.content}
+            </div>
+          </div>
+          
+          <!-- Tags -->
+          ${post.tags && post.tags.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+              <strong style="color: #666; font-size: 13px; display: block; margin-bottom: 8px;">Tags:</strong>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                ${post.tags.map(tag => `
+                  <span style="background: #e5e7eb; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #555;">
+                    #${tag}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Stats -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <div style="text-align: center;">
+              <div style="font-size: 24px; color: #667eea; font-weight: bold;">${post.likes?.length || 0}</div>
+              <div style="font-size: 12px; color: #999;">Lượt thích</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; color: #10b981; font-weight: bold;">${post.comments?.length || 0}</div>
+              <div style="font-size: 12px; color: #999;">Bình luận</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; color: #f59e0b; font-weight: bold;">${post.shares || 0}</div>
+              <div style="font-size: 12px; color: #999;">Chia sẻ</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+          ${post.status === 'pending' ? `
+            <button class="btn btn-success" onclick="approveBlogPost('${post._id}'); closeModal('blogPostModal');">
+              <i class="fas fa-check"></i> Duyệt Bài Viết
+            </button>
+            <button class="btn btn-danger" onclick="rejectBlogPost('${post._id}'); closeModal('blogPostModal');">
+              <i class="fas fa-times"></i> Từ Chối
+            </button>
+          ` : ''}
+          <button class="btn btn-secondary" onclick="closeModal('blogPostModal')">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  setTimeout(() => {
+    document.getElementById('blogPostModal').classList.add('active');
+  }, 10);
+}
+
+// View user detail modal  
+async function viewUserDetail(userId) {
+  try {
+    const response = await apiRequest(`/admin/users/${userId}`);
+    
+    if (response.success) {
+      const user = response.data;
+      if (user.role === 'tutor') {
+        showTutorProfileModal(user);
+      } else if (user.role === 'student') {
+        showStudentProfileModal(user);
+      } else {
+        showBasicUserModal(user);
+      }
+    }
+  } catch (error) {
+    console.error('Load user detail error:', error);
+    showNotification('Không thể tải thông tin người dùng', 'error');
+  }
+}
+
+// Show student profile modal
+function showStudentProfileModal(user) {
+  const profile = user.profile || {};
+  
+  const modalHTML = `
+    <div class="modal-overlay" id="studentProfileModal" onclick="closeModal('studentProfileModal')">
+      <div class="modal-container" onclick="event.stopPropagation()" style="max-width: 600px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+          <h2><i class="fas fa-user-graduate"></i> Thông Tin Học Sinh</h2>
+          <button class="modal-close" onclick="closeModal('studentProfileModal')" style="color: white;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="${profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.fullName || user.email)}&size=100&background=10b981&color=fff`}" 
+                 alt="${profile.fullName}" 
+                 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #10b981;">
+            <h3 style="margin: 10px 0 5px 0; color: #333;">${profile.fullName || 'N/A'}</h3>
+            <p style="color: #666; margin: 0;">${user.email}</p>
+          </div>
+          
+          <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="info-item">
+              <strong><i class="fas fa-phone"></i> Điện thoại:</strong>
+              <span>${profile.phone || 'Chưa cập nhật'}</span>
+            </div>
+            <div class="info-item">
+              <strong><i class="fas fa-birthday-cake"></i> Ngày sinh:</strong>
+              <span>${profile.dateOfBirth ? formatDate(profile.dateOfBirth) : 'Chưa cập nhật'}</span>
+            </div>
+            <div class="info-item">
+              <strong><i class="fas fa-venus-mars"></i> Giới tính:</strong>
+              <span>${profile.gender === 'male' ? 'Nam' : profile.gender === 'female' ? 'Nữ' : 'Chưa cập nhật'}</span>
+            </div>
+            <div class="info-item">
+              <strong><i class="fas fa-graduation-cap"></i> Cấp học:</strong>
+              <span>${profile.educationLevel || 'Chưa cập nhật'}</span>
+            </div>
+          </div>
+          
+          ${profile.address ? `
+            <div class="info-item" style="margin-top: 15px;">
+              <strong><i class="fas fa-map-marker-alt"></i> Địa chỉ:</strong>
+              <span>${[profile.address.street, profile.address.ward, profile.address.district, profile.address.city].filter(Boolean).join(', ') || 'Chưa cập nhật'}</span>
+            </div>
+          ` : ''}
+          
+          <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <strong style="display: block; margin-bottom: 10px;">Trạng thái:</strong>
+            <div>
+              <span class="status-badge ${user.isEmailVerified ? 'approved' : 'pending'}">
+                ${user.isEmailVerified ? '✓ Email đã xác thực' : '⏳ Email chưa xác thực'}
+              </span>
+              <span class="status-badge ${user.isActive ? 'active' : 'cancelled'}" style="margin-left: 10px;">
+                ${user.isActive ? '● Đang hoạt động' : '○ Vô hiệu hóa'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-${user.isActive ? 'danger' : 'success'}" 
+                  onclick="toggleUserStatus('${user._id}', ${user.isActive}); closeModal('studentProfileModal');">
+            <i class="fas fa-${user.isActive ? 'ban' : 'check'}"></i> 
+            ${user.isActive ? 'Vô Hiệu Hóa' : 'Kích Hoạt'}
+          </button>
+          <button class="btn btn-secondary" onclick="closeModal('studentProfileModal')">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  setTimeout(() => {
+    document.getElementById('studentProfileModal').classList.add('active');
+  }, 10);
+}
+
+// Show basic user modal (for admins or other roles)
+function showBasicUserModal(user) {
+  const profile = user.profile || {};
+  
+  const modalHTML = `
+    <div class="modal-overlay" id="basicUserModal" onclick="closeModal('basicUserModal')">
+      <div class="modal-container" onclick="event.stopPropagation()" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2><i class="fas fa-user"></i> Thông Tin Người Dùng</h2>
+          <button class="modal-close" onclick="closeModal('basicUserModal')">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="${profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}&size=100&background=667eea&color=fff`}" 
+                 alt="${user.email}" 
+                 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #667eea;">
+            <h3 style="margin: 10px 0 5px 0; color: #333;">${profile.fullName || user.email}</h3>
+            <p style="color: #666; margin: 0;">${user.role === 'admin' ? 'Quản trị viên' : user.role}</p>
+          </div>
+          
+          <div class="info-item" style="margin-bottom: 12px;">
+            <strong><i class="fas fa-envelope"></i> Email:</strong>
+            <span>${user.email}</span>
+          </div>
+          <div class="info-item" style="margin-bottom: 12px;">
+            <strong><i class="fas fa-calendar-alt"></i> Ngày tạo:</strong>
+            <span>${formatDate(user.createdAt)}</span>
+          </div>
+          
+          <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <strong style="display: block; margin-bottom: 10px;">Trạng thái:</strong>
+            <div>
+              <span class="status-badge ${user.isEmailVerified ? 'approved' : 'pending'}">
+                ${user.isEmailVerified ? '✓ Email đã xác thực' : '⏳ Email chưa xác thực'}
+              </span>
+              <span class="status-badge ${user.isActive ? 'active' : 'cancelled'}" style="margin-left: 10px;">
+                ${user.isActive ? '● Đang hoạt động' : '○ Vô hiệu hóa'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="closeModal('basicUserModal')">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  setTimeout(() => {
+    document.getElementById('basicUserModal').classList.add('active');
+  }, 10);
+}
+
 // Change user chart period
 document.getElementById('userChartPeriod')?.addEventListener('change', async (e) => {
   const period = e.target.value;
-  
-  try {
-    const response = await apiRequest(`/admin/dashboard?period=${period}`);
-    
-    if (response.success) {
-      loadUserCharts(response.data.userStats);
-    }
-  } catch (error) {
-    console.error('Load user chart error:', error);
-    showNotification('Không thể tải biểu đồ', 'error');
-  }
+  loadDashboard(); // Reload entire dashboard with new period
 });
 
 // Initialize

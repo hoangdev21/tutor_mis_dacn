@@ -27,23 +27,23 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
                     <div class="menu-item" data-page="dashboard">
-                        <i class="fas fa-home"></i>
+                        <img src="../../assets/images/dashboard-tutor/dashboard.png" alt="dashboard">
                         <span>Dashboard</span>
                     </div>
                     <div class="menu-item active" data-page="students">
-                        <i class="fas fa-users"></i>
+                        <img src="../../assets/images/dashboard-tutor/students.png" alt="students">
                         <span>Học Sinh</span>
                     </div>
                     <div class="menu-item" data-page="requests">
-                        <i class="fas fa-clipboard-list"></i>
+                        <img src="../../assets/images/dashboard-tutor/requests.png" alt="requests">
                         <span>Yêu Cầu Mới</span>
                     </div>
                     <div class="menu-item" data-page="schedule">
-                        <i class="fas fa-calendar-alt"></i>
+                        <img src="../../assets/images/dashboard-tutor/schedule.png" alt="schedule">
                         <span>Lịch Dạy</span>
                     </div>
                     <div class="menu-item" data-page="income">
-                        <i class="fas fa-chart-line"></i>
+                        <img src="../../assets/images/dashboard-tutor/income.png" alt="income">
                         <span>Thu Nhập</span>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Giao Tiếp</div>
                     <div class="menu-item" data-page="messages">
-                        <i class="fas fa-comments"></i>
+                        <img src="../../assets/images/dashboard-tutor/messages.png" alt="messages">
                         <span>Tin Nhắn</span>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
                     <div class="menu-item" data-page="blog">
-                        <i class="fas fa-blog"></i>
+                        <img src="../../assets/images/dashboard-tutor/blog.png" alt="blog">
                         <span>Blog</span>
                     </div>
                 </div>
@@ -67,15 +67,15 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Cài Đặt</div>
                     <div class="menu-item" data-page="profile">
-                        <i class="fas fa-user"></i>
+                        <img src="../../assets/images/dashboard-tutor/profile.png" alt="profile">
                         <span>Hồ Sơ</span>
                     </div>
                     <div class="menu-item" data-page="settings">
-                        <i class="fas fa-cog"></i>
+                        <img src="../../assets/images/dashboard-tutor/settings.png" alt="settings">
                         <span>Cài Đặt</span>
                     </div>
                     <div class="menu-item" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <img src="../../assets/images/dashboard-tutor/log-out.png" alt="logout">
                         <span>Đăng Xuất</span>
                     </div>
                 </div>
@@ -113,12 +113,32 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-grid" id="statsCards" style="margin-bottom: 30px;">
+                    <!-- Stats will be rendered here -->
+                </div>
+
+                <!-- Filters -->
                 <div class="content-section">
-                    <div class="section-header">
+                    <div class="section-header" style="margin-bottom: 20px;">
                         <h2 class="section-title">
                             <i class="fas fa-users"></i>
                             Học Sinh Của Tôi
                         </h2>
+                        <div class="filter-buttons" style="display: flex; gap: 10px;">
+                            <button class="filter-btn active" data-filter="all">
+                                <i class="fas fa-list"></i> Tất cả
+                            </button>
+                            <button class="filter-btn" data-filter="accepted">
+                                <i class="fas fa-user-check"></i> Đang học
+                            </button>
+                            <button class="filter-btn" data-filter="completed">
+                                <i class="fas fa-graduation-cap"></i> Hoàn thành
+                            </button>
+                            <button class="filter-btn" data-filter="pending">
+                                <i class="fas fa-clock"></i> Chờ xác nhận
+                            </button>
+                        </div>
                     </div>
 
                     <div id="studentsContainer">
@@ -128,6 +148,8 @@
                             <p>Bạn chưa có học sinh nào. Hãy chấp nhận yêu cầu từ học sinh!</p>
                         </div>
                     </div>
+
+                    <div id="paginationContainer" style="margin-top: 30px;"></div>
                 </div>
             </div>
         </main>
@@ -136,5 +158,397 @@
     <!-- Scripts -->
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/tutor-students.js"></script>
+    
+    <style>
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: #f8fafc;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .student-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .student-card:hover {
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .student-card-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        
+        .student-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+        }
+        
+        .student-header-info {
+            flex: 1;
+        }
+        
+        .student-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .student-email, .student-phone {
+            font-size: 13px;
+            opacity: 0.9;
+            margin: 3px 0;
+        }
+        
+        .student-card-header .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .student-card-body {
+            padding: 20px;
+        }
+        
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .info-item.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .info-item i {
+            color: #667eea;
+            margin-top: 2px;
+            font-size: 14px;
+        }
+        
+        .info-label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 3px;
+        }
+        
+        .info-value {
+            display: block;
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+        
+        .pricing-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .pricing-item {
+            text-align: center;
+        }
+        
+        .pricing-label {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .pricing-value {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            color: #059669;
+        }
+        
+        .pricing-value.total {
+            font-size: 18px;
+            color: #667eea;
+        }
+        
+        .student-card-footer {
+            padding: 15px 20px;
+            background: #f8fafc;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .student-card-footer button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 14px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .pagination-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-dots {
+            color: #94a3b8;
+            padding: 0 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                width: 100%;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
 </body>
 </html>

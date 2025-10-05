@@ -36,11 +36,13 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   try {
     const response = await apiRequest('/auth/login', {
       method: 'POST',
+      credentials: 'include', // Important: include cookies for refresh token
       body: JSON.stringify(data)
     });
     
     if (response.success) {
-      // Store access token
+      // Store access token (token and accessToken for compatibility)
+      localStorage.setItem('token', response.data.accessToken);
       localStorage.setItem('accessToken', response.data.accessToken);
       
       // Store user data

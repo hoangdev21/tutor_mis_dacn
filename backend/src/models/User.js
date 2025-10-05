@@ -74,6 +74,11 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date
   },
+  // Thời gian hoạt động cuối cùng (cho tính năng online/offline status)
+  lastSeen: {
+    type: Date,
+    default: Date.now
+  },
   loginAttempts: {
     type: Number,
     default: 0
@@ -82,7 +87,9 @@ const userSchema = new mongoose.Schema({
     type: Date
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Virtual cho profile dựa trên role

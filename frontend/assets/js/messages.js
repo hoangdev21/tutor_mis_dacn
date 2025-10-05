@@ -6,6 +6,25 @@ let currentRecipient = null;
 let conversations = [];
 let messages = [];
 let messagePollingInterval = null;
+let messageSocket = null;
+
+// Use TokenManager for automatic token refresh
+const tokenManager = window.TokenManager || {
+  apiRequest: async (endpoint, options) => {
+    // Fallback if TokenManager not loaded
+    console.warn('⚠️ TokenManager not loaded, using fallback');
+    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        ...options?.headers
+      }
+    });
+    return response.json();
+  }
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
@@ -13,6 +32,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadConversations();
   setupEventListeners();
   startMessagePolling();
+  
+  // Initialize Socket.IO for real-time updates
+  await initializeSocket();
+  
+  // Ensure empty state is shown if no conversation selected
+  ensureEmptyStateDisplay();
   
   // Check if redirected from tutor profile with recipientId
   await checkAndOpenConversation();
@@ -40,12 +65,75 @@ function setupEventListeners() {
   }
 }
 
+// Initialize Socket.IO connection
+async function initializeSocket() {
+  try {
+    // Load Socket.IO client script if not already loaded
+    if (typeof MessageSocket === 'undefined') {
+      await loadScript('/assets/js/messages-socket.js');
+    }
+    
+    // Create socket instance
+    messageSocket = new MessageSocket(API_BASE_URL);
+    
+    // Setup callbacks for online/offline events
+    messageSocket.onUserOnline = (data) => {
+      console.log('🟢 User came online:', data);
+      if (data.userId) {
+        updateUserStatusDisplay(data.userId, true, data.lastSeen || new Date());
+      }
+    };
+    
+    messageSocket.onUserOffline = (data) => {
+      console.log('⚫ User went offline:', data);
+      if (data.userId) {
+        updateUserStatusDisplay(data.userId, false, data.lastSeen || new Date());
+      }
+    };
+    
+    messageSocket.onConnect = () => {
+      console.log('✅ Socket connected successfully');
+    };
+    
+    messageSocket.onDisconnect = () => {
+      console.log('❌ Socket disconnected');
+    };
+    
+    messageSocket.onError = (error) => {
+      console.error('❌ Socket error:', error);
+    };
+    
+    // Connect to socket
+    await messageSocket.connect();
+  } catch (error) {
+    console.error('Error initializing socket:', error);
+  }
+}
+
+// Load external script dynamically
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    // Check if script already exists
+    const existingScript = document.querySelector(`script[src="${src}"]`);
+    if (existingScript) {
+      resolve();
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
 // Check and open conversation from URL parameter
 async function checkAndOpenConversation() {
   try {
-    // Get recipientId from URL
+    // Get recipientId from URL (support both recipientId and userId for backward compatibility)
     const urlParams = new URLSearchParams(window.location.search);
-    const recipientId = urlParams.get('recipientId');
+    const recipientId = urlParams.get('recipientId') || urlParams.get('userId');
     
     if (!recipientId) {
       return;
@@ -75,20 +163,75 @@ async function checkAndOpenConversation() {
         recipientInfo = JSON.parse(chatRecipient);
         console.log('👤 Got recipient info from localStorage:', recipientInfo);
       } else {
-        // Fetch recipient info from API
+        // Fetch recipient info from API - try multiple endpoints based on role
+        console.log('🔍 Fetching recipient info from API...');
+        
+        // Try to fetch as tutor first (most common case for students)
         try {
-          const response = await apiRequest(`/auth/tutor/${recipientId}`);
-          if (response.success && response.data) {
+          const tutorResponse = await apiRequest(`/auth/tutor/${recipientId}`);
+          if (tutorResponse.success && tutorResponse.data) {
+            const tutorData = tutorResponse.data;
             recipientInfo = {
-              id: recipientId,
-              name: response.data.profile?.fullName || response.data.name || 'Người dùng',
-              avatar: response.data.profile?.avatar || response.data.avatar || '',
-              role: response.data.role || 'tutor'
+              id: tutorData._id || recipientId,
+              name: tutorData.profile?.fullName || tutorData.email || 'Gia sư',
+              avatar: tutorData.profile?.avatar || tutorData.avatar || '',
+              role: 'tutor',
+              email: tutorData.email || '',
+              phone: tutorData.profile?.phone || ''
             };
-            console.log('👤 Fetched recipient info from API:', recipientInfo);
+            console.log('✅ Found recipient as tutor:', recipientInfo);
           }
-        } catch (error) {
-          console.error('❌ Failed to fetch recipient info:', error);
+        } catch (tutorError) {
+          console.log('⚠️ Not a tutor, trying student...');
+          
+          // If not found as tutor, try as student
+          try {
+            const studentResponse = await apiRequest(`/auth/student/${recipientId}`);
+            if (studentResponse.success && studentResponse.data) {
+              const studentData = studentResponse.data;
+              recipientInfo = {
+                id: studentData._id || recipientId,
+                name: studentData.profile?.fullName || studentData.email || 'Học sinh',
+                avatar: studentData.profile?.avatar || studentData.avatar || '',
+                role: 'student',
+                email: studentData.email || '',
+                phone: studentData.profile?.phone || ''
+              };
+              console.log('✅ Found recipient as student:', recipientInfo);
+            }
+          } catch (studentError) {
+            console.log('⚠️ Not a student, trying admin...');
+            
+            // If still not found, try as admin
+            try {
+              const adminResponse = await apiRequest(`/auth/admin/${recipientId}`);
+              if (adminResponse.success && adminResponse.data) {
+                const adminData = adminResponse.data;
+                recipientInfo = {
+                  id: adminData._id || recipientId,
+                  name: adminData.profile?.fullName || adminData.email || 'Admin',
+                  avatar: adminData.profile?.avatar || adminData.avatar || '',
+                  role: 'admin',
+                  email: adminData.email || '',
+                  phone: adminData.profile?.phone || ''
+                };
+                console.log('✅ Found recipient as admin:', recipientInfo);
+              }
+            } catch (adminError) {
+              console.error('❌ Could not find recipient in any role:', adminError);
+              
+              // Final fallback: create basic recipient info with just the ID
+              console.log('⚠️ Using fallback recipient info');
+              recipientInfo = {
+                id: recipientId,
+                name: 'Người dùng',
+                avatar: '',
+                role: 'user',
+                email: '',
+                phone: ''
+              };
+            }
+          }
         }
       }
       
@@ -105,9 +248,9 @@ async function checkAndOpenConversation() {
         };
         
         // Show active conversation UI
-        const noConversation = document.querySelector('.no-conversation');
-        if (noConversation) {
-          noConversation.style.display = 'none';
+        const emptyChat = document.querySelector('.empty-chat');
+        if (emptyChat) {
+          emptyChat.classList.remove('no-conversation');
         }
         
         const activeConversation = document.getElementById('activeConversation');
@@ -116,20 +259,56 @@ async function checkAndOpenConversation() {
         }
         
         // Update conversation header with recipient info (check if elements exist)
+        const chatUserAvatar = document.getElementById('chatUserAvatar');
         const chatUserName = document.getElementById('chatUserName');
         const chatUserStatus = document.getElementById('chatUserStatus');
+        
+        // Update avatar
+        if (chatUserAvatar) {
+          if (currentRecipient.avatar) {
+            chatUserAvatar.src = currentRecipient.avatar;
+            chatUserAvatar.alt = currentRecipient.name;
+          } else {
+            // Fallback to UI Avatars API
+            chatUserAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentRecipient.name)}&background=667eea&color=fff&size=128`;
+            chatUserAvatar.alt = currentRecipient.name;
+          }
+          
+          // Update online indicator if wrapper exists
+          const avatarWrapper = chatUserAvatar.parentElement;
+          if (avatarWrapper && avatarWrapper.classList.contains('chat-user-avatar-wrapper')) {
+            let indicator = avatarWrapper.querySelector('.online-indicator');
+            if (!indicator) {
+              indicator = document.createElement('div');
+              indicator.className = 'online-indicator';
+              avatarWrapper.appendChild(indicator);
+            }
+            // Update indicator status
+            if (currentRecipient.isOnline) {
+              indicator.classList.remove('offline');
+            } else {
+              indicator.classList.add('offline');
+            }
+          }
+        }
         
         if (chatUserName) {
           chatUserName.textContent = currentRecipient.name;
         }
         
         if (chatUserStatus) {
-          chatUserStatus.textContent = currentRecipient.isOnline ? 'Đang hoạt động' : 'Không hoạt động';
-          chatUserStatus.className = currentRecipient.isOnline ? 'user-status' : 'user-status offline';
+          const statusText = getStatusText(currentRecipient);
+          chatUserStatus.textContent = statusText;
+          chatUserStatus.className = currentRecipient.isOnline ? 'user-status online' : 'user-status offline';
         }
         
         // Load messages (will be empty for new conversation)
         await loadMessages(recipientId, true);
+        
+        // Mark conversation as read in UI after loading
+        if (existingConvo) {
+          await markConversationAsReadInUI(existingConvo._id);
+        }
         
         // Clear localStorage
         localStorage.removeItem('chatRecipient');
@@ -218,7 +397,7 @@ function renderConversations(convos) {
            onclick="selectConversation('${convo._id}', '${userId}')">
         <div class="user-avatar ${isOnline ? 'online' : ''}">
           ${userAvatar ? 
-            `<img src="${userAvatar}" alt="${userName}">` : 
+            `<img src="${userAvatar}" alt="${userName}" style="border-radius: 50%;">` : 
             `<i class="fas fa-user"></i>`
           }
         </div>
@@ -280,7 +459,7 @@ async function selectConversation(conversationId, recipientId) {
   const emptyChat = document.querySelector('.empty-chat');
   const activeConversation = document.getElementById('activeConversation');
   
-  if (emptyChat) emptyChat.style.display = 'none';
+  if (emptyChat) emptyChat.classList.remove('no-conversation');
   if (activeConversation) activeConversation.style.display = 'flex';
   
   // Update active state in sidebar
@@ -295,9 +474,6 @@ async function selectConversation(conversationId, recipientId) {
 
   // Load messages
   await loadMessages(conversationId);
-  
-  // Mark as read
-  await markAsRead(conversationId);
   
   // Update recipient info
   updateRecipientInfo();
@@ -322,7 +498,8 @@ async function loadMessages(conversationIdOrRecipientId, isRecipientId = false) 
     if (response.success) {
       messages = response.data.messages || response.data || [];
       renderMessages();
-      scrollToBottom();
+      // Chỉ tự động cuộn khi load lần đầu (force = true)
+      scrollToBottom(true, true);
     }
   } catch (error) {
     console.error('Error loading messages:', error);
@@ -373,7 +550,17 @@ function renderMessages() {
     // Check if message is sent by current user
     // API returns senderId as object with _id, or sometimes just the ID string
     const messageSenderId = typeof msg.senderId === 'object' ? msg.senderId._id : msg.senderId;
-    const isSent = messageSenderId === currentUserId;
+    const isSent = String(messageSenderId) === String(currentUserId);
+    
+    // Debug logging (có thể remove sau khi fix)
+    if (messages.indexOf(msg) === 0) {
+      console.log('🔍 Message comparison debug:', {
+        messageSenderId: messageSenderId,
+        currentUserId: currentUserId,
+        isSent: isSent,
+        senderObject: msg.senderId
+      });
+    }
     
     html += `
       <div class="message ${isSent ? 'sent' : 'received'}">
@@ -400,6 +587,10 @@ function renderMessages() {
   });
 
   container.innerHTML = html;
+  
+  // Thêm scroll listener để phát hiện khi người dùng cuộn
+  container.removeEventListener('scroll', checkUserScrolling);
+  container.addEventListener('scroll', checkUserScrolling);
 }
 
 // Send message
@@ -436,7 +627,8 @@ async function sendMessage(event) {
       // Add message to UI optimistically
       messages.push(response.data);
       renderMessages();
-      scrollToBottom();
+      // Force scroll khi người dùng gửi tin nhắn
+      scrollToBottom(true, true);
       
       // Clear input
       input.value = '';
@@ -507,25 +699,10 @@ async function handleFileSelect(event) {
   event.target.value = '';
 }
 
-// Mark conversation as read
-async function markAsRead(conversationId) {
-  if (!currentRecipient?._id) return;
-  
+// Mark conversation as read - Backend tự động xử lý khi load messages
+// Chỉ cần update UI
+async function markConversationAsReadInUI(conversationId) {
   try {
-    // Find unread messages from current recipient
-    const unreadMessages = messages.filter(
-      msg => !msg.isRead && msg.senderId?._id === currentRecipient._id
-    );
-    
-    if (unreadMessages.length === 0) return;
-    
-    // Mark each unread message as read using backend API: PUT /messages/:messageId/read
-    for (const msg of unreadMessages) {
-      await apiRequest(`/messages/${msg._id}/read`, {
-        method: 'PUT'
-      });
-    }
-    
     // Update UI
     const convoItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
     if (convoItem) {
@@ -533,9 +710,10 @@ async function markAsRead(conversationId) {
       convoItem.querySelector('.unread-badge')?.remove();
     }
     
-    updateUnreadBadge();
+    // Reload conversations để cập nhật unread count
+    await loadConversations();
   } catch (error) {
-    console.error('Error marking as read:', error);
+    console.error('Error updating conversation UI:', error);
   }
 }
 
@@ -543,6 +721,7 @@ async function markAsRead(conversationId) {
 function updateRecipientInfo() {
   if (!currentRecipient) return;
 
+  const chatUserAvatar = document.getElementById('chatUserAvatar');
   const chatUserName = document.getElementById('chatUserName');
   const chatUserStatus = document.getElementById('chatUserStatus');
   const profileUserName = document.getElementById('profileUserName');
@@ -550,12 +729,48 @@ function updateRecipientInfo() {
   const profileUserEmail = document.getElementById('profileUserEmail');
   const profileUserPhone = document.getElementById('profileUserPhone');
 
+  // Update avatar in chat header
+  if (chatUserAvatar) {
+    if (currentRecipient.avatar) {
+      chatUserAvatar.src = currentRecipient.avatar;
+      chatUserAvatar.alt = currentRecipient.name;
+    } else {
+      // Fallback to UI Avatars API with user's name
+      chatUserAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentRecipient.name)}&background=667eea&color=fff&size=128`;
+      chatUserAvatar.alt = currentRecipient.name;
+    }
+    
+    // Update online indicator if wrapper exists
+    const avatarWrapper = chatUserAvatar.parentElement;
+    if (avatarWrapper && avatarWrapper.classList.contains('chat-user-avatar-wrapper')) {
+      let indicator = avatarWrapper.querySelector('.online-indicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'online-indicator';
+        avatarWrapper.appendChild(indicator);
+      }
+      // Update indicator status
+      if (currentRecipient.isOnline) {
+        indicator.classList.remove('offline');
+      } else {
+        indicator.classList.add('offline');
+      }
+    }
+  }
+
+  // Update name
   if (chatUserName) chatUserName.textContent = currentRecipient.name;
+  
+  // Show loading state for status while fetching real data
   if (chatUserStatus) {
-    // Show online status or last seen time
-    const statusText = getStatusText(currentRecipient);
-    chatUserStatus.textContent = statusText;
-    chatUserStatus.className = currentRecipient.isOnline ? 'user-status online' : 'user-status offline';
+    chatUserStatus.textContent = 'Đang tải...';
+    chatUserStatus.className = 'user-status chat-status offline';
+  }
+  
+  // Fetch and update real-time user status from API
+  // This will update the status with accurate data
+  if (currentRecipient && currentRecipient._id) {
+    fetchAndDisplayUserStatus(currentRecipient._id);
   }
   
   // Update panel info (these might not exist in all pages)
@@ -727,10 +942,17 @@ function startMessagePolling() {
           
           // Check if there are new messages
           if (newMessages.length > messages.length) {
+            const hadMessages = messages.length > 0;
             messages = newMessages;
             renderMessages();
-            scrollToBottom();
-            playNotificationSound();
+            
+            // Chỉ tự động cuộn nếu user không đang xem tin nhắn cũ
+            // Hoặc nếu là tin nhắn đầu tiên
+            if (!hadMessages || !isUserScrolling) {
+              scrollToBottom(true, false);
+            }
+            
+            // Không cần play sound nữa - hàm này không tồn tại
           }
         }
       } catch (error) {
@@ -755,14 +977,49 @@ function updateUnreadBadge() {
   }
 }
 
-// Utility functions
-function scrollToBottom() {
-  const container = document.getElementById('messagesArea');
-  if (container) {
-    setTimeout(() => {
-      container.scrollTop = container.scrollHeight;
-    }, 100);
+// Ensure empty state is displayed when no conversation is selected
+function ensureEmptyStateDisplay() {
+  const emptyChat = document.querySelector('.empty-chat');
+  const activeConversation = document.getElementById('activeConversation');
+  
+  // If no current conversation selected, show empty state
+  if (!currentConversationId && !currentRecipient) {
+    if (emptyChat && !emptyChat.classList.contains('no-conversation')) {
+      emptyChat.classList.add('no-conversation');
+    }
+    if (activeConversation) {
+      activeConversation.style.display = 'none';
+    }
   }
+}
+
+// Utility functions
+let isUserScrolling = false;
+let scrollTimeout = null;
+
+function scrollToBottom(smooth = true, force = false) {
+  const container = document.getElementById('messagesArea');
+  if (!container) return;
+  
+  // Nếu người dùng đang cuộn và không force, không tự động cuộn
+  if (isUserScrolling && !force) return;
+  
+  setTimeout(() => {
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }, 50);
+}
+
+// Kiểm tra xem người dùng có đang cuộn lên xem tin nhắn cũ không
+function checkUserScrolling() {
+  const container = document.getElementById('messagesArea');
+  if (!container) return;
+  
+  // Nếu người dùng cuộn lên (cách bottom > 100px), đánh dấu là đang cuộn
+  const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+  isUserScrolling = !isAtBottom;
 }
 
 function getCurrentUserId() {
@@ -781,30 +1038,8 @@ function getCurrentUserId() {
 function getStatusText(user) {
   if (!user) return 'Không hoạt động';
   
-  // Check if user is currently online
-  if (user.isOnline) {
-    return 'Đang hoạt động';
-  }
-  
-  // Show last seen time if available
-  if (user.lastSeen || user.lastLogin) {
-    const lastSeenDate = new Date(user.lastSeen || user.lastLogin);
-    const now = new Date();
-    const diffMs = now - lastSeenDate;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    
-    if (diffMins < 1) return 'Hoạt động vừa xong';
-    if (diffMins < 60) return `Hoạt động ${diffMins} phút trước`;
-    if (diffHours < 24) return `Hoạt động ${diffHours} giờ trước`;
-    if (diffDays === 1) return 'Hoạt động hôm qua';
-    if (diffDays < 7) return `Hoạt động ${diffDays} ngày trước`;
-    
-    return 'Không hoạt động';
-  }
-  
-  return 'Không hoạt động';
+  // Use formatLastSeen for consistent formatting
+  return formatLastSeen(user.lastSeen || user.lastLogin, user.isOnline);
 }
 
 function formatTime(dateString) {
@@ -898,47 +1133,137 @@ function showNotification(message, type = 'info') {
   }, 5000);
 }
 
-// API request helper
+// API request helper - Use TokenManager for automatic token refresh
 async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-  
-  if (!token) {
-    console.error('❌ No token available for API request');
-    window.location.href = '../../index.html';
-    throw new Error('Authentication required');
+  return await tokenManager.apiRequest(endpoint, options);
+}
+
+// ===== USER STATUS FUNCTIONS =====
+
+/**
+ * Format lastSeen time to human readable string
+ * @param {Date|string} lastSeen - Last seen timestamp
+ * @param {boolean} isOnline - Whether user is currently online
+ * @returns {string} Formatted status text
+ */
+function formatLastSeen(lastSeen, isOnline) {
+  if (isOnline) {
+    return 'Đang hoạt động';
   }
   
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  const config = {
-    method: options.method || 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      ...options.headers
-    },
-    ...options
-  };
-
-  const response = await fetch(url, config);
-  
-  // Handle authentication errors
-  if (response.status === 401 || response.status === 403) {
-    console.error('❌ Authentication failed - redirecting to login');
-    localStorage.removeItem('token');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userData');
-    window.location.href = '../../index.html';
-    throw new Error('Authentication failed');
+  if (!lastSeen) {
+    return 'Không hoạt động';
   }
   
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Request failed');
+  const now = new Date();
+  const lastSeenDate = new Date(lastSeen);
+  const diffMs = now - lastSeenDate;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  if (diffMinutes < 1) {
+    return 'Vừa xong';
+  } else if (diffMinutes < 60) {
+    return `Hoạt động ${diffMinutes} phút trước`;
+  } else if (diffHours < 24) {
+    return `Hoạt động ${diffHours} giờ trước`;
+  } else if (diffDays < 7) {
+    return `Hoạt động ${diffDays} ngày trước`;
+  } else {
+    // Format as date if more than a week
+    return `Hoạt động ${lastSeenDate.toLocaleDateString('vi-VN')}`;
   }
+}
 
-  return data;
+/**
+ * Update user status display in chat header
+ * @param {string} userId - User ID to update status for
+ * @param {boolean} isOnline - Whether user is online
+ * @param {Date|string} lastSeen - Last seen timestamp
+ */
+function updateUserStatusDisplay(userId, isOnline, lastSeen) {
+  // Only update if this is the current conversation
+  if (!currentRecipient || currentRecipient._id !== userId) {
+    return;
+  }
+  
+  // Update status text using ID selector (more reliable)
+  const statusElement = document.getElementById('chatUserStatus');
+  if (!statusElement) {
+    console.warn('⚠️ Status element not found');
+    return;
+  }
+  
+  const statusText = formatLastSeen(lastSeen, isOnline);
+  statusElement.textContent = statusText;
+  
+  // Update status classes
+  if (isOnline) {
+    statusElement.classList.remove('offline');
+    statusElement.classList.add('online');
+  } else {
+    statusElement.classList.remove('online');
+    statusElement.classList.add('offline');
+  }
+  
+  // Update online indicator (the dot next to avatar)
+  const statusIndicator = document.querySelector('.chat-header .online-indicator');
+  if (statusIndicator) {
+    if (isOnline) {
+      statusIndicator.classList.remove('offline');
+    } else {
+      statusIndicator.classList.add('offline');
+    }
+  }
+  
+  console.log('✅ Status updated:', { userId, isOnline, statusText });
+}
+
+/**
+ * Fetch and display user status
+ * @param {string} userId - User ID to fetch status for
+ */
+async function fetchAndDisplayUserStatus(userId) {
+  try {
+    console.log('🔍 Fetching user status for:', userId);
+    
+    const response = await apiRequest(`/messages/user-status/${userId}`, {
+      method: 'GET'
+    });
+    
+    console.log('📊 User status response:', response);
+    
+    if (response.success && response.data) {
+      console.log('✅ Updating status display:', {
+        userId: response.data.userId,
+        isOnline: response.data.isOnline,
+        lastSeen: response.data.lastSeen
+      });
+      
+      updateUserStatusDisplay(
+        response.data.userId,
+        response.data.isOnline,
+        response.data.lastSeen
+      );
+    } else {
+      console.warn('⚠️ Invalid response:', response);
+      // Fallback to offline status
+      const statusElement = document.getElementById('chatUserStatus');
+      if (statusElement) {
+        statusElement.textContent = 'Không hoạt động';
+        statusElement.className = 'user-status chat-status offline';
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error fetching user status:', error);
+    // Fallback to offline status
+    const statusElement = document.getElementById('chatUserStatus');
+    if (statusElement) {
+      statusElement.textContent = 'Không hoạt động';
+      statusElement.className = 'user-status chat-status offline';
+    }
+  }
 }
 
 // Cleanup on page unload

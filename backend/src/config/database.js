@@ -49,7 +49,7 @@ const createIndexes = async () => {
     await db.collection('messages').createIndex({ courseId: 1 });
     
     // BlogPost indexes
-    await db.collection('blogposts').createIndex({ slug: 1 }, { unique: true });
+    // Note: slug index removed - not used in current schema
     await db.collection('blogposts').createIndex({ category: 1 });
     
     console.log('✅ Database indexes created successfully');

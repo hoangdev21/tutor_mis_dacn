@@ -71,7 +71,9 @@ const messageSchema = new mongoose.Schema({
     }
   }]
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Index cho hiệu suất
@@ -84,19 +86,23 @@ messageSchema.pre(/^find/, function(next) {
   this.populate([
     {
       path: 'senderId',
-      select: 'email role',
-      populate: {
-        path: 'profile',
-        select: 'fullName avatar'
-      }
+      select: 'email role _id',
+      populate: [
+        {
+          path: 'profile',
+          select: 'fullName avatar'
+        }
+      ]
     },
     {
       path: 'receiverId',  
-      select: 'email role',
-      populate: {
-        path: 'profile',
-        select: 'fullName avatar'
-      }
+      select: 'email role _id',
+      populate: [
+        {
+          path: 'profile',
+          select: 'fullName avatar'
+        }
+      ]
     },
     {
       path: 'replyTo',

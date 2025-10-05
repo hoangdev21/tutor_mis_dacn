@@ -6,6 +6,8 @@
     <title>Yêu Cầu Gia Sư - Học Sinh | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/booking.css">
+    <link rel="stylesheet" href="../../assets/css/requests.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -27,19 +29,20 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
                     <div class="menu-item" data-page="dashboard">
-                        <i class="fas fa-home"></i>
+                        <img src="../../assets/images/dashboard-student/dashboard.png" alt="home">
                         <span>Dashboard</span>
                     </div>
                     <div class="menu-item" data-page="courses">
-                        <i class="fas fa-book"></i>
+                        <img src="../../assets/images/dashboard-student/courses.png" alt="courses">
                         <span>Khóa Học</span>
+                        <span class="badge" id="coursesCount">0</span>
                     </div>
                     <div class="menu-item active" data-page="requests">
-                        <i class="fas fa-paper-plane"></i>
+                        <img src="../../assets/images/dashboard-student/requests.png" alt="requests">
                         <span>Yêu Cầu Gia Sư</span>
                     </div>
                     <div class="menu-item" data-page="find-tutor">
-                        <i class="fas fa-search"></i>
+                        <img src="../../assets/images/dashboard-student/find-tutor.png" alt="find-tutor">
                         <span>Tìm Gia Sư</span>
                     </div>
                 </div>
@@ -47,31 +50,32 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Giao Tiếp</div>
                     <div class="menu-item" data-page="messages">
-                        <i class="fas fa-comments"></i>
+                        <img src="../../assets/images/dashboard-student/messages.png" alt="messages">
                         <span>Tin Nhắn</span>
+                        <span class="badge" id="messagesCount">0</span>
                     </div>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
-                    <div class="menu-item" data-page="blog">
-                        <i class="fas fa-blog"></i>
+                    <a href="./blog.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-student/blog.png" alt="blog">
                         <span>Blog</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Cài Đặt</div>
                     <div class="menu-item" data-page="profile">
-                        <i class="fas fa-user"></i>
+                        <img src="../../assets/images/dashboard-student/profile.png" alt="profile">
                         <span>Hồ Sơ</span>
                     </div>
                     <div class="menu-item" data-page="settings">
-                        <i class="fas fa-cog"></i>
+                        <img src="../../assets/images/dashboard-student/settings.png" alt="settings">
                         <span>Cài Đặt</span>
                     </div>
                     <div class="menu-item" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
+                        <img src="../../assets/images/dashboard-student/log-out.png" alt="logout">
                         <span>Đăng Xuất</span>
                     </div>
                 </div>
@@ -109,25 +113,192 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <div class="content-section">
+                <!-- Create Request Form (Hidden by default) -->
+                <div class="content-section" id="createRequestSection" style="display: none;">
                     <div class="section-header">
                         <h2 class="section-title">
-                            <i class="fas fa-paper-plane"></i>
+                            <i class="fas fa-plus-circle"></i>
+                            Tạo Yêu Cầu Mới
+                        </h2>
+                        <div class="section-actions">
+                            <button class="action-btn secondary" onclick="showRequestsList()">
+                                <i class="fas fa-arrow-left"></i>
+                                Quay Lại Danh Sách
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-container">
+                        <form id="bookingForm">
+                            <!-- Tutor Info -->
+                            <div class="form-section">
+                                <h3 class="form-section-title">
+                                    <i class="fas fa-user-tie"></i>
+                                    Thông Tin Gia Sư
+                                </h3>
+                                <div id="tutorInfoDisplay" class="tutor-preview">
+                                    <!-- Will be populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Subject Info -->
+                            <div class="form-section">
+                                <h3 class="form-section-title">
+                                    <i class="fas fa-book"></i>
+                                    Môn Học
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="subjectName">Môn học <span class="required">*</span></label>
+                                        <select id="subjectName" required>
+                                            <option value="">Chọn môn học</option>
+                                            <option value="Toán">Toán</option>
+                                            <option value="Vật lý">Vật lý</option>
+                                            <option value="Hóa học">Hóa học</option>
+                                            <option value="Sinh học">Sinh học</option>
+                                            <option value="Tiếng Anh">Tiếng Anh</option>
+                                            <option value="Ngữ văn">Ngữ văn</option>
+                                            <option value="Lịch sử">Lịch sử</option>
+                                            <option value="Địa lý">Địa lý</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="subjectLevel">Cấp học <span class="required">*</span></label>
+                                        <select id="subjectLevel" required>
+                                            <option value="">Chọn cấp học</option>
+                                            <option value="Tiểu học">Tiểu học</option>
+                                            <option value="THCS">THCS</option>
+                                            <option value="THPT">THPT</option>
+                                            <option value="Đại học">Đại học</option>
+                                            <option value="Người đi làm">Người đi làm</option>
+                                            <option value="Khác">Khác</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Schedule -->
+                            <div class="form-section">
+                                <h3 class="form-section-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Lịch Học
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="startDate">Ngày bắt đầu <span class="required">*</span></label>
+                                        <input type="date" id="startDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="preferredTime">Thời gian mong muốn</label>
+                                        <input type="text" id="preferredTime" placeholder="VD: Tối thứ 2, 4, 6">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="daysPerWeek">Số buổi/tuần</label>
+                                        <input type="number" id="daysPerWeek" min="1" max="7" value="2">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="hoursPerSession">Số giờ/buổi</label>
+                                        <input type="number" id="hoursPerSession" min="1" max="4" step="0.5" value="1.5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="duration">Thời lượng (tháng)</label>
+                                        <input type="number" id="duration" min="1" max="12" value="4">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="form-section">
+                                <h3 class="form-section-title">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Địa Điểm
+                                </h3>
+                                <div class="form-group">
+                                    <label for="locationType">Hình thức <span class="required">*</span></label>
+                                    <select id="locationType" required>
+                                        <option value="">Chọn hình thức</option>
+                                        <option value="online">Online</option>
+                                        <option value="student_home">Tại nhà học sinh</option>
+                                        <option value="tutor_home">Tại nhà gia sư</option>
+                                        <option value="other">Địa điểm khác</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="address">Địa chỉ chi tiết</label>
+                                    <textarea id="address" rows="3" placeholder="Nhập địa chỉ học..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div class="form-section">
+                                <h3 class="form-section-title">
+                                    <i class="fas fa-sticky-note"></i>
+                                    Ghi Chú
+                                </h3>
+                                <div class="form-group">
+                                    <label for="studentNote">Ghi chú cho gia sư</label>
+                                    <textarea id="studentNote" rows="4" placeholder="Mô tả yêu cầu, mục tiêu học tập của bạn..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="showRequestsList()">Hủy</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Gửi Yêu Cầu
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Requests List (Default view) -->
+                <div class="content-section" id="requestsListSection">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-list"></i>
                             Các Yêu Cầu Của Tôi
                         </h2>
                         <div class="section-actions">
-                            <button class="action-btn primary">
+                            <button class="action-btn primary" onclick="showCreateForm()">
                                 <i class="fas fa-plus"></i>
                                 Tạo Yêu Cầu Mới
                             </button>
                         </div>
                     </div>
 
+                    <!-- Filter Tabs -->
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-status="all">
+                            Tất cả
+                            <span class="tab-count" id="countAll">0</span>
+                        </button>
+                        <button class="filter-tab" data-status="pending" style="color: blue;">
+                            Chờ xử lý
+                            <span class="tab-count" id="countPending">0</span>
+                        </button>
+                        <button class="filter-tab" data-status="accepted" style="color: rgb(63, 145, 63);">
+                            Đã chấp nhận
+                            <span class="tab-count" id="countAccepted">0</span>
+                        </button>
+                        <button class="filter-tab" data-status="rejected" style="color: red;">
+                            Bị từ chối
+                            <span class="tab-count" id="countRejected">0</span>
+                        </button>
+                        <button class="filter-tab" data-status="cancelled" style="color: gray;">
+                            Đã hủy
+                            <span class="tab-count" id="countCancelled">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Requests Container -->
                     <div id="requestsContainer">
-                        <div class="empty-state">
-                            <i class="fas fa-clipboard-list"></i>
-                            <h3>Chưa có yêu cầu</h3>
-                            <p>Bạn chưa tạo yêu cầu nào. Hãy tạo yêu cầu để tìm gia sư phù hợp!</p>
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Đang tải yêu cầu...</p>
                         </div>
                     </div>
                 </div>
@@ -135,8 +306,25 @@
         </main>
     </div>
 
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Gửi Yêu Cầu Thành Công!</h3>
+            <p>Yêu cầu của bạn đã được gửi đến gia sư. Bạn sẽ nhận được thông báo khi gia sư phản hồi.</p>
+            <div style="width: 100%; display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="closeSuccessModal()"  >
+                Đóng
+            </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/tutor-requests.js"></script>
 </body>
 </html>

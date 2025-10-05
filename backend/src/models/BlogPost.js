@@ -1,177 +1,197 @@
 const mongoose = require('mongoose');
 
-const blogPostSchema = new mongoose.Schema({
-  authorId: {
+const replySchema = new mongoose.Schema({
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  title: {
+  content: {
     type: String,
     required: true,
-    trim: true,
-    maxlength: 200
+    maxlength: 1000
   },
-  slug: {
-    type: String,
-    required: true,
-    unique: true
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const commentSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   content: {
     type: String,
+    required: true,
+    maxlength: 1000
+  },
+  likes: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  replies: [replySchema],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const blogPostSchema = new mongoose.Schema({
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
-  excerpt: {
+  authorRole: {
     type: String,
-    maxlength: 300
+    enum: ['student', 'tutor', 'admin'],
+    required: true
   },
-  featuredImage: {
-    type: String
+  title: {
+    type: String,
+    trim: true,
+    maxlength: 200
+  },
+  content: {
+    type: String,
+    required: [true, 'Nội dung bài viết không được để trống'],
+    maxlength: 10000
+  },
+  images: [{
+    url: {
+      type: String,
+      required: true
+    },
+    publicId: {
+      type: String,
+      required: true
+    },
+    caption: String
+  }],
+  type: {
+    type: String,
+    enum: ['status', 'article', 'photo'],
+    default: 'status'
   },
   category: {
     type: String,
-    enum: ['education', 'teaching_tips', 'student_guide', 'exam_prep', 'career_advice', 'technology', 'other'],
-    required: true
+    enum: ['education', 'experience', 'tips', 'announcement', 'general'],
+    default: 'general'
   },
   tags: [{
     type: String,
     trim: true
   }],
-  // Trạng thái
+  likes: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  comments: [commentSchema],
+  shares: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    sharedAt: {
+      type: Date,
+      default: Date.now
+    },
+    caption: String
+  }],
   status: {
     type: String,
-    enum: ['draft', 'pending', 'published', 'rejected'],
+    enum: ['draft', 'pending', 'approved', 'rejected'],
     default: 'draft'
   },
-  publishedAt: {
-    type: Date
+  moderationNote: {
+    type: String,
+    maxlength: 500
   },
-  // Moderation
   moderatedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  moderatedAt: {
-    type: Date
-  },
-  rejectionReason: {
-    type: String
-  },
-  // SEO
-  metaTitle: {
-    type: String,
-    maxlength: 60
-  },
-  metaDescription: {
-    type: String,
-    maxlength: 160
-  },
-  // Thống kê
+  moderatedAt: Date,
   views: {
     type: Number,
     default: 0
   },
-  likes: {
-    type: Number,
-    default: 0
+  isPublic: {
+    type: Boolean,
+    default: true
   },
-  comments: {
-    type: Number,
-    default: 0
-  },
-  shares: {
-    type: Number,
-    default: 0
-  },
-  // Engagement
-  likedBy: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-  // Reading time estimation
-  readingTime: {
-    type: Number, // minutes
-    default: 1
+  isPinned: {
+    type: Boolean,
+    default: false
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
-// Index
-blogPostSchema.index({ slug: 1 }, { unique: true });
-blogPostSchema.index({ authorId: 1, status: 1 });
+// Indexes for better query performance
+blogPostSchema.index({ author: 1, createdAt: -1 });
+blogPostSchema.index({ status: 1, createdAt: -1 });
 blogPostSchema.index({ category: 1, status: 1 });
 blogPostSchema.index({ tags: 1 });
-blogPostSchema.index({ publishedAt: -1 });
-blogPostSchema.index({ views: -1 });
+blogPostSchema.index({ isPinned: -1, createdAt: -1 });
 
-// Populate author info
-blogPostSchema.pre(/^find/, function(next) {
-  this.populate({
-    path: 'authorId',
-    select: 'email role',
-    populate: {
-      path: 'profile',
-      select: 'fullName avatar'
+// Virtual for like count
+blogPostSchema.virtual('likeCount').get(function() {
+  return this.likes ? this.likes.length : 0;
+});
+
+// Virtual for comment count
+blogPostSchema.virtual('commentCount').get(function() {
+  return this.comments ? this.comments.length : 0;
+});
+
+// Virtual for share count
+blogPostSchema.virtual('shareCount').get(function() {
+  return this.shares ? this.shares.length : 0;
+});
+
+// Method to check if user liked the post
+blogPostSchema.methods.isLikedBy = function(userId) {
+  return this.likes.some(like => like.user.toString() === userId.toString());
+};
+
+// Static method to get posts by status
+blogPostSchema.statics.getByStatus = function(status, limit = 10) {
+  return this.find({ status })
+    .populate('author', 'email role')
+    .sort({ createdAt: -1 })
+    .limit(limit);
+};
+
+// Pre-save middleware to set authorRole
+blogPostSchema.pre('save', async function(next) {
+  if (this.isNew || this.isModified('author')) {
+    const User = mongoose.model('User');
+    const user = await User.findById(this.author);
+    if (user) {
+      this.authorRole = user.role;
     }
-  });
+  }
   next();
 });
 
-// Generate slug from title
-blogPostSchema.pre('save', function(next) {
-  if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim('-') + '-' + Date.now();
-  }
-  
-  // Calculate reading time (average 200 words per minute)
-  if (this.isModified('content')) {
-    const wordCount = this.content.split(/\s+/).length;
-    this.readingTime = Math.ceil(wordCount / 200);
-  }
-  
-  // Generate excerpt if not provided
-  if (this.isModified('content') && !this.excerpt) {
-    const plainText = this.content.replace(/<[^>]*>/g, ''); // Remove HTML tags
-    this.excerpt = plainText.substring(0, 250) + '...';
-  }
-  
-  next();
-});
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
 
-// Increment views
-blogPostSchema.methods.incrementViews = function() {
-  this.views += 1;
-  return this.save();
-};
-
-// Toggle like
-blogPostSchema.methods.toggleLike = function(userId) {
-  const index = this.likedBy.indexOf(userId);
-  
-  if (index > -1) {
-    // Unlike
-    this.likedBy.splice(index, 1);
-    this.likes -= 1;
-  } else {
-    // Like
-    this.likedBy.push(userId);
-    this.likes += 1;
-  }
-  
-  return this.save();
-};
-
-// Publish post
-blogPostSchema.methods.publish = function() {
-  this.status = 'published';
-  this.publishedAt = new Date();
-  return this.save();
-};
-
-module.exports = mongoose.model('BlogPost', blogPostSchema);
+module.exports = BlogPost;

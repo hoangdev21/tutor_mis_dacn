@@ -31,6 +31,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid #e4e6eb;
 }
 
 .sidebar-brand {
@@ -130,6 +131,7 @@
   position: sticky;
   top: 0;
   z-index: 999;
+  height: 89px;
 }
 
 .header-left {
@@ -203,6 +205,11 @@
   transition: background 0.3s ease;
 }
 
+/* Ensure notification button is positioning context for panel */
+.notification-btn {
+  position: relative;
+}
+
 .notification-btn:hover, .user-menu-btn:hover {
   background: var(--bg-color);
 }
@@ -244,6 +251,19 @@
   margin-bottom: 30px;
 }
 
+.stat-card.blue{
+  background: linear-gradient(135deg, #a6afd9 0%, #f5abd0 100%);
+}
+.stat-card.green{
+  background: linear-gradient(135deg, #6bbfb8 0%, #62e494 100%);
+}
+.stat-card.orange{
+  background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+}
+.stat-card.purple{
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
 .stat-card {
   background: white;
   padding: 25px;
@@ -273,33 +293,52 @@
 
 .stat-icon.blue {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
 }
 
 .stat-icon.green {
   background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-radius: 50%;
 }
 
 .stat-icon.orange {
   background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+  border-radius: 50%;
+}
+.stat-icon.yellow {
+  background: linear-gradient(135deg, #ffeb3b 0%, #fbc02d 100%);
+  border-radius: 50%;
 }
 
 .stat-icon.purple {
   background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-radius: 50%;
   color: #764ba2;
 }
 
 .stat-info h3 {
   font-size: 32px;
   font-weight: 700;
-  margin: 0 0 5px 0;
+  text-align: center;
   color: var(--text-color);
 }
 
 .stat-info p {
   color: var(--text-secondary);
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
 }
+
+.stat-icon.white {
+    border: 2px solid black; 
+    border-radius: 50%; 
+    padding: 10px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #a4e1ed;
+}
+
 
 .stat-change {
   display: flex;
@@ -466,18 +505,18 @@
 }
 
 .action-btn.primary {
-  background: var(--primary-color);
-  color: white;
+  border: 1px solid gray;
+  color: rgb(170, 156, 239);
 }
 
 .action-btn.success {
-  background: var(--success-color);
-  color: white;
+  background: rgb(132, 213, 132);
+  color: rgb(0, 0, 0);
 }
 
 .action-btn.danger {
-  background: var(--danger-color);
-  color: white;
+  background: rgb(214, 54, 54);
+  color: rgb(0, 0, 0);
 }
 
 .action-btn.secondary {

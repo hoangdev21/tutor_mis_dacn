@@ -362,7 +362,39 @@ GET    /admin/finance          # Thống kê tài chính
 
 ## 🧪 Testing
 
-### Manual Testing
+### Automated Testing (Blog Features)
+
+TutorMis bao gồm test suite tự động để kiểm tra các chức năng blog.
+
+#### 1. Chạy Automated Test
+```bash
+cd backend
+
+# Test với một user
+node test-blog-automated.js
+
+# Test nhanh với nhiều users
+node test-blog-quick.js
+```
+
+**Các test cases:**
+- ✅ Authentication & JWT Token
+- ✅ User Profile & Avatar (Cloudinary)
+- ✅ Create Blog Post (with/without images)
+- ✅ Get Posts (all, filtered by category)
+- ✅ Like/Unlike Post
+- ✅ Add Comment
+- ✅ Share Post
+- ✅ Get My Posts (all, filtered by status)
+
+**Xem thêm**: [AUTOMATED_TEST_GUIDE.md](./AUTOMATED_TEST_GUIDE.md)
+
+#### 2. Manual HTML Testing
+Mở file `frontend/test-blog-features.html` trong browser để test thủ công với UI.
+
+**Xem thêm**: [TEST_BLOG_GUIDE.md](./TEST_BLOG_GUIDE.md)
+
+### API Testing
 
 #### 1. User Registration Flow
 ```bash

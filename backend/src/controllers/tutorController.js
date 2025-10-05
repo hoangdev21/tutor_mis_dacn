@@ -1,4 +1,4 @@
-const { TutorProfile, TutorRequest, Course, Message, User } = require('../models');
+const { TutorProfile, TutorRequest, Course, Message, User, BookingRequest } = require('../models');
 
 // @desc    Lấy thông tin dashboard gia sư
 // @route   GET /api/tutor/dashboard
@@ -6,78 +6,344 @@ const { TutorProfile, TutorRequest, Course, Message, User } = require('../models
 const getDashboard = async (req, res) => {
   try {
     const tutorId = req.user._id;
+    const { period = 'month' } = req.query;
     
-    // Thống kê tổng quan
+    // Calculate date range for income
+    const now = new Date();
+    let startDate = new Date();
+    let futureDate = new Date();
+    
+    switch (period) {
+      case 'week':
+        startDate.setDate(now.getDate() - 7);
+        futureDate.setDate(now.getDate() + 7);
+        break;
+      case 'month':
+        startDate.setMonth(now.getMonth() - 1);
+        futureDate.setMonth(now.getMonth() + 1);
+        break;
+      case 'year':
+        startDate.setFullYear(now.getFullYear() - 1);
+        futureDate.setFullYear(now.getFullYear() + 1);
+        break;
+    }
+    
+    // Get tutor profile for rating
+    const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
+    
+    // Thống kê tổng quan với BookingRequest - sử dụng đúng tên trường
     const [
-      newRequests,
+      totalStudents,
       activeStudents,
-      totalEarnings,
-      unreadMessages
+      availableRequests,
+      unreadMessages,
+      completedBookings,
+      totalBookings
     ] = await Promise.all([
-      TutorRequest.countDocuments({ 
-        'applications.tutorId': tutorId,
-        'applications.status': 'pending'
+      // Tổng học sinh (đã accept hoặc completed)
+      BookingRequest.distinct('student', { 
+        tutor: tutorId, 
+        status: { $in: ['accepted', 'completed'] } 
+      }).then(students => students.length),
+      
+      // Học sinh đang học (status = accepted)
+      BookingRequest.countDocuments({ 
+        tutor: tutorId, 
+        status: 'accepted' 
       }),
-      Course.countDocuments({ tutorId, status: 'active' }),
-      Course.aggregate([
-        { $match: { tutorId, status: { $in: ['active', 'completed'] } } },
-        { $group: { _id: null, total: { $sum: '$payment.paidAmount' } } }
-      ]).then(result => result[0]?.total || 0),
-      Message.countDocuments({ receiverId: tutorId, isRead: false })
+      
+      // Yêu cầu có sẵn (chưa ứng tuyển)
+      TutorRequest.countDocuments({ 
+        status: 'open',
+        expiryDate: { $gt: now },
+        'applications.tutorId': { $ne: tutorId }
+      }),
+      
+      // Tin nhắn chưa đọc
+      Message.countDocuments({ 
+        receiverId: tutorId, 
+        isRead: false 
+      }),
+      
+      // Khóa học hoàn thành
+      BookingRequest.countDocuments({ 
+        tutor: tutorId, 
+        status: 'completed' 
+      }),
+      
+      // Tổng khóa học
+      BookingRequest.countDocuments({ 
+        tutor: tutorId,
+        status: { $in: ['pending', 'accepted', 'completed'] }
+      })
+    ]);
+    
+    // Thu nhập thực tế (đã hoàn thành) - sử dụng completedAt thay vì payment.paidDate
+    const actualIncomeData = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: startDate, $lte: now }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } }
+          },
+          amount: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+        }
+      },
+      { $sort: { '_id.date': 1 } }
+    ]);
+    
+    // Thu nhập dự kiến (đang học)
+    const predictedIncomeData = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'accepted',
+          'schedule.startDate': { $gte: now, $lte: futureDate }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$schedule.startDate' } }
+          },
+          amount: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+        }
+      },
+      { $sort: { '_id.date': 1 } }
+    ]);
+    
+    // Format income data for chart
+    const incomeChartData = {
+      actual: actualIncomeData.map(d => ({ date: d._id.date, amount: d.amount })),
+      predicted: predictedIncomeData.map(d => ({ date: d._id.date, amount: d.amount }))
+    };
+    
+    // Tổng thu nhập thực tế (tháng này)
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    
+    const actualIncome = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: monthStart, $lte: monthEnd }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+        }
+      }
+    ]);
+    
+    // Tổng thu nhập dự kiến (tháng sau)
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+    
+    const predictedIncome = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'accepted',
+          'schedule.startDate': { $gte: nextMonthStart, $lte: nextMonthEnd }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+        }
+      }
     ]);
     
     // Học sinh gần đây
-    const recentStudents = await Course.find({ tutorId })
+    const recentStudents = await BookingRequest.find({
+      tutor: tutorId,
+      status: { $in: ['accepted', 'completed'] }
+    })
       .sort({ updatedAt: -1 })
       .limit(5)
-      .populate('studentId', 'email')
       .populate({
-        path: 'studentId',
-        populate: {
-          path: 'profile',
-          select: 'fullName avatar'
-        }
-      });
+        path: 'student',
+        select: 'email role'
+      })
+      .lean();
     
-    // Yêu cầu mới
+    // Lấy thông tin StudentProfile cho mỗi booking
+    const recentStudentsWithProfile = await Promise.all(
+      recentStudents.map(async (booking) => {
+        const studentProfile = await require('../models/StudentProfile').findOne({ 
+          userId: booking.student._id 
+        }).select('fullName avatar phone').lean();
+        
+        return {
+          ...booking,
+          studentProfile
+        };
+      })
+    );
+    
+    // Yêu cầu mới (chưa ứng tuyển)
     const newRequestsList = await TutorRequest.find({
       status: 'open',
-      $or: [
-        { 'applications.tutorId': { $ne: tutorId } },
-        { applications: { $size: 0 } }
-      ]
+      expiryDate: { $gt: now },
+      'applications.tutorId': { $ne: tutorId }
     })
       .sort({ createdAt: -1 })
       .limit(5)
-      .select('title subject level budgetRange location.city createdAt');
-    
-    // Lịch dạy hôm nay (giả lập)
-    const todaySchedule = await Course.find({
-      tutorId,
-      status: 'active'
-    })
-      .limit(3)
-      .populate('studentId', 'email')
       .populate({
         path: 'studentId',
+        select: 'email',
         populate: {
           path: 'profile',
           select: 'fullName avatar'
         }
-      });
+      })
+      .lean();
+    
+    // Lịch dạy sắp tới
+    const upcomingSchedule = await BookingRequest.find({
+      tutor: tutorId,
+      status: 'accepted',
+      'schedule.startDate': { $gte: now }
+    })
+      .sort({ 'schedule.startDate': 1 })
+      .limit(5)
+      .populate({
+        path: 'student',
+        select: 'email'
+      })
+      .lean();
+    
+    // Lấy thông tin StudentProfile cho lịch sắp tới
+    const upcomingScheduleWithProfile = await Promise.all(
+      upcomingSchedule.map(async (booking) => {
+        const studentProfile = await require('../models/StudentProfile').findOne({ 
+          userId: booking.student._id 
+        }).select('fullName avatar phone').lean();
+        
+        return {
+          ...booking,
+          studentProfile
+        };
+      })
+    );
+    
+    // Thông báo mới nhất (từ messages + system)
+    const recentNotifications = await Message.aggregate([
+      {
+        $match: {
+          receiverId: tutorId
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $limit: 5
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'senderId',
+          foreignField: '_id',
+          as: 'sender'
+        }
+      },
+      {
+        $unwind: '$sender'
+      },
+      {
+        $lookup: {
+          from: 'studentprofiles',
+          localField: 'sender._id',
+          foreignField: 'userId',
+          as: 'senderProfile'
+        }
+      },
+      {
+        $addFields: {
+          senderProfile: { $arrayElemAt: ['$senderProfile', 0] }
+        }
+      }
+    ]);
     
     res.status(200).json({
       success: true,
       data: {
         stats: {
-          newRequests,
+          totalStudents,
           activeStudents,
-          totalEarnings,
-          unreadMessages
+          completedBookings,
+          totalBookings,
+          availableRequests,
+          unreadMessages,
+          monthlyIncome: actualIncome[0]?.total || 0,
+          predictedIncome: predictedIncome[0]?.total || 0,
+          averageRating: tutorProfile?.stats?.averageRating || 0,
+          totalReviews: tutorProfile?.stats?.totalReviews || 0
         },
-        recentStudents,
-        newRequestsList,
-        todaySchedule
+        incomeChartData,
+        period,
+        recentStudents: recentStudentsWithProfile.map(booking => ({
+          _id: booking._id,
+          studentId: booking.student?._id,
+          studentName: booking.studentProfile?.fullName || 'Học sinh',
+          studentAvatar: booking.studentProfile?.avatar,
+          studentEmail: booking.student?.email,
+          subject: booking.subject?.name || 'N/A',  // ✅ Sử dụng subject.name
+          level: booking.subject?.level || 'N/A',
+          status: booking.status,
+          startDate: booking.schedule?.startDate,
+          totalAmount: booking.pricing?.totalAmount || 0,  // ✅ Sử dụng pricing.totalAmount
+          updatedAt: booking.updatedAt
+        })),
+        newRequests: newRequestsList.map(req => ({
+          _id: req._id,
+          studentId: req.studentId?._id,
+          studentName: req.studentId?.profile?.fullName || 'N/A',
+          studentAvatar: req.studentId?.profile?.avatar,
+          subject: req.subject,
+          level: req.level,
+          budget: req.budget,
+          teachingMethod: req.teachingMethod,
+          address: req.address,
+          description: req.description,
+          createdAt: req.createdAt
+        })),
+        upcomingSchedule: upcomingScheduleWithProfile.map(booking => ({
+          _id: booking._id,
+          studentId: booking.student?._id,
+          studentName: booking.studentProfile?.fullName || 'Học sinh',
+          studentAvatar: booking.studentProfile?.avatar,
+          studentPhone: booking.studentProfile?.phone,
+          subject: booking.subject?.name || 'N/A',  // ✅ Sử dụng subject.name
+          level: booking.subject?.level || 'N/A',
+          startDate: booking.schedule?.startDate,
+          preferredTime: booking.schedule?.preferredTime,  // ✅ Thời gian ưa thích
+          daysPerWeek: booking.schedule?.daysPerWeek,
+          hoursPerSession: booking.schedule?.hoursPerSession,
+          duration: booking.schedule?.duration,
+          location: booking.location?.type === 'online' ? 'Trực tuyến' : 
+                   (booking.location?.address || 'Chưa xác định')  // ✅ Sử dụng location.address
+        })),
+        notifications: recentNotifications.map(notif => ({
+          _id: notif._id,
+          senderId: notif.senderId,
+          senderName: notif.senderProfile?.fullName || notif.sender.email,
+          senderAvatar: notif.senderProfile?.avatar,
+          content: notif.content,
+          isRead: notif.isRead,
+          createdAt: notif.createdAt
+        }))
       }
     });
     
@@ -599,37 +865,57 @@ const applyRequest = async (req, res) => {
 // @access  Private (Tutor only)
 const getStudents = async (req, res) => {
   try {
-    const { status, page = 1, limit = 10 } = req.query;
+    const { status, page = 1, limit = 20 } = req.query;
     const tutorId = req.user._id;
     
-    const query = { tutorId };
-    if (status) query.status = status;
+    // Build query cho BookingRequest
+    const query = { tutor: tutorId };
+    
+    // Filter by status
+    if (status && status !== 'all') {
+      query.status = status;
+    } else {
+      // Mặc định lấy tất cả trừ rejected và cancelled
+      query.status = { $in: ['pending', 'accepted', 'completed'] };
+    }
     
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
     
     // Get total count
-    const total = await Course.countDocuments(query);
+    const total = await BookingRequest.countDocuments(query);
     
-    // Get courses
-    const courses = await Course.find(query)
+    // Get bookings
+    const bookings = await BookingRequest.find(query)
       .populate({
-        path: 'studentId',
-        select: 'email',
-        populate: {
-          path: 'profile',
-          select: 'fullName avatar phone'
-        }
+        path: 'student',
+        select: 'email'
       })
       .sort({ updatedAt: -1 })
       .skip(skip)
-      .limit(limitNum);
+      .limit(limitNum)
+      .lean();
+    
+    // Get StudentProfile for each booking
+    const bookingsWithProfile = await Promise.all(
+      bookings.map(async (booking) => {
+        const StudentProfile = require('../models/StudentProfile');
+        const studentProfile = await StudentProfile.findOne({ 
+          userId: booking.student._id 
+        }).select('fullName avatar phone').lean();
+        
+        return {
+          ...booking,
+          studentProfile
+        };
+      })
+    );
     
     res.status(200).json({
       success: true,
       data: {
-        courses: courses,
+        bookings: bookingsWithProfile,
         total: total,
         page: pageNum,
         pages: Math.ceil(total / limitNum)
