@@ -15,8 +15,12 @@ const authenticateSocket = async (socket, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.userId = decoded.id;
+    
+    // JWT token structure: { userId, role }
+    socket.userId = decoded.userId || decoded.id; // Support both for backward compatibility
     socket.userRole = decoded.role;
+    
+    console.log(`🔐 Socket authenticated: userId=${socket.userId}, role=${socket.userRole}`);
     
     next();
   } catch (error) {
@@ -36,6 +40,13 @@ const initializeSocket = (io) => {
 
     // Add user to online users
     onlineUsers.set(userId, socket.id);
+    console.log(`📊 Online users now: ${onlineUsers.size}`);
+    
+    // DEBUG: Log ALL events received from this socket
+    socket.onAny((eventName, ...args) => {
+      console.log(`🎯 [Socket ${socket.id}] Event received: "${eventName}"`, 
+        args.length > 0 ? `with ${args.length} arg(s)` : '');
+    });
 
     // Update lastSeen in database to current time (user is now online)
     try {
@@ -55,6 +66,7 @@ const initializeSocket = (io) => {
 
     // Join user's personal room
     socket.join(`user:${userId}`);
+    console.log(`✅ User ${userId} joined personal room: user:${userId}`);
 
     // Handle joining a conversation room
     socket.on('join_conversation', async ({ conversationId, recipientId }) => {
@@ -258,6 +270,174 @@ const initializeSocket = (io) => {
         userId,
         lastSeen: lastSeenTime
       });
+    });
+
+    // ========== WEBRTC SIGNALING EVENTS ==========
+    
+    // Handle call initiation
+    socket.on('call_user', async ({ recipientId, offer, callType }) => {
+      try {
+        console.log(`📞 ===== CALL_USER EVENT =====`);
+        console.log(`📞 Caller userId: ${userId}`);
+        console.log(`📞 Recipient ID: ${recipientId}`);
+        console.log(`📞 Call Type: ${callType}`);
+        console.log(`🔍 Online users count: ${onlineUsers.size}`);
+        console.log(`🔍 Is recipient online? ${onlineUsers.has(recipientId)}`);
+        console.log(`🔍 Online user IDs:`, Array.from(onlineUsers.keys()));
+        
+        // Verify userId is valid
+        if (!userId) {
+          console.error('❌ userId is undefined!');
+          return socket.emit('call_failed', { message: 'Authentication error' });
+        }
+        
+        // Get caller info from User AND Profile
+        console.log(`🔍 Fetching caller info for: ${userId}`);
+        const caller = await User.findById(userId).select('role').populate('profile');
+        
+        if (!caller) {
+          console.error(`❌ Caller not found: ${userId}`);
+          return socket.emit('call_failed', { message: 'Caller not found' });
+        }
+        
+        // Extract name and avatar from profile
+        const callerName = caller.profile?.name || caller.profile?.fullName || 'Unknown User';
+        const callerAvatar = caller.profile?.avatar || caller.profile?.profilePicture || null;
+        
+        console.log(`✅ Caller found:`, {
+          id: caller._id,
+          role: caller.role,
+          name: callerName,
+          avatar: callerAvatar,
+          profileExists: !!caller.profile
+        });
+        
+        // CRITICAL: Validate data
+        if (!callerName || callerName === 'Unknown User') {
+          console.error(`⚠️ WARNING: Caller name not found in profile for user ${userId}`);
+        }
+        if (!callerAvatar) {
+          console.warn(`⚠️ WARNING: Caller avatar not found in profile for user ${userId}`);
+        }
+        
+        // Check if recipient exists and get their info
+        console.log(`🔍 Fetching recipient info for: ${recipientId}`);
+        const recipient = await User.findById(recipientId).select('name');
+        if (!recipient) {
+          console.error(`❌ Recipient not found: ${recipientId}`);
+          return socket.emit('call_failed', { 
+            message: 'User not found',
+            recipientId 
+          });
+        }
+        console.log(`✅ Recipient found: ${recipient.name}`);
+        
+        // Prepare call data with fallbacks
+        const callData = {
+          callerId: userId,
+          callerName: callerName,
+          callerAvatar: callerAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(callerName)}`,
+          callerRole: caller.role,
+          offer,
+          callType, // 'video' or 'audio'
+          timestamp: new Date()
+        };
+        
+        console.log(`📤 Sending incoming_call event with data:`, {
+          callerId: callData.callerId,
+          callerName: callData.callerName,
+          callerAvatar: callData.callerAvatar,
+          callerRole: callData.callerRole,
+          callType: callData.callType
+        });
+        
+        // Send call request to recipient
+        io.to(`user:${recipientId}`).emit('incoming_call', callData);
+
+        console.log(`✅ Call notification sent to user:${recipientId}`);
+        
+        // Set a timeout - if no response in 30 seconds, consider failed
+        setTimeout(() => {
+          // This will be handled by frontend timeout as well
+          console.log(`⏰ Call timeout for ${recipientId}`);
+        }, 30000);
+        
+      } catch (error) {
+        console.error('❌ Error initiating call:', error);
+        console.error('❌ Error stack:', error.stack);
+        console.error('❌ Error details:', {
+          name: error.name,
+          message: error.message,
+          userId,
+          recipientId
+        });
+        socket.emit('call_failed', { 
+          message: 'Failed to initiate call',
+          error: error.message 
+        });
+      }
+    });
+
+    // Handle call acceptance
+    socket.on('call_accepted', ({ callerId, answer }) => {
+      try {
+        console.log(`✅ User ${userId} accepted call from ${callerId}`);
+        
+        if (onlineUsers.has(callerId)) {
+          io.to(`user:${callerId}`).emit('call_accepted', {
+            recipientId: userId,
+            answer
+          });
+        }
+      } catch (error) {
+        console.error('Error accepting call:', error);
+      }
+    });
+
+    // Handle call rejection
+    socket.on('call_rejected', ({ callerId, reason }) => {
+      try {
+        console.log(`❌ User ${userId} rejected call from ${callerId}`);
+        
+        if (onlineUsers.has(callerId)) {
+          io.to(`user:${callerId}`).emit('call_rejected', {
+            recipientId: userId,
+            reason: reason || 'Call declined'
+          });
+        }
+      } catch (error) {
+        console.error('Error rejecting call:', error);
+      }
+    });
+
+    // Handle ICE candidate exchange
+    socket.on('ice_candidate', ({ recipientId, candidate }) => {
+      try {
+        if (onlineUsers.has(recipientId)) {
+          io.to(`user:${recipientId}`).emit('ice_candidate', {
+            senderId: userId,
+            candidate
+          });
+        }
+      } catch (error) {
+        console.error('Error sending ICE candidate:', error);
+      }
+    });
+
+    // Handle call end
+    socket.on('end_call', ({ recipientId }) => {
+      try {
+        console.log(`📴 User ${userId} ending call with ${recipientId}`);
+        
+        if (recipientId && onlineUsers.has(recipientId)) {
+          io.to(`user:${recipientId}`).emit('call_ended', {
+            userId,
+            reason: 'Call ended by peer'
+          });
+        }
+      } catch (error) {
+        console.error('Error ending call:', error);
+      }
     });
 
     // Handle errors

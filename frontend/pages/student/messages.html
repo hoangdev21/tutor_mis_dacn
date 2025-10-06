@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
     <link rel="stylesheet" href="../../assets/css/messages.css">
+    <link rel="stylesheet" href="../../assets/css/webrtc-call.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -154,6 +155,12 @@
                                 </div>
                             </div>
                             <div class="chat-actions">
+                                <button class="icon-btn" id="audioCallBtn" title="Gọi thoại" onclick="initiateCall('audio')">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button class="icon-btn" id="videoCallBtn" title="Gọi video" onclick="initiateCall('video')">
+                                    <i class="fas fa-video"></i>
+                                </button>
                                 <button class="icon-btn" title="Tìm kiếm">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -221,8 +228,79 @@
         </div>
     </div>
 
+    <!-- Call Modal -->
+    <div class="call-modal" id="callModal">
+        <div class="call-overlay"></div>
+        <div class="call-container">
+            <!-- Incoming Call -->
+            <div class="incoming-call" id="incomingCall" style="display: none;">
+                <div class="call-avatar">
+                    <img id="incomingCallerAvatar" src="" alt="Caller">
+                </div>
+                <h3 id="incomingCallerName">Caller Name</h3>
+                <p class="call-type-text" id="incomingCallType">Cuộc gọi đến...</p>
+                <div class="call-actions-row">
+                    <button class="call-btn call-btn-reject" onclick="rejectIncomingCall()">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                    <button class="call-btn call-btn-accept" onclick="acceptIncomingCall()">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Outgoing Call -->
+            <div class="outgoing-call" id="outgoingCall" style="display: none;">
+                <div class="call-avatar">
+                    <img id="outgoingRecipientAvatar" src="" alt="Recipient">
+                </div>
+                <h3 id="outgoingRecipientName">Recipient Name</h3>
+                <p class="call-type-text">Đang gọi...</p>
+                <div class="call-actions-row">
+                    <button class="call-btn call-btn-reject" onclick="endCall()">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Call -->
+            <div class="active-call" id="activeCall" style="display: none;">
+                <div class="video-container">
+                    <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
+                    <video id="localVideo" class="local-video" autoplay playsinline muted></video>
+                    
+                    <!-- Call Info Overlay -->
+                    <div class="call-info-overlay" id="callInfoOverlay">
+                        <div class="call-user-info">
+                            <img id="activeCallAvatar" src="" alt="User">
+                            <div>
+                                <h4 id="activeCallName">User Name</h4>
+                                <span class="call-duration" id="callDuration">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call Controls -->
+                <div class="call-controls">
+                    <button class="call-control-btn" id="toggleAudioBtn" onclick="toggleAudio()" title="Tắt/Bật micro">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="call-control-btn" id="toggleVideoBtn" onclick="toggleVideo()" title="Tắt/Bật camera" style="display: none;">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="call-control-btn call-control-end" onclick="endCall()" title="Kết thúc">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="../../assets/js/token-manager.js"></script>
+    <script src="../../assets/js/webrtc-service.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
     <script src="../../assets/js/messages.js"></script>
 </body>

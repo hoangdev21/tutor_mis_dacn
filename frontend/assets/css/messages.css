@@ -1,11 +1,7 @@
 /* ===== MESSAGES PAGE STYLES - MESSENGER STYLE ===== */
 
 /* ===== GENERAL ===== */
-body {
-  overflow: hidden;
-  background: #f0f2f5;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
+
 
 .messages-container {
   display: grid;

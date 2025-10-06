@@ -253,10 +253,15 @@ function renderRecentStudents(students) {
               <p style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">
                 <i class="fas fa-calendar" style="margin-right: 4px;"></i>${formatDate(student.startDate)}
               </p>
-              <p style="font-size: 14px; font-weight: 700; color: #059669;">${formatCurrency(student.totalAmount)}</p>
-              <button onclick="contactStudent('${student.studentId}')" style="margin-top: 6px; padding: 4px 10px; font-size: 11px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                <i class="fas fa-comment"></i> Nhắn tin
-              </button>
+              <p style="font-size: 14px; font-weight: 700; color: #059669; margin-bottom: 6px;">${formatCurrency(student.totalAmount)}</p>
+              <div style="display: flex; gap: 4px;">
+                <button onclick="contactStudent('${student.studentId}')" style="padding: 4px 10px; font-size: 11px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" title="Nhắn tin">
+                  <i class="fas fa-comment"></i>
+                </button>
+                <button onclick="callStudent('${student.studentId}', 'video')" style="padding: 4px 10px; font-size: 11px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" title="Gọi video">
+                  <i class="fas fa-video"></i>
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -382,11 +387,9 @@ function renderUpcomingSchedule(schedule) {
               <button onclick="contactStudent('${item.studentId}')" style="padding: 8px 14px; font-size: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
                 <i class="fas fa-comment"></i> Nhắn tin
               </button>
-              ${item.studentPhone ? `
-              <button onclick="window.location.href='tel:${item.studentPhone}'" style="padding: 8px 14px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
-                <i class="fas fa-phone"></i> Gọi
+              <button onclick="callStudent('${item.studentId}', 'video')" style="padding: 8px 14px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                <i class="fas fa-video"></i> Gọi video
               </button>
-              ` : ''}
             </div>
           </div>
         `;
@@ -522,6 +525,12 @@ async function applyToRequest(requestId) {
 // Contact student
 function contactStudent(studentId) {
   window.location.href = `messages.html?userId=${studentId}`;
+}
+
+// Call student - initiate video/audio call
+function callStudent(studentId, callType = 'video') {
+  // Redirect to messages page with call parameter
+  window.location.href = `messages.html?userId=${studentId}&autoCall=${callType}`;
 }
 
 // Change income chart period

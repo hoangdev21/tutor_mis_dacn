@@ -377,6 +377,9 @@ const getProfile = async (req, res) => {
     const formattedProfile = {
       _id: profile._id,
       userId: profile.userId,
+      fullName: profile.fullName,
+      phone: profile.phone,
+      avatar: profile.avatar,  // ✅ Thêm avatar vào root level
       dateOfBirth: profile.dateOfBirth,
       gender: profile.gender,
       idCard: profile.idCard,
@@ -642,6 +645,9 @@ const updateProfile = async (req, res) => {
     const formattedProfile = {
       _id: profile._id,
       userId: profile.userId,
+      fullName: profile.fullName,
+      phone: profile.phone,
+      avatar: profile.avatar,  // ✅ Thêm avatar vào root level
       dateOfBirth: profile.dateOfBirth,
       gender: profile.gender,
       idCard: profile.idCard,

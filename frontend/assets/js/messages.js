@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Socket.IO for real-time updates
   await initializeSocket();
   
+  // Initialize call audio
+  initializeCallAudio();
+  
   // Ensure empty state is shown if no conversation selected
   ensureEmptyStateDisplay();
   
@@ -105,9 +108,111 @@ async function initializeSocket() {
     
     // Connect to socket
     await messageSocket.connect();
+    
+    // Setup WebRTC event listeners (must be after socket connects)
+    setupWebRTCListeners();
   } catch (error) {
     console.error('Error initializing socket:', error);
   }
+}
+
+// Setup WebRTC event listeners
+function setupWebRTCListeners() {
+  if (!messageSocket || !messageSocket.socket) {
+    console.warn('⚠️ Socket not ready for WebRTC listeners');
+    return;
+  }
+  
+  // Remove existing listeners to avoid duplicates
+  messageSocket.socket.off('incoming_call');
+  messageSocket.socket.off('call_accepted');
+  messageSocket.socket.off('call_rejected');
+  messageSocket.socket.off('call_ended');
+  
+  // Listen for incoming calls - This must be always active
+  messageSocket.socket.on('incoming_call', (data) => {
+    console.log('📞 ===== INCOMING CALL RECEIVED =====');
+    console.log('📞 Caller:', data.callerName);
+    console.log('📞 Call Type:', data.callType);
+    console.log('📞 Full Data:', data);
+    handleIncomingCall(data);
+  });
+  
+  // Listen for call accepted (for outgoing calls)
+  // Note: WebRTC service already handles the answer, we just update UI
+  messageSocket.socket.on('call_accepted', ({ recipientId, answer }) => {
+    console.log('✅ Call accepted by:', recipientId);
+    
+    // Stop ringback tone (outgoing call sound)
+    stopRingtone();
+    
+    // Transition from outgoing to active call UI
+    setTimeout(() => {
+      document.getElementById('outgoingCall').style.display = 'none';
+      document.getElementById('activeCall').style.display = 'block';
+      
+      // Update active call info with recipient details
+      if (currentRecipient) {
+        const activeCallName = document.getElementById('activeCallName');
+        const activeCallAvatar = document.getElementById('activeCallAvatar');
+        
+        if (activeCallName) {
+          activeCallName.textContent = currentRecipient.name || 'User';
+        }
+        
+        if (activeCallAvatar) {
+          activeCallAvatar.src = currentRecipient.avatar || 
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(currentRecipient.name || 'User')}`;
+        }
+        
+        console.log('📞 Active call info set:', {
+          name: currentRecipient.name,
+          avatar: currentRecipient.avatar
+        });
+          
+        // Show video button only for video calls
+        const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+        if (toggleVideoBtn && webrtcService) {
+          toggleVideoBtn.style.display = webrtcService.callType === 'video' ? 'block' : 'none';
+        }
+      } else {
+        console.warn('⚠️ currentRecipient is not set!');
+      }
+      
+      startCallDuration();
+    }, 500); // Small delay to ensure WebRTC connection is established
+  });
+  
+  // Listen for call rejected
+  messageSocket.socket.on('call_rejected', ({ reason }) => {
+    console.log('❌ Call rejected:', reason);
+    
+    // Stop ringback tone
+    stopRingtone();
+    
+    hideCallModal();
+    showNotification(reason || 'Cuộc gọi bị từ chối', 'error');
+    
+    // Add call history message
+    addCallHistoryMessage('rejected', false);
+  });
+  
+  // Listen for call ended by peer
+  messageSocket.socket.on('call_ended', () => {
+    console.log('📴 Call ended by peer');
+    
+    // Stop any ringtone/ringback
+    stopRingtone();
+    
+    hideCallModal();
+    stopCallDuration();
+    showNotification('Cuộc gọi đã kết thúc', 'info');
+    
+    // Add call history message
+    addCallHistoryMessage('ended', false);
+  });
+  
+  console.log('✅ WebRTC listeners setup complete');
 }
 
 // Load external script dynamically
@@ -318,6 +423,20 @@ async function checkAndOpenConversation() {
         console.error('❌ Could not get recipient info');
         showNotification('Không thể mở cuộc trò chuyện', 'error');
       }
+    }
+    
+    // Check if auto-call is requested
+    const autoCall = urlParams.get('autoCall');
+    if (autoCall && (autoCall === 'video' || autoCall === 'audio')) {
+      console.log(`📞 Auto-initiating ${autoCall} call...`);
+      // Wait a bit for the conversation UI to fully load
+      setTimeout(() => {
+        if (typeof initiateCall === 'function') {
+          initiateCall(autoCall);
+        } else {
+          console.error('❌ initiateCall function not found');
+        }
+      }, 500);
     }
     
     // Clean up URL
@@ -1266,11 +1385,960 @@ async function fetchAndDisplayUserStatus(userId) {
   }
 }
 
+// ========== WEBRTC VIDEO/AUDIO CALL FUNCTIONALITY ==========
+
+let webrtcService = null;
+let callDurationInterval = null;
+let callStartTime = null;
+let incomingCallData = null;
+
+// Initialize WebRTC service
+function initializeWebRTC() {
+  if (!WebRTCService.isSupported()) {
+    console.error('❌ WebRTC is not supported in this browser');
+    showNotification('Trình duyệt của bạn không hỗ trợ gọi điện', 'error');
+    return false;
+  }
+
+  // Wait for socket to be available
+  if (!messageSocket || !messageSocket.socket) {
+    console.error('❌ Socket not initialized');
+    return false;
+  }
+
+  webrtcService = new WebRTCService(messageSocket.socket);
+
+  // Setup callbacks
+  webrtcService.onLocalStream = (stream) => {
+    const localVideo = document.getElementById('localVideo');
+    if (localVideo) {
+      localVideo.srcObject = stream;
+      // Local video is always muted to prevent echo
+      localVideo.muted = true;
+      
+      // Force position to top-right corner (default)
+      localVideo.style.position = 'absolute';
+      localVideo.style.top = '20px';
+      localVideo.style.right = '20px';
+      localVideo.style.left = 'auto';
+      localVideo.style.bottom = 'auto';
+      
+      console.log('✅ Local stream set');
+      console.log('   Audio tracks:', stream.getAudioTracks().length);
+      console.log('   Video tracks:', stream.getVideoTracks().length);
+      
+      // Debug: Check if audio tracks are enabled
+      stream.getAudioTracks().forEach((track, index) => {
+        console.log(`   Audio track ${index}:`, {
+          enabled: track.enabled,
+          muted: track.muted,
+          readyState: track.readyState,
+          label: track.label
+        });
+      });
+      
+      // Make local video draggable after position is set
+      setTimeout(() => makeLocalVideoDraggable(), 200);
+    }
+  };
+
+  webrtcService.onRemoteStream = (stream) => {
+    // CRITICAL: Stop ringtone immediately when remote stream arrives
+    stopRingtone();
+    console.log('🔕 Remote stream received, stopping all ringtones');
+    
+    const remoteVideo = document.getElementById('remoteVideo');
+    if (remoteVideo) {
+      remoteVideo.srcObject = stream;
+      
+      // CRITICAL: Enable audio playback
+      remoteVideo.volume = 1.0;
+      remoteVideo.muted = false;
+      
+      // Ensure video plays with audio
+      remoteVideo.play().catch(err => {
+        console.warn('Auto-play prevented, trying with user interaction:', err);
+      });
+      
+      console.log('✅ Remote stream set with audio enabled');
+      console.log('   Audio tracks:', stream.getAudioTracks().length);
+      console.log('   Video tracks:', stream.getVideoTracks().length);
+      
+      // Debug: Check if audio tracks are enabled
+      stream.getAudioTracks().forEach((track, index) => {
+        console.log(`   Audio track ${index}:`, {
+          enabled: track.enabled,
+          muted: track.muted,
+          readyState: track.readyState,
+          label: track.label
+        });
+      });
+    }
+  };
+
+  webrtcService.onCallEnded = () => {
+    hideCallModal();
+    stopCallDuration();
+    showNotification('Cuộc gọi đã kết thúc', 'info');
+  };
+
+  webrtcService.onError = (error) => {
+    console.error('WebRTC Error:', error);
+    showNotification(error, 'error');
+  };
+
+  webrtcService.onStateChange = (state) => {
+    console.log('Call state changed:', state);
+    
+    // Stop ringtone when call is connected
+    if (state === 'connected') {
+      stopRingtone();
+      console.log('🔕 Call connected, ensuring ringtones stopped');
+    }
+  };
+
+  console.log('✅ WebRTC service initialized');
+  return true;
+}
+
+// Initiate a call (audio or video)
+async function initiateCall(callType) {
+  if (!currentRecipient) {
+    showNotification('Vui lòng chọn người nhận', 'error');
+    return;
+  }
+
+  // Check socket connection
+  if (!messageSocket || !messageSocket.socket || !messageSocket.connected) {
+    showNotification('Không có kết nối. Vui lòng tải lại trang.', 'error');
+    console.error('❌ Socket not connected');
+    return;
+  }
+
+  console.log('📞 Initiating call to:', currentRecipient);
+  console.log('📞 Socket ID:', messageSocket.socket.id);
+  console.log('📞 Socket connected:', messageSocket.connected);
+
+  // Initialize WebRTC if not already done
+  if (!webrtcService) {
+    if (!initializeWebRTC()) {
+      showNotification('Không thể khởi tạo WebRTC', 'error');
+      return;
+    }
+  }
+
+  try {
+    // Show outgoing call UI
+    showOutgoingCall(currentRecipient, callType);
+    
+    // Play ringback tone for outgoing call
+    playRingback();
+
+    // Start the call
+    await webrtcService.startCall(currentRecipient._id, callType);
+    
+    console.log('✅ Call initiated successfully');
+    
+    // Set a timeout to handle no response (30 seconds)
+    setTimeout(() => {
+      // Check if still in outgoing state (not connected yet)
+      const outgoingCall = document.getElementById('outgoingCall');
+      if (outgoingCall && outgoingCall.style.display === 'block') {
+        console.log('⏰ Call timeout - no response');
+        stopRingtone(); // Stop ringback tone
+        hideCallModal();
+        showNotification('Không có phản hồi. Người dùng có thể đang bận.', 'warning');
+        
+        if (webrtcService) {
+          webrtcService.endCall();
+        }
+        
+        // Add missed call history
+        addCallHistoryMessage('missed', true);
+      }
+    }, 30000); // 30 seconds timeout
+    
+  } catch (error) {
+    console.error('❌ Error initiating call:', error);
+    stopRingtone(); // Stop ringback tone
+    hideCallModal();
+    
+    // Better error messages
+    let errorMsg = 'Không thể bắt đầu cuộc gọi';
+    if (error.message.includes('offline')) {
+      errorMsg = 'Người dùng không trực tuyến. Vui lòng thử lại sau.';
+    } else if (error.message.includes('camera')) {
+      errorMsg = 'Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.';
+    } else if (error.message.includes('microphone')) {
+      errorMsg = 'Không thể truy cập microphone. Vui lòng kiểm tra quyền truy cập.';
+    }
+    
+    showNotification(errorMsg, 'error');
+  }
+}
+
+// Handle incoming call
+function handleIncomingCall(data) {
+  console.log('📞 Received incoming call data:', data);
+  console.log('  - callerId:', data.callerId);
+  console.log('  - callerName:', data.callerName);
+  console.log('  - callerAvatar:', data.callerAvatar);
+  console.log('  - callerRole:', data.callerRole);
+  console.log('  - callType:', data.callType);
+  
+  incomingCallData = data;
+  
+  // Show incoming call UI
+  showIncomingCall(data);
+  
+  // Play ringtone (optional)
+  playRingtone();
+}
+
+// Accept incoming call
+async function acceptIncomingCall() {
+  if (!incomingCallData) return;
+
+  if (!webrtcService) {
+    if (!initializeWebRTC()) return;
+  }
+
+  try {
+    const { callerId, offer, callType, callerName, callerAvatar } = incomingCallData;
+    
+    console.log('📞 Accepting call from:', {
+      callerId,
+      callerName,
+      callerAvatar,
+      callType,
+      fullData: incomingCallData
+    });
+    
+    // Stop ringtone
+    stopRingtone();
+    
+    // Hide incoming call, show active call
+    document.getElementById('incomingCall').style.display = 'none';
+    document.getElementById('activeCall').style.display = 'block';
+    
+    // Update active call info with caller details
+    const activeCallName = document.getElementById('activeCallName');
+    const activeCallAvatar = document.getElementById('activeCallAvatar');
+    
+    if (activeCallName) {
+      activeCallName.textContent = callerName || incomingCallData.callerName || 'Unknown User';
+      console.log('✅ Set active call name:', activeCallName.textContent);
+    }
+    
+    if (activeCallAvatar) {
+      const avatarUrl = callerAvatar || incomingCallData.callerAvatar || 
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(callerName || incomingCallData.callerName || 'User')}`;
+      activeCallAvatar.src = avatarUrl;
+      console.log('✅ Set active call avatar:', avatarUrl);
+    }
+    
+    // Show/hide video button based on call type
+    document.getElementById('toggleVideoBtn').style.display = callType === 'video' ? 'block' : 'none';
+    
+    // Answer the call
+    await webrtcService.answerCall(callerId, offer, callType);
+    
+    // Start call duration counter
+    startCallDuration();
+    
+  } catch (error) {
+    console.error('Error accepting call:', error);
+    hideCallModal();
+    showNotification('Không thể trả lời cuộc gọi: ' + error.message, 'error');
+  }
+}
+
+// Reject incoming call
+function rejectIncomingCall() {
+  if (!incomingCallData) return;
+
+  if (webrtcService) {
+    webrtcService.rejectCall(incomingCallData.callerId, 'Cuộc gọi bị từ chối');
+  }
+
+  hideCallModal();
+  stopRingtone();
+  
+  // Add call history message
+  addCallHistoryMessage('rejected', true);
+  
+  incomingCallData = null;
+}
+
+// End call
+function endCall() {
+  const hadConnection = callStartTime !== null;
+  
+  // Stop any playing audio
+  stopRingtone();
+  
+  if (webrtcService) {
+    webrtcService.endCall();
+  }
+  hideCallModal();
+  stopCallDuration();
+  
+  // Add call history message if call was connected
+  if (hadConnection) {
+    addCallHistoryMessage('ended', true);
+  } else {
+    // Call was cancelled before connecting
+    addCallHistoryMessage('cancelled', true);
+  }
+}
+
+// Toggle audio mute
+function toggleAudio() {
+  if (!webrtcService) return;
+
+  const isEnabled = webrtcService.toggleAudio();
+  const btn = document.getElementById('toggleAudioBtn');
+  const icon = btn.querySelector('i');
+  
+  if (isEnabled) {
+    icon.className = 'fas fa-microphone';
+    btn.classList.remove('muted');
+  } else {
+    icon.className = 'fas fa-microphone-slash';
+    btn.classList.add('muted');
+  }
+}
+
+// Toggle video
+function toggleVideo() {
+  if (!webrtcService) return;
+
+  const isEnabled = webrtcService.toggleVideo();
+  const btn = document.getElementById('toggleVideoBtn');
+  const icon = btn.querySelector('i');
+  
+  if (isEnabled) {
+    icon.className = 'fas fa-video';
+    btn.classList.remove('muted');
+  } else {
+    icon.className = 'fas fa-video-slash';
+    btn.classList.add('muted');
+  }
+}
+
+// Show outgoing call UI
+function showOutgoingCall(recipient, callType) {
+  const callModal = document.getElementById('callModal');
+  const outgoingCall = document.getElementById('outgoingCall');
+  
+  document.getElementById('outgoingRecipientName').textContent = recipient.name;
+  document.getElementById('outgoingRecipientAvatar').src = recipient.avatar || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(recipient.name)}`;
+  
+  callModal.style.display = 'flex';
+  document.getElementById('incomingCall').style.display = 'none';
+  document.getElementById('activeCall').style.display = 'none';
+  outgoingCall.style.display = 'block';
+}
+
+// Show incoming call UI
+function showIncomingCall(data) {
+  const callModal = document.getElementById('callModal');
+  const incomingCall = document.getElementById('incomingCall');
+  
+  console.log('🎨 showIncomingCall called with data:', data);
+  console.log('  - callerName:', data.callerName);
+  console.log('  - callerAvatar:', data.callerAvatar);
+  
+  // Set incoming call modal info
+  document.getElementById('incomingCallerName').textContent = data.callerName || 'Unknown User';
+  document.getElementById('incomingCallerAvatar').src = data.callerAvatar || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(data.callerName || 'User')}`;
+  document.getElementById('incomingCallType').textContent = 
+    data.callType === 'video' ? 'Cuộc gọi video đến...' : 'Cuộc gọi thoại đến...';
+  
+  // CRITICAL FIX: Pre-set active call info NOW (before accepting)
+  // This ensures info is ready when we switch to active call modal
+  const activeCallName = document.getElementById('activeCallName');
+  const activeCallAvatar = document.getElementById('activeCallAvatar');
+  
+  if (activeCallName) {
+    activeCallName.textContent = data.callerName || 'Unknown User';
+    console.log('✅ Pre-set activeCallName:', activeCallName.textContent);
+  } else {
+    console.error('❌ activeCallName element not found!');
+  }
+  
+  if (activeCallAvatar) {
+    const avatarUrl = data.callerAvatar || 
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(data.callerName || 'User')}`;
+    activeCallAvatar.src = avatarUrl;
+    console.log('✅ Pre-set activeCallAvatar:', avatarUrl);
+  } else {
+    console.error('❌ activeCallAvatar element not found!');
+  }
+  
+  callModal.style.display = 'flex';
+  document.getElementById('outgoingCall').style.display = 'none';
+  document.getElementById('activeCall').style.display = 'none';
+  incomingCall.style.display = 'block';
+}
+
+// Hide call modal
+function hideCallModal() {
+  const callModal = document.getElementById('callModal');
+  callModal.style.display = 'none';
+  document.getElementById('incomingCall').style.display = 'none';
+  document.getElementById('outgoingCall').style.display = 'none';
+  document.getElementById('activeCall').style.display = 'none';
+  
+  // Reset video elements
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  if (localVideo) {
+    localVideo.srcObject = null;
+    // Reset position to default (top-right corner)
+    localVideo.style.left = 'auto';
+    localVideo.style.top = '20px';
+    localVideo.style.right = '20px';
+    localVideo.style.bottom = 'auto';
+  }
+  if (remoteVideo) remoteVideo.srcObject = null;
+}
+
+// Start call duration counter
+function startCallDuration() {
+  callStartTime = Date.now();
+  callDurationInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const seconds = (elapsed % 60).toString().padStart(2, '0');
+    
+    const durationEl = document.getElementById('callDuration');
+    if (durationEl) {
+      durationEl.textContent = `${minutes}:${seconds}`;
+    }
+  }, 1000);
+}
+
+// Stop call duration counter
+function stopCallDuration() {
+  if (callDurationInterval) {
+    clearInterval(callDurationInterval);
+    callDurationInterval = null;
+  }
+  callStartTime = null;
+}
+
+// Ringtone functions (optional - can be enhanced with actual audio)
+// Audio Management for Calls
+let ringtoneAudio = null; // For incoming calls
+let ringbackAudio = null; // For outgoing calls
+let audioContext = null;
+let oscillator = null;
+let gainNode = null;
+
+// Initialize audio elements
+function initializeCallAudio() {
+  try {
+    // Use relative path from pages/student or pages/tutor
+    const audioBasePath = '../../assets/audio';
+    
+    // Ringtone for incoming calls
+    ringtoneAudio = new Audio(`${audioBasePath}/ringtone.mp3`);
+    ringtoneAudio.loop = true;
+    ringtoneAudio.volume = 0.5;
+    
+    // Add error handler
+    ringtoneAudio.addEventListener('error', (e) => {
+      console.error('❌ Ringtone audio failed to load:', e);
+      console.error('  - Attempted path:', ringtoneAudio.src);
+    });
+    
+    // Ringback for outgoing calls
+    ringbackAudio = new Audio(`${audioBasePath}/ringback.mp3`);
+    ringbackAudio.loop = true;
+    ringbackAudio.volume = 0.3;
+    
+    // Add error handler
+    ringbackAudio.addEventListener('error', (e) => {
+      console.error('❌ Ringback audio failed to load:', e);
+      console.error('  - Attempted path:', ringbackAudio.src);
+    });
+    
+    console.log('✅ Call audio initialized');
+    console.log('  - Ringtone path:', ringtoneAudio.src);
+    console.log('  - Ringback path:', ringbackAudio.src);
+  } catch (error) {
+    console.error('⚠️ Could not initialize audio files:', error);
+  }
+}
+
+// Play ringtone for incoming call
+function playRingtone() {
+  try {
+    console.log('🔔 playRingtone() called');
+    stopRingtone(); // Stop any existing ringtone
+    
+    if (ringtoneAudio) {
+      console.log('  - Using HTML5 Audio ringtone');
+      ringtoneAudio.currentTime = 0;
+      ringtoneAudio.play().then(() => {
+        console.log('✅ Ringtone playing via HTML5 Audio');
+      }).catch(err => {
+        console.warn('❌ Failed to play ringtone, using Web Audio fallback:', err);
+        playRingtoneWithWebAudio();
+      });
+    } else {
+      console.log('  - ringtoneAudio not initialized, using Web Audio');
+      playRingtoneWithWebAudio();
+    }
+  } catch (error) {
+    console.error('Error playing ringtone:', error);
+  }
+}
+
+// Stop ringtone
+function stopRingtone() {
+  try {
+    console.log('🔕 Stopping ringtone... (checking all audio sources)');
+    
+    // Stop HTML5 Audio elements
+    if (ringtoneAudio) {
+      console.log('  - Stopping ringtoneAudio:', {
+        paused: ringtoneAudio.paused,
+        currentTime: ringtoneAudio.currentTime,
+        src: ringtoneAudio.src
+      });
+      ringtoneAudio.pause();
+      ringtoneAudio.currentTime = 0;
+      ringtoneAudio.volume = 0; // FORCE mute
+      ringtoneAudio.src = ''; // CLEAR source
+      try {
+        ringtoneAudio.load(); // Force reload to reset state
+      } catch (e) {
+        console.warn('Could not reload ringtoneAudio:', e);
+      }
+    }
+    
+    if (ringbackAudio) {
+      console.log('  - Stopping ringbackAudio:', {
+        paused: ringbackAudio.paused,
+        currentTime: ringbackAudio.currentTime,
+        src: ringbackAudio.src
+      });
+      ringbackAudio.pause();
+      ringbackAudio.currentTime = 0;
+      ringbackAudio.volume = 0; // FORCE mute
+      ringbackAudio.src = ''; // CLEAR source
+      try {
+        ringbackAudio.load(); // Force reload to reset state
+      } catch (e) {
+        console.warn('Could not reload ringbackAudio:', e);
+      }
+    }
+    
+    // Stop Web Audio API oscillators
+    stopWebAudioTone();
+    
+    // CRITICAL: Close AudioContext completely
+    if (audioContext) {
+      console.log('  - AudioContext state:', audioContext.state);
+      if (audioContext.state === 'running') {
+        console.log('  - Suspending AudioContext');
+        audioContext.suspend().catch(err => {
+          console.warn('Could not suspend AudioContext:', err);
+        });
+      }
+      // Try to close it completely
+      if (audioContext.state !== 'closed') {
+        console.log('  - Attempting to close AudioContext');
+        audioContext.close().then(() => {
+          console.log('  - AudioContext closed');
+          audioContext = null; // Clear reference
+        }).catch(err => {
+          console.warn('Could not close AudioContext:', err);
+        });
+      }
+    }
+    
+    console.log('✅ All ringtones stopped');
+    
+    // Verify after 100ms
+    setTimeout(() => {
+      console.log('🔍 Verifying audio stopped...');
+      if (ringtoneAudio && !ringtoneAudio.paused) {
+        console.error('⚠️ WARNING: ringtoneAudio still playing!');
+        ringtoneAudio.pause();
+      }
+      if (ringbackAudio && !ringbackAudio.paused) {
+        console.error('⚠️ WARNING: ringbackAudio still playing!');
+        ringbackAudio.pause();
+      }
+      if (audioContext && audioContext.state === 'running') {
+        console.error('⚠️ WARNING: AudioContext still running!');
+      }
+    }, 100);
+  } catch (error) {
+    console.error('❌ Error stopping ringtone:', error);
+  }
+}
+
+// Play ringback for outgoing call
+function playRingback() {
+  try {
+    stopRingtone(); // Stop any existing audio
+    
+    if (ringbackAudio) {
+      ringbackAudio.currentTime = 0;
+      ringbackAudio.play().catch(err => {
+        console.warn('Failed to play ringback, using fallback:', err);
+        playRingbackWithWebAudio();
+      });
+      console.log('� Playing ringback tone...');
+    } else {
+      playRingbackWithWebAudio();
+    }
+  } catch (error) {
+    console.error('Error playing ringback:', error);
+  }
+}
+
+// Web Audio API fallback for ringtone (incoming)
+function playRingtoneWithWebAudio() {
+  try {
+    console.log('🔊 playRingtoneWithWebAudio() called (fallback)');
+    
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      console.log('  - Created new AudioContext');
+    }
+    
+    stopWebAudioTone();
+    console.log('  - Creating oscillator for ringtone');
+    
+    // Create oscillator for ringtone (double beep pattern)
+    oscillator = audioContext.createOscillator();
+    gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 480; // Hz
+    oscillator.type = 'sine';
+    gainNode.gain.value = 0.3;
+    
+    // Create beep pattern
+    const now = audioContext.currentTime;
+    oscillator.start(now);
+    
+    // Pattern: beep-beep-pause-repeat
+    let time = now;
+    const beepDuration = 0.2;
+    const pauseDuration = 0.2;
+    const longPause = 1.0;
+    
+    function scheduleBeeps() {
+      // Two short beeps
+      gainNode.gain.setValueAtTime(0.3, time);
+      gainNode.gain.setValueAtTime(0, time + beepDuration);
+      time += beepDuration + pauseDuration;
+      
+      gainNode.gain.setValueAtTime(0.3, time);
+      gainNode.gain.setValueAtTime(0, time + beepDuration);
+      time += beepDuration + longPause;
+      
+      // Repeat every 1.6 seconds
+      setTimeout(scheduleBeeps, 1600);
+    }
+    
+    scheduleBeeps();
+    
+  } catch (error) {
+    console.error('Error with Web Audio API:', error);
+  }
+}
+
+// Web Audio API fallback for ringback (outgoing)
+function playRingbackWithWebAudio() {
+  try {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    stopWebAudioTone();
+    
+    // Create oscillator for ringback (single beep pattern)
+    oscillator = audioContext.createOscillator();
+    gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 440; // Hz (A note)
+    oscillator.type = 'sine';
+    gainNode.gain.value = 0.2;
+    
+    // Create beep pattern
+    const now = audioContext.currentTime;
+    oscillator.start(now);
+    
+    // Pattern: beep-pause-repeat (like traditional ringback)
+    let time = now;
+    const beepDuration = 0.4;
+    const pauseDuration = 2.0;
+    
+    function scheduleRingback() {
+      gainNode.gain.setValueAtTime(0.2, time);
+      gainNode.gain.setValueAtTime(0, time + beepDuration);
+      time += beepDuration + pauseDuration;
+      
+      // Repeat every 2.4 seconds
+      setTimeout(scheduleRingback, 2400);
+    }
+    
+    scheduleRingback();
+    
+  } catch (error) {
+    console.error('Error with Web Audio API:', error);
+  }
+}
+
+// Stop Web Audio API tone
+function stopWebAudioTone() {
+  try {
+    if (oscillator) {
+      console.log('  - Stopping Web Audio oscillator');
+      try {
+        oscillator.stop();
+      } catch (e) {
+        // Already stopped
+      }
+      try {
+        oscillator.disconnect();
+      } catch (e) {
+        // Already disconnected
+      }
+      oscillator = null;
+    }
+    
+    if (gainNode) {
+      console.log('  - Disconnecting gainNode');
+      try {
+        gainNode.disconnect();
+      } catch (e) {
+        // Already disconnected
+      }
+      gainNode = null;
+    }
+    
+    console.log('  - Web Audio tone stopped');
+  } catch (error) {
+    console.warn('Error in stopWebAudioTone:', error);
+  }
+}
+
+// Debug: Check what audio is currently playing
+function checkAudioStatus() {
+  console.log('🔍 Checking audio status...');
+  
+  if (ringtoneAudio) {
+    console.log('  📱 Ringtone:', {
+      paused: ringtoneAudio.paused,
+      currentTime: ringtoneAudio.currentTime,
+      volume: ringtoneAudio.volume,
+      muted: ringtoneAudio.muted,
+      src: ringtoneAudio.src,
+      readyState: ringtoneAudio.readyState
+    });
+  }
+  
+  if (ringbackAudio) {
+    console.log('  📞 Ringback:', {
+      paused: ringbackAudio.paused,
+      currentTime: ringbackAudio.currentTime,
+      volume: ringbackAudio.volume,
+      muted: ringbackAudio.muted,
+      src: ringbackAudio.src,
+      readyState: ringbackAudio.readyState
+    });
+  }
+  
+  if (audioContext) {
+    console.log('  🔊 AudioContext:', {
+      state: audioContext.state,
+      currentTime: audioContext.currentTime
+    });
+  }
+  
+  if (oscillator) {
+    console.log('  🎵 Oscillator:', {
+      exists: !!oscillator,
+      type: oscillator?.type,
+      frequency: oscillator?.frequency?.value
+    });
+  } else {
+    console.log('  🎵 Oscillator: null');
+  }
+}
+
+// Make it globally accessible for debugging
+window.checkAudioStatus = checkAudioStatus;
+
+// Add call history message to chat
+function addCallHistoryMessage(status, isOutgoing) {
+  if (!currentRecipient) return;
+  
+  const messagesArea = document.getElementById('messagesArea');
+  if (!messagesArea) return;
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'message ' + (isOutgoing ? 'sent' : 'received');
+  
+  let icon = '';
+  let text = '';
+  let color = '';
+  
+  switch(status) {
+    case 'rejected':
+      icon = '📵';
+      text = isOutgoing ? 'Cuộc gọi bị từ chối' : 'Đã từ chối cuộc gọi';
+      color = '#ef4444';
+      break;
+    case 'cancelled':
+      icon = '📞';
+      text = 'Cuộc gọi đã hủy';
+      color = '#f59e0b';
+      break;
+    case 'ended':
+      icon = '📞';
+      const duration = callStartTime ? formatCallDuration(Date.now() - callStartTime) : '00:00';
+      text = `Cuộc gọi kết thúc • ${duration}`;
+      color = '#10b981';
+      break;
+    case 'missed':
+      icon = '📵';
+      text = 'Cuộc gọi nhỡ';
+      color = '#ef4444';
+      break;
+    default:
+      icon = '📞';
+      text = 'Cuộc gọi';
+      color = '#667eea';
+  }
+  
+  messageDiv.innerHTML = `
+    <div class="message-content" style="background: rgba(102, 126, 234, 0.1); border-left: 3px solid ${color}; padding: 12px 16px; border-radius: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px; color: ${color}; font-weight: 500;">
+        <span style="font-size: 18px;">${icon}</span>
+        <span>${text}</span>
+      </div>
+      <div class="message-time" style="margin-top: 4px;">${new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
+    </div>
+  `;
+  
+  messagesArea.appendChild(messageDiv);
+  messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+// Format call duration
+function formatCallDuration(ms) {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// ========== DRAGGABLE LOCAL VIDEO ==========
+// Make local video draggable with mouse
+function makeLocalVideoDraggable() {
+  const localVideo = document.getElementById('localVideo');
+  if (!localVideo) return;
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  localVideo.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  function dragStart(e) {
+    if (e.target === localVideo) {
+      isDragging = true;
+      
+      // Get current position
+      const rect = localVideo.getBoundingClientRect();
+      startX = e.clientX - rect.left;
+      startY = e.clientY - rect.top;
+      
+      localVideo.classList.add('dragging');
+      e.preventDefault();
+    }
+  }
+
+  function drag(e) {
+    if (!isDragging) return;
+    
+    e.preventDefault();
+
+    const container = localVideo.parentElement;
+    const containerRect = container.getBoundingClientRect();
+
+    // Calculate new position relative to container
+    let newLeft = e.clientX - containerRect.left - startX;
+    let newTop = e.clientY - containerRect.top - startY;
+
+    // Constrain within container boundaries
+    const maxLeft = containerRect.width - localVideo.offsetWidth;
+    const maxTop = containerRect.height - localVideo.offsetHeight;
+
+    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+    newTop = Math.max(0, Math.min(newTop, maxTop));
+
+    // Apply position
+    localVideo.style.left = newLeft + 'px';
+    localVideo.style.top = newTop + 'px';
+    localVideo.style.right = 'auto';
+    localVideo.style.bottom = 'auto';
+  }
+
+  function dragEnd(e) {
+    if (isDragging) {
+      isDragging = false;
+      localVideo.classList.remove('dragging');
+    }
+  }
+}
+
+// Initialize draggable when local stream is set
+function initializeLocalVideoDraggable() {
+  // Wait for video element to be available
+  const checkVideo = setInterval(() => {
+    const localVideo = document.getElementById('localVideo');
+    if (localVideo && localVideo.srcObject) {
+      makeLocalVideoDraggable();
+      clearInterval(checkVideo);
+    }
+  }, 500);
+
+  // Clear check after 10 seconds to prevent memory leak
+  setTimeout(() => clearInterval(checkVideo), 10000);
+}
+
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {
   if (messagePollingInterval) {
     clearInterval(messagePollingInterval);
   }
+  
+  if (webrtcService) {
+    webrtcService.destroy();
+  }
+  
+  stopCallDuration();
 });
 
 console.log('Messages page initialized');

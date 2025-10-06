@@ -439,5 +439,122 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/otp.js"></script>
     <script src="assets/js/auth.js"></script>
+    <script src="assets/js/mobile-debug-console.js"></script>
+    <script>
+  // ===== MOBILE DEBUG CONSOLE =====
+  // Shows console on screen for mobile debugging without USB
+  
+  (function() {
+    // Create debug console element
+    const debugConsole = document.createElement('div');
+    debugConsole.id = 'mobileDebugConsole';
+    debugConsole.style.cssText = `
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 40vh;
+      background: rgba(0,0,0,0.95);
+      color: #0f0;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 10px;
+      overflow-y: auto;
+      z-index: 999999;
+      border-top: 2px solid #0f0;
+      display: none;
+    `;
+    
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = '🐛 Debug';
+    toggleBtn.style.cssText = `
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1000000;
+      padding: 10px 15px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      font-size: 14px;
+    `;
+    
+    toggleBtn.onclick = () => {
+      if (debugConsole.style.display === 'none') {
+        debugConsole.style.display = 'block';
+        toggleBtn.textContent = '🐛 Hide';
+        toggleBtn.style.background = '#4CAF50';
+      } else {
+        debugConsole.style.display = 'none';
+        toggleBtn.textContent = '🐛 Debug';
+        toggleBtn.style.background = '#f44336';
+      }
+    };
+    
+    document.body.appendChild(debugConsole);
+    document.body.appendChild(toggleBtn);
+    
+    // Intercept console methods
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+    
+    function addToDebugConsole(type, args) {
+      const timestamp = new Date().toLocaleTimeString();
+      const msg = Array.from(args).map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2);
+          } catch {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
+      
+      const color = {
+        log: '#0f0',
+        error: '#f44',
+        warn: '#fa0'
+      }[type] || '#0f0';
+      
+      const logLine = document.createElement('div');
+      logLine.style.cssText = `
+        padding: 5px 0;
+        border-bottom: 1px solid #333;
+        color: ${color};
+      `;
+      logLine.textContent = `[${timestamp}] ${type.toUpperCase()}: ${msg}`;
+      
+      debugConsole.appendChild(logLine);
+      debugConsole.scrollTop = debugConsole.scrollHeight;
+    }
+    
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      addToDebugConsole('log', args);
+    };
+    
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      addToDebugConsole('error', args);
+    };
+    
+    console.warn = function(...args) {
+      originalWarn.apply(console, args);
+      addToDebugConsole('warn', args);
+    };
+    
+    // Log initial status
+    console.log('🐛 Mobile Debug Console Active');
+    console.log('API_BASE_URL:', typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'UNDEFINED');
+    console.log('apiRequest:', typeof apiRequest !== 'undefined' ? 'defined' : 'UNDEFINED');
+    console.log('showNotification:', typeof showNotification !== 'undefined' ? 'defined' : 'UNDEFINED');
+    console.log('closeModal:', typeof closeModal !== 'undefined' ? 'defined' : 'UNDEFINED');
+  })();
+</script>
 </body>
 </html>

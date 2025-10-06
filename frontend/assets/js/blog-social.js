@@ -41,6 +41,7 @@ async function loadUserProfile() {
 
         if (response.ok) {
             const data = await response.json();
+            
             if (data.success && data.data) {
                 // Update current user with profile data
                 blogCurrentUser.profile = data.data;
@@ -49,8 +50,14 @@ async function loadUserProfile() {
                 const avatarUrl = getAvatarUrl(data.data);
                 
                 // Update all avatar images
-                document.querySelectorAll('.create-post-avatar img, .comment-input-avatar img, #modalUserAvatar').forEach(img => {
+                const avatarElements = document.querySelectorAll('.create-post-avatar img, .comment-input-avatar img, #modalUserAvatar');
+                
+                avatarElements.forEach((img) => {
                     img.src = avatarUrl;
+                    img.onerror = () => {
+                        console.error('Failed to load avatar image:', avatarUrl);
+                        img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.data.fullName || 'User')}&background=667eea&color=fff&size=200`;
+                    };
                 });
                 
                 // Update user name in modal
@@ -59,6 +66,8 @@ async function loadUserProfile() {
                     modalUserName.textContent = data.data.fullName || blogCurrentUser.email;
                 }
             }
+        } else {
+            console.error('Profile fetch failed:', response.status);
         }
     } catch (error) {
         console.error('Error loading profile:', error);
@@ -67,7 +76,7 @@ async function loadUserProfile() {
 
 // Get avatar URL with fallback
 function getAvatarUrl(profile) {
-    if (profile.avatar) {
+    if (profile && profile.avatar) {
         // If avatar is a full URL, use it directly
         if (profile.avatar.startsWith('http')) {
             return profile.avatar;
@@ -77,7 +86,7 @@ function getAvatarUrl(profile) {
     }
     
     // Fallback to UI Avatars
-    const name = profile.fullName || blogCurrentUser.email || 'User';
+    const name = (profile && profile.fullName) || (blogCurrentUser && blogCurrentUser.email) || 'User';
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff&size=200`;
 }
 
