@@ -25,6 +25,11 @@ body {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
 }
 
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 .sidebar-header h2 {
   font-size: 28px;
@@ -51,6 +56,10 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 20px;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+.button-container {
+  display: flex;
+  justify-content: flex-start; /* Đây là dòng quan trọng */
 }
 
 .new-message-btn:hover {

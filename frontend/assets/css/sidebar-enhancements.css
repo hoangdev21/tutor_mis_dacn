@@ -1,0 +1,111 @@
+/* ===== COLLAPSIBLE SIDEBAR - ADDITIONAL ENHANCEMENTS (Optional) ===== */
+
+/* If you want to add tooltip on hover for collapsed menu items */
+.dashboard-sidebar.collapsed:not(:hover) .menu-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  margin-left: 10px;
+  z-index: 1001;
+}
+
+.dashboard-sidebar.collapsed:not(:hover) .menu-item:hover::after {
+  opacity: 1;
+}
+
+/* Add smooth shadow transition */
+.dashboard-sidebar {
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-sidebar.collapsed:hover {
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge position adjustment for collapsed state */
+.dashboard-sidebar.collapsed:not(:hover) .menu-item {
+  position: relative;
+  overflow: visible;
+}
+
+/* Smooth badge transition */
+.menu-item .badge {
+  transition: all 0.3s ease;
+}
+
+/* Profile menu at bottom adjustment */
+.user-menu {
+  border-top: 1px solid var(--border-color);
+  padding: 15px 20px;
+  transition: padding 0.3s ease;
+}
+
+.dashboard-sidebar.collapsed:not(:hover) .user-menu {
+  padding: 15px 0;
+  justify-content: center;
+}
+
+/* User info hiding in collapsed mode */
+.user-info {
+  transition: opacity 0.3s ease;
+}
+
+.dashboard-sidebar.collapsed:not(:hover) .user-info {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Alternative: Add slide effect for sidebar */
+.dashboard-sidebar {
+  /* Keep existing styles and add: */
+  transform: translateX(0);
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
+/* Add backdrop when hovering collapsed sidebar (optional visual enhancement) */
+.dashboard-sidebar.collapsed:hover::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.02);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Accessibility: Focus styles for keyboard navigation */
+.hamburger-icon:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Print styles - always show expanded */
+@media print {
+  .dashboard-sidebar {
+    width: 280px !important;
+  }
+  
+  .dashboard-sidebar.collapsed {
+    width: 280px !important;
+  }
+  
+  .hamburger-icon {
+    display: none !important;
+  }
+}

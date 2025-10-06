@@ -17,11 +17,32 @@ function checkAuth() {
 // Initialize dashboard
 const currentUser = checkAuth();
 
-// Sidebar toggle
+// Sidebar toggle functionality
 const menuToggle = document.getElementById('menuToggle');
 const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
 const dashboardSidebar = document.getElementById('dashboardSidebar');
+const hamburgerIcon = document.getElementById('hamburgerIcon');
 
+// Load collapsed state from localStorage
+const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+if (isCollapsed && dashboardSidebar) {
+  dashboardSidebar.classList.add('collapsed');
+}
+
+// Hamburger icon toggle functionality
+if (hamburgerIcon && dashboardSidebar) {
+  hamburgerIcon.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dashboardSidebar.classList.toggle('collapsed');
+    
+    // Save state to localStorage
+    const collapsed = dashboardSidebar.classList.contains('collapsed');
+    localStorage.setItem('sidebarCollapsed', collapsed);
+  });
+}
+
+// Mobile sidebar toggle (existing functionality for mobile)
 if (menuToggle) {
   menuToggle.addEventListener('click', () => {
     dashboardSidebar.classList.toggle('active');
@@ -31,6 +52,25 @@ if (menuToggle) {
 if (sidebarToggleBtn) {
   sidebarToggleBtn.addEventListener('click', () => {
     dashboardSidebar.classList.remove('active');
+  });
+}
+
+// Hover functionality - auto expand on hover when collapsed
+let hoverTimeout;
+if (dashboardSidebar) {
+  dashboardSidebar.addEventListener('mouseenter', () => {
+    if (dashboardSidebar.classList.contains('collapsed')) {
+      clearTimeout(hoverTimeout);
+    }
+  });
+
+  dashboardSidebar.addEventListener('mouseleave', () => {
+    if (dashboardSidebar.classList.contains('collapsed')) {
+      // Auto collapse again after leaving
+      hoverTimeout = setTimeout(() => {
+        // This is handled by CSS, no action needed
+      }, 300);
+    }
   });
 }
 

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Width-Based Test - v1.1.2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --text-color: #1a202c;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --bg-color: #f7fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles - v1.1.2 */
+        .dashboard-sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            transition: width 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .dashboard-sidebar.collapsed {
+            width: 80px;
+        }
+
+        .dashboard-sidebar.collapsed:hover {
+            width: 280px;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 25px 10px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            white-space: nowrap;
+            position: relative;
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .dashboard-sidebar.collapsed .sidebar-brand {
+            justify-content: center;
+            gap: 0;
+        }
+
+        .sidebar-brand > span:first-child {
+            transition: none;
+            opacity: 1;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand-text {
+            transition: opacity 0.3s ease, width 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .dashboard-sidebar.collapsed .sidebar-brand-text {
+            display: none;
+        }
+
+        .dashboard-sidebar.collapsed:hover .sidebar-brand-text {
+            display: inline;
+        }
+
+        /* Hamburger Icon */
+        .hamburger-icon {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-sidebar.collapsed .hamburger-icon span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .dashboard-sidebar.collapsed .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .dashboard-sidebar.collapsed .hamburger-icon span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* Menu Styles */
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+        }
+
+        .menu-section-title {
+            padding: 0 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            transition: opacity 0.25s ease, height 0.25s ease, margin 0.25s ease, padding 0.25s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .dashboard-sidebar.collapsed .menu-section-title {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-sidebar.collapsed:hover .menu-section-title {
+            opacity: 1;
+            height: auto;
+            margin-bottom: 10px;
+            padding: 0 20px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-sidebar.collapsed .menu-item {
+            padding: 12px 0;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .dashboard-sidebar.collapsed:hover .menu-item {
+            padding: 12px 20px;
+            gap: 15px;
+        }
+
+        .menu-item:hover {
+            background: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            font-size: 24px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: none;
+            opacity: 1;
+        }
+
+        .menu-item > span:not(.badge) {
+            transition: opacity 0.25s ease, transform 0.25s ease, width 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .dashboard-sidebar.collapsed .menu-item > span:not(.badge) {
+            opacity: 0;
+            width: 0;
+            transform: translateX(-10px);
+            overflow: hidden;
+        }
+
+        .dashboard-sidebar.collapsed:hover .menu-item > span:not(.badge) {
+            opacity: 1;
+            width: auto;
+            transform: translateX(0);
+        }
+
+        /* Main Content */
+        .dashboard-main {
+            flex: 1;
+            margin-left: 280px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+            padding: 30px;
+        }
+
+        .dashboard-sidebar.collapsed ~ .dashboard-main {
+            margin-left: 80px;
+        }
+
+        .dashboard-sidebar.collapsed:hover ~ .dashboard-main {
+            margin-left: 280px;
+        }
+
+        .test-info {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .test-info h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .test-checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .test-checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .test-checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: #48bb78;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span class="sidebar-brand-text">TutorMis</span>
+                    <div class="hamburger-icon" id="hamburgerIcon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item active">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item">
+                        <i>📚</i>
+                        <span>Khóa Học</span>
+                    </div>
+                    <div class="menu-item">
+                        <i>📝</i>
+                        <span>Yêu Cầu Gia Sư</span>
+                    </div>
+                    <div class="menu-item">
+                        <i>🔍</i>
+                        <span>Tìm Gia Sư</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item">
+                        <i>💬</i>
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item">
+                        <i>👤</i>
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item">
+                        <i>⚙️</i>
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item">
+                        <i>🚪</i>
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div class="test-info">
+                <h1>✅ Sidebar Width-Based Fix Test (v1.1.2)</h1>
+                <p><strong>Issue Fixed:</strong> Collapsed sidebar no longer displays as blank/white space</p>
+                <p><strong>Solution:</strong> Changed from transform-based to width-based animation</p>
+
+                <h2 style="margin-top: 30px; margin-bottom: 15px;">🧪 Testing Instructions:</h2>
+                <ul class="test-checklist">
+                    <li><span class="status-indicator"></span>Click hamburger icon (☰) to collapse sidebar</li>
+                    <li><span class="status-indicator"></span>Verify sidebar shows 80px width with icons visible (NOT blank white)</li>
+                    <li><span class="status-indicator"></span>Verify hamburger transforms to X and stays centered</li>
+                    <li><span class="status-indicator"></span>Verify emoji (🎓) remains visible</li>
+                    <li><span class="status-indicator"></span>Verify menu icons (📊, 📚, 💬, etc.) remain visible</li>
+                    <li><span class="status-indicator"></span>Verify text labels are hidden</li>
+                    <li><span class="status-indicator"></span>Hover over collapsed sidebar to expand</li>
+                    <li><span class="status-indicator"></span>Verify text labels reappear on hover</li>
+                    <li><span class="status-indicator"></span>Click X to expand back to full width</li>
+                    <li><span class="status-indicator"></span>Refresh page - state should persist (localStorage)</li>
+                </ul>
+
+                <h2 style="margin-top: 30px; margin-bottom: 15px;">🔍 What to Look For:</h2>
+                <div class="code-block">
+✅ CORRECT (v1.1.2 - Width-Based):
+[80px Sidebar with Icons] [Main Content]
+   🎓 📊 📚 💬          Your content here
+
+❌ INCORRECT (v1.1.1 - Transform-Based):
+[Blank White Space]    [Main Content]
+                       Your content here
+                </div>
+
+                <h2 style="margin-top: 30px; margin-bottom: 15px;">🔧 Technical Details:</h2>
+                <p><strong>Animation Type:</strong> Width Transition</p>
+                <p><strong>Normal Width:</strong> 280px</p>
+                <p><strong>Collapsed Width:</strong> 80px</p>
+                <p><strong>Position:</strong> Fixed, left: 0 (always anchored)</p>
+                <p><strong>Duration:</strong> 0.4s</p>
+                <p><strong>Easing:</strong> cubic-bezier(0.4, 0.0, 0.2, 1)</p>
+            </div>
+
+            <div class="test-info">
+                <h2>📋 Expected Behavior:</h2>
+                <ul style="list-style-type: disc; margin-left: 30px; line-height: 2;">
+                    <li>Sidebar starts at 280px width (full)</li>
+                    <li>Click hamburger → Sidebar animates to 80px width</li>
+                    <li>80px sidebar remains visible on left edge (NOT blank)</li>
+                    <li>Icons (emoji + menu icons) clearly visible in 80px sidebar</li>
+                    <li>Text labels hidden (no overflow)</li>
+                    <li>Hamburger icon transforms to X and stays centered</li>
+                    <li>Hover → Sidebar expands back to 280px temporarily</li>
+                    <li>Leave hover → Sidebar collapses back to 80px</li>
+                    <li>Click X → Sidebar expands permanently to 280px</li>
+                    <li>Main content margin adjusts smoothly with sidebar width</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Hamburger toggle functionality
+        const hamburgerIcon = document.getElementById('hamburgerIcon');
+        const dashboardSidebar = document.getElementById('dashboardSidebar');
+
+        // Load collapsed state from localStorage
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed && dashboardSidebar) {
+            dashboardSidebar.classList.add('collapsed');
+        }
+
+        // Hamburger icon toggle
+        if (hamburgerIcon && dashboardSidebar) {
+            hamburgerIcon.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dashboardSidebar.classList.toggle('collapsed');
+                
+                // Save state to localStorage
+                const collapsed = dashboardSidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebarCollapsed', collapsed);
+
+                // Log for testing
+                console.log('Sidebar collapsed:', collapsed);
+                console.log('Sidebar width:', dashboardSidebar.offsetWidth + 'px');
+            });
+        }
+
+        // Menu item hover effect
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Console log for testing
+        console.log('🧪 Sidebar Width-Based Test v1.1.2');
+        console.log('✅ Expected: 80px sidebar with icons visible when collapsed');
+        console.log('❌ Bug (v1.1.1): Blank white sidebar when collapsed');
+        console.log('Current sidebar width:', dashboardSidebar.offsetWidth + 'px');
+    </script>
+</body>
+</html>
