@@ -150,7 +150,7 @@
 }
 
 .page-title h1 {
-  font-size: 28px;
+  font-size: 22px;
   color: var(--text-color);
   margin: 0;
 }
@@ -337,6 +337,33 @@
     justify-content: center;
     align-items: center;
     background-color: #a4e1ed;
+}
+.stat-icon.white1 {
+    border: 2px solid black; 
+    border-radius: 50%; 
+    padding: 10px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #31c560;
+}
+.stat-icon.white2 {
+    border: 2px solid black; 
+    border-radius: 50%; 
+    padding: 10px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #4d8dfb;
+}
+.stat-icon.white3 {
+    border: 2px solid black; 
+    border-radius: 50%; 
+    padding: 10px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: 33333#b56ea1;
 }
 
 
