@@ -8,7 +8,10 @@
     "dev": "nodemon src/server.js",
     "test": "jest",
     "test:blog": "node test-blog-automated.js",
-    "test:blog:quick": "node test-blog-quick.js"
+    "test:blog:quick": "node test-blog-quick.js",
+    "test:ai": "node test-ai-training.js",
+    "demo:ai": "node demo-ai-training.js",
+    "quick:ai": "node quick-test-ai.js"
   },
   "keywords": [
     "tutoring",
@@ -19,6 +22,7 @@
   "author": "TutorMis Team",
   "license": "MIT",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.7.0",

@@ -943,54 +943,109 @@ const getStudents = async (req, res) => {
 const getIncome = async (req, res) => {
   try {
     const tutorId = req.user._id;
-    const { startDate, endDate } = req.query;
+    const { period = 'year' } = req.query; // year, 6months, 3months, month
     
-    let dateFilter = {};
-    if (startDate && endDate) {
-      dateFilter = {
-        createdAt: {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
-      };
+    const now = new Date();
+    let startDate = new Date();
+    
+    // Calculate start date based on period
+    switch (period) {
+      case 'month':
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case '3months':
+        startDate.setMonth(now.getMonth() - 3);
+        break;
+      case '6months':
+        startDate.setMonth(now.getMonth() - 6);
+        break;
+      case 'year':
+      default:
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
     }
     
-    // Tổng thu nhập
-    const totalIncome = await Course.aggregate([
-      { 
-        $match: { 
-          tutorId,
-          status: { $in: ['active', 'completed'] },
-          ...dateFilter
+    // 1. Tổng thu nhập thực tế (completed bookings)
+    const completedIncome = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $exists: true, $ne: null }
         }
       },
       {
         $group: {
           _id: null,
-          total: { $sum: '$payment.paidAmount' },
-          pending: { $sum: '$payment.pendingAmount' },
-          totalHours: { $sum: '$completedHours' }
+          total: { $sum: '$pricing.totalAmount' },
+          totalHours: { $sum: '$pricing.totalHours' },
+          count: { $sum: 1 }
         }
       }
     ]);
     
-    // Thu nhập theo tháng
-    const monthlyIncome = await Course.aggregate([
-      { 
-        $match: { 
-          tutorId,
-          status: { $in: ['active', 'completed'] }
+    // 2. Thu nhập đang chờ (accepted bookings - chưa hoàn thành)
+    const pendingIncome = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'accepted'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$pricing.totalAmount' },
+          totalHours: { $sum: '$pricing.totalHours' },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    // 3. Thu nhập tháng này
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthIncome = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: monthStart, $lte: now }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$pricing.totalAmount' },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    // 4. Số học sinh
+    const totalStudents = await BookingRequest.distinct('student', {
+      tutor: tutorId,
+      status: { $in: ['accepted', 'completed'] }
+    });
+    
+    // 5. Thu nhập theo tháng (12 tháng gần nhất)
+    const monthlyIncomeData = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: startDate, $lte: now }
         }
       },
       {
         $group: {
           _id: {
-            year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' }
+            year: { $year: '$completedAt' },
+            month: { $month: '$completedAt' }
           },
-          income: { $sum: '$payment.paidAmount' },
-          hours: { $sum: '$completedHours' },
-          students: { $addToSet: '$studentId' }
+          income: { $sum: '$pricing.totalAmount' },
+          hours: { $sum: '$pricing.totalHours' },
+          students: { $addToSet: '$student' },
+          bookings: { $sum: 1 }
         }
       },
       {
@@ -998,20 +1053,132 @@ const getIncome = async (req, res) => {
           _id: 1,
           income: 1,
           hours: 1,
-          studentCount: { $size: '$students' }
+          studentCount: { $size: '$students' },
+          bookings: 1
         }
       },
-      { $sort: { '_id.year': -1, '_id.month': -1 } },
-      { $limit: 12 }
+      { $sort: { '_id.year': 1, '_id.month': 1 } }
     ]);
     
-    const result = totalIncome[0] || { total: 0, pending: 0, totalHours: 0 };
+    // 6. Thu nhập theo môn học
+    const incomeBySubject = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: startDate, $lte: now }
+        }
+      },
+      {
+        $group: {
+          _id: '$subject.name',
+          income: { $sum: '$pricing.totalAmount' },
+          hours: { $sum: '$pricing.totalHours' },
+          bookings: { $sum: 1 }
+        }
+      },
+      { $sort: { income: -1 } },
+      { $limit: 10 }
+    ]);
+    
+    // 7. Thu nhập theo cấp độ
+    const incomeByLevel = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: startDate, $lte: now }
+        }
+      },
+      {
+        $group: {
+          _id: '$subject.level',
+          income: { $sum: '$pricing.totalAmount' },
+          bookings: { $sum: 1 }
+        }
+      },
+      { $sort: { income: -1 } }
+    ]);
+    
+    // 8. Booking gần đây đã hoàn thành
+    const recentCompletedBookings = await BookingRequest.find({
+      tutor: tutorId,
+      status: 'completed'
+    })
+      .populate({
+        path: 'student',
+        select: 'email'
+      })
+      .sort({ completedAt: -1 })
+      .limit(10)
+      .lean();
+    
+    // Lấy StudentProfile cho mỗi booking
+    const StudentProfile = require('../models/StudentProfile');
+    const recentBookingsWithProfile = await Promise.all(
+      recentCompletedBookings.map(async (booking) => {
+        const studentProfile = await StudentProfile.findOne({ 
+          userId: booking.student._id 
+        }).select('fullName avatar').lean();
+        
+        return {
+          _id: booking._id,
+          studentName: studentProfile?.fullName || 'Học sinh',
+          studentAvatar: studentProfile?.avatar,
+          subject: booking.subject?.name || 'N/A',
+          level: booking.subject?.level || 'N/A',
+          totalAmount: booking.pricing?.totalAmount || 0,
+          totalHours: booking.pricing?.totalHours || 0,
+          hourlyRate: booking.pricing?.hourlyRate || 0,
+          completedAt: booking.completedAt,
+          startDate: booking.schedule?.startDate,
+          rating: booking.rating?.score
+        };
+      })
+    );
+    
+    // 9. Thống kê theo trạng thái
+    const statusStats = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId
+        }
+      },
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+          totalAmount: { $sum: '$pricing.totalAmount' }
+        }
+      }
+    ]);
+    
+    // Format response
+    const completedData = completedIncome[0] || { total: 0, totalHours: 0, count: 0 };
+    const pendingData = pendingIncome[0] || { total: 0, totalHours: 0, count: 0 };
+    const monthData = monthIncome[0] || { total: 0, count: 0 };
     
     res.status(200).json({
       success: true,
       data: {
-        summary: result,
-        monthlyIncome
+        summary: {
+          totalIncome: completedData.total,
+          pendingIncome: pendingData.total,
+          monthlyIncome: monthData.total,
+          totalHours: completedData.totalHours,
+          totalStudents: totalStudents.length,
+          completedBookings: completedData.count,
+          activeBookings: pendingData.count,
+          averageHourlyRate: completedData.totalHours > 0 
+            ? Math.round(completedData.total / completedData.totalHours) 
+            : 0
+        },
+        monthlyIncome: monthlyIncomeData,
+        incomeBySubject: incomeBySubject,
+        incomeByLevel: incomeByLevel,
+        recentBookings: recentBookingsWithProfile,
+        statusStats: statusStats,
+        period: period
       }
     });
     
@@ -1019,7 +1186,8 @@ const getIncome = async (req, res) => {
     console.error('Get tutor income error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get income data'
+      message: 'Failed to get income data',
+      error: error.message
     });
   }
 };

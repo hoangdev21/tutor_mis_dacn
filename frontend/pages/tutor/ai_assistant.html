@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trợ Lý AI - Gia Sư | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/ai-assistant.css">
+    <link rel="stylesheet" href="../../assets/css/ai-assistant-enhanced.css">
+    <link rel="stylesheet" href="../../assets/css/notifications.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span class="sidebar-brand-text">TutorMis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <div class="hamburger-icon" id="hamburgerIcon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <img src="../../assets/images/dashboard-tutor/dashboard.png" alt="dashboard">
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="students">
+                        <img src="../../assets/images/dashboard-tutor/students.png" alt="students">
+                        <span>Học Sinh</span>
+                    </div>
+                    <div class="menu-item" data-page="requests">
+                        <img src="../../assets/images/dashboard-tutor/requests.png" alt="requests">
+                        <span>Yêu Cầu Mới</span>
+                    </div>
+                    <div class="menu-item" data-page="schedule">
+                        <img src="../../assets/images/dashboard-tutor/schedule.png" alt="schedule">
+                        <span>Lịch Dạy</span>
+                    </div>
+                    <div class="menu-item" data-page="income">
+                        <img src="../../assets/images/dashboard-tutor/income.png" alt="income">
+                        <span>Thu Nhập</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item" data-page="messages">
+                        <img src="../../assets/images/dashboard-tutor/messages.png" alt="messages">
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <img src="../../assets/images/dashboard-tutor/blog.png" alt="blog">
+                        <span>Blog</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Hỗ Trợ</div>
+                    <a href="./contact_support.html" class="menu-item">
+                        <i class="fas fa-headset"></i>
+                        <span>Liên Hệ</span>
+                    </a>
+                    <a href="./ai_assistant.html" class="menu-item active">
+                        <img src="../../assets/images/dashboard-student/ai-chat.png" alt="ai">
+                        <span>Trợ Lý AI</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item" data-page="profile">
+                        <img src="../../assets/images/dashboard-student/profile.png" alt="profile">
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item" data-page="settings">
+                        <img src="../../assets/images/dashboard-student/settings.png" alt="settings">
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <img src="../../assets/images/dashboard-student/log-out.png" alt="logout">
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Trợ Lý AI TutorMis</h1>
+                        <p>Powered by Google Gemini</p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=Tutor&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- AI Chat Content -->
+            <div class="dashboard-content">
+                <div class="ai-container">
+                    <!-- AI Info Card -->
+                    <div class="ai-info-card">
+                        <div class="ai-avatar">
+                            <img src="../../assets/images/avatar/ai-avatar.png" alt="AI Avatar">
+                        </div>
+                        <h3>TutorMis AI Assistant</h3>
+                        <p>Xin chào! Tôi là trợ lý AI của TutorMis. Tôi có thể giúp bạn:</p>
+                        <ul class="ai-capabilities">
+                            <li><i class="fas fa-check"></i> Tìm gia sư phù hợp</li>
+                            <li><i class="fas fa-check"></i> Hướng dẫn sử dụng website</li>
+                            <li><i class="fas fa-check"></i> Trả lời câu hỏi thường gặp</li>
+                            <li><i class="fas fa-check"></i> Giải đáp vấn đề học tập</li>
+                            <li><i class="fas fa-check"></i> Tư vấn khóa học</li>
+                        </ul>
+
+                        <div class="quick-questions">
+                            <h4>Câu hỏi gợi ý:</h4>
+                            <button class="quick-question-btn" onclick="sendQuickQuestion('Làm sao để tìm gia sư phù hợp?')">
+                                Làm sao để tìm gia sư?
+                            </button>
+                            <button class="quick-question-btn" onclick="sendQuickQuestion('Quy trình đặt lịch học như thế nào?')">
+                                Quy trình đặt lịch học?
+                            </button>
+                            <button class="quick-question-btn" onclick="sendQuickQuestion('Phương thức thanh toán nào được chấp nhận?')">
+                                Phương thức thanh toán?
+                            </button>
+                            <button class="quick-question-btn" onclick="sendQuickQuestion('Tôi muốn hủy lịch học thì làm sao?')">
+                                Làm sao để hủy lịch?
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Interface -->
+                    <div class="chat-card">
+                        <div class="chat-header">
+                            <div class="chat-header-info">
+                                <div class="chat-status online"></div>
+                                <div>
+                                    <h3>TutorMis AI</h3>
+                                    <span class="status-text">Đang hoạt động</span>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="chat-action-btn" onclick="clearChat()" title="Xóa lịch sử chat">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="chat-action-btn" onclick="exportChat()" title="Xuất chat">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message ai-message">
+                                <div class="message-avatar">
+                                    <img src="../../assets/images/avatar/ai-avatar.png" alt="AI Avatar">
+                                </div>
+                                <div class="message-content">
+                                    <div class="message-text">
+                                        Xin chào! Tôi là trợ lý AI của TutorMis. 👋<br><br>
+                                        Tôi có thể giúp bạn tìm gia sư, hướng dẫn sử dụng website, và trả lời mọi câu hỏi của bạn về TutorMis.<br><br>
+                                        Bạn cần giúp đỡ gì hôm nay?
+                                    </div>
+                                    <div class="message-time">Bây giờ</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-container">
+                            <form id="chatForm" class="chat-input-form">
+                                <button type="button" class="attachment-btn" title="Đính kèm file">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <input 
+                                    type="text" 
+                                    id="chatInput" 
+                                    class="chat-input" 
+                                    placeholder="Nhập câu hỏi của bạn..." 
+                                    autocomplete="off"
+                                />
+                                <button type="submit" class="send-btn" id="sendBtn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+    <script src="../../assets/js/ai-assistant.js"></script>
+</body>
+</html>

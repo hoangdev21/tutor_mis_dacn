@@ -1,0 +1,342 @@
+/* Additional styles for enhanced AI response formatting */
+
+/* AI Link Styling */
+.message-text .ai-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.message-text .ai-link:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.message-text .ai-link i {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* AI Headers in Messages */
+.message-text .ai-header {
+    color: #667eea;
+    font-weight: 700;
+    margin: 16px 0 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.message-text h2.ai-header {
+    font-size: 20px;
+}
+
+.message-text h3.ai-header {
+    font-size: 18px;
+}
+
+.message-text h4.ai-header {
+    font-size: 16px;
+}
+
+/* AI Lists Styling */
+.message-text .ai-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0;
+}
+
+.message-text .ai-list li {
+    padding: 8px 12px 8px 32px;
+    margin: 6px 0;
+    background: rgba(102, 126, 234, 0.05);
+    border-left: 3px solid #667eea;
+    border-radius: 6px;
+    position: relative;
+    line-height: 1.6;
+}
+
+.message-text .ai-list li:before {
+    content: '→';
+    position: absolute;
+    left: 12px;
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* Tutor Name Highlighting */
+.message-text .tutor-name {
+    display: inline-block;
+    color: #764ba2;
+    font-size: 16px;
+    margin: 12px 0 4px;
+}
+
+/* Tutor Card in Message (if AI returns structured data) */
+.tutor-card-inline {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.tutor-card-inline:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.tutor-card-inline .tutor-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.tutor-card-inline .tutor-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.tutor-card-inline .tutor-detail i {
+    color: #667eea;
+    width: 20px;
+}
+
+.tutor-card-inline .tutor-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.tutor-card-inline .tutor-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Code blocks in AI response */
+.message-text code {
+    background: #f5f7fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #e83e8c;
+}
+
+.message-text pre {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 12px 0;
+}
+
+.message-text pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+/* Emoji support - make them bigger */
+.message-text img.emoji {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+/* Stats/Numbers highlighting */
+.message-text strong {
+    color: #764ba2;
+    font-weight: 700;
+}
+
+/* Blockquote style for important info */
+.message-text blockquote {
+    border-left: 4px solid #667eea;
+    padding-left: 16px;
+    margin: 12px 0;
+    font-style: italic;
+    color: #666;
+}
+
+/* Price display */
+.price-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #333;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    margin: 0 4px;
+}
+
+/* Rating display */
+.rating-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #ffa500;
+    font-weight: 600;
+}
+
+.rating-tag i {
+    color: #ffa500;
+}
+
+/* Loading skeleton for search results */
+.search-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+.skeleton-card {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 12px;
+    height: 120px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Search results grid (if AI returns multiple tutors) */
+.tutors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+/* Metadata tags */
+.ai-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #f5f7fa;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #666;
+}
+
+.meta-tag i {
+    font-size: 10px;
+    color: #667eea;
+}
+
+/* Success/Error indicators in messages */
+.message-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 8px 0;
+}
+
+.message-indicator.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.message-indicator.info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.message-indicator.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Smooth animations */
+.message-text * {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .tutors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tutor-card-inline {
+        padding: 12px;
+    }
+    
+    .message-text .ai-header {
+        font-size: 16px !important;
+    }
+    
+    .ai-metadata {
+        font-size: 11px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .quick-questions,
+    .chat-input-area {
+        display: none;
+    }
+    
+    .message-text .ai-link {
+        color: #667eea;
+        text-decoration: underline;
+    }
+}

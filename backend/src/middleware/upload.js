@@ -48,6 +48,26 @@ const uploadCertificate = multer({
   fileFilter: certificateFileFilter
 }).single('certificate');
 
+// Multiple files upload middleware for support tickets
+const uploadMultiple = multer({
+  storage: memoryStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB per file
+    files: 5 // Maximum 5 files
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = /jpeg|jpg|png|pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document/.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Chỉ chấp nhận file ảnh, PDF, hoặc DOC'));
+    }
+  }
+}).array('attachments', 5);
+
 // Error handler for multer
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -73,5 +93,6 @@ const handleMulterError = (err, req, res, next) => {
 module.exports = {
   uploadAvatar,
   uploadCertificate,
+  uploadMultiple,
   handleMulterError
 };

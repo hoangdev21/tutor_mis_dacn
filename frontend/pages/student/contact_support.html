@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên Hệ Hỗ Trợ - Học Sinh | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/contact-support.css">
+    <link rel="stylesheet" href="../../assets/css/notifications.css">
+    <link rel="stylesheet" href="../../assets/css/custom-modals.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span class="sidebar-brand-text">TutorMis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <div class="hamburger-icon" id="hamburgerIcon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <img src="../../assets/images/dashboard-student/dashboard.png" alt="home">
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="courses">
+                        <img src="../../assets/images/dashboard-student/courses.png" alt="courses">
+                        <span>Khóa Học</span>
+                    </div>
+                    <div class="menu-item" data-page="requests">
+                        <img src="../../assets/images/dashboard-student/requests.png" alt="requests">
+                        <span>Yêu Cầu Gia Sư</span>
+                    </div>
+                    <div class="menu-item" data-page="find-tutor">
+                        <img src="../../assets/images/dashboard-student/find-tutor.png" alt="find-tutor">
+                        <span>Tìm Gia Sư</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Giao Tiếp</div>
+                    <div class="menu-item" data-page="messages">
+                        <img src="../../assets/images/dashboard-student/messages.png" alt="messages">
+                        <span>Tin Nhắn</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <a href="./blog.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-student/blog.png" alt="blog">
+                        <span>Blog</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Hỗ Trợ</div>
+                    <a href="./contact_support.html" class="menu-item active">
+                        <i class="fas fa-headset"></i>
+                        <span>Liên Hệ</span>
+                    </a>
+                    <a href="./ai_assistant.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-student/ai-chat.png" alt="ai">
+                        <span>Trợ Lý AI</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Cài Đặt</div>
+                    <div class="menu-item" data-page="profile">
+                        <img src="../../assets/images/dashboard-student/profile.png" alt="profile">
+                        <span>Hồ Sơ</span>
+                    </div>
+                    <div class="menu-item" data-page="settings">
+                        <img src="../../assets/images/dashboard-student/settings.png" alt="settings">
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <img src="../../assets/images/dashboard-student/log-out.png" alt="logout">
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Liên Hệ Hỗ Trợ</h1>
+                        <p>Gửi yêu cầu hỗ trợ đến Admin</p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <img src="../../assets/images/dashboard-student/elements/bell-ring.png" alt="notifications">
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=Student&background=667eea&color=fff" alt="User" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Support Content -->
+            <div class="dashboard-content">
+                <div class="support-container">
+                    <!-- Support Info -->
+                    <div class="support-info-card">
+                        <div class="info-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>&nbsp;&nbsp;&nbsp;Trung Tâm Hỗ Trợ</h3>
+                        </div>
+                        <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn. Vui lòng mô tả vấn đề của bạn và chúng tôi sẽ phản hồi trong vòng 24 giờ.</p><br><br><br>
+                        
+                        <div class="quick-links">
+                            <h4>Liên kết nhanh:</h4>
+                            <ul>
+                                <li><i class="fas fa-book"></i> <a href="#">Hướng dẫn sử dụng</a></li>
+                                <li><i class="fas fa-question-circle"></i> <a href="#">Câu hỏi thường gặp</a></li>
+                                <li><i class="fas fa-robot"></i> <a href="./ai_assistant.html">Trợ lý AI</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="support-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>Thời gian phản hồi</strong>
+                                    <span>~ 2-6 giờ</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-ticket-alt"></i>
+                                <div>
+                                    <strong>Yêu cầu của bạn</strong>
+                                    <span id="myTicketsCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support Form -->
+                    <div class="support-form-card">
+                        <div class="form-header">
+                            <i class="fas fa-paper-plane"></i>
+                            <h3>Gửi Yêu Cầu Hỗ Trợ</h3>
+                        </div>
+
+                        <form id="supportForm">
+                            <div class="form-group">
+                                <label for="category">
+                                    <i class="fas fa-tag"></i>
+                                    Loại Yêu Cầu <span class="required">*</span>
+                                </label>
+                                <select id="category" name="category" required>
+                                    <option value="">-- Chọn loại yêu cầu --</option>
+                                    <option value="bug">🐛 Báo lỗi (Bug Report)</option>
+                                    <option value="feature">💡 Đề xuất tính năng</option>
+                                    <option value="payment">💳 Vấn đề thanh toán</option>
+                                    <option value="account">👤 Vấn đề tài khoản</option>
+                                    <option value="tutor">👨‍🏫 Vấn đề với gia sư</option>
+                                    <option value="course">📚 Vấn đề khóa học</option>
+                                    <option value="complaint">⚠️ Khiếu nại</option>
+                                    <option value="other">📋 Khác</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="priority">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Mức độ ưu tiên <span class="required">*</span>
+                                </label>
+                                <select id="priority" name="priority" required>
+                                    <option value="low">🟢 Thấp - Không gấp</option>
+                                    <option value="medium" selected>🟡 Trung bình - Bình thường</option>
+                                    <option value="high">🟠 Cao - Cần sớm</option>
+                                    <option value="urgent">🔴 Khẩn cấp - Cần ngay</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject">
+                                    <i class="fas fa-heading"></i>
+                                    Tiêu đề <span class="required">*</span>
+                                </label>
+                                <input type="text" id="subject" name="subject" placeholder="Mô tả ngắn gọn vấn đề..." required maxlength="200">
+                                <small class="char-count"><span id="subjectCount">0</span>/200</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">
+                                    <i class="fas fa-align-left"></i>
+                                    Mô tả chi tiết <span class="required">*</span>
+                                </label>
+                                <textarea id="description" name="description" rows="6" placeholder="Vui lòng mô tả chi tiết vấn đề của bạn..." required maxlength="2000"></textarea>
+                                <small class="char-count"><span id="descriptionCount">0</span>/2000</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attachments">
+                                    <i class="fas fa-paperclip"></i>
+                                    Đính kèm file (tùy chọn)
+                                </label>
+                                <input type="file" id="attachments" name="attachments" multiple accept="image/*,.pdf,.doc,.docx">
+                                <small>Tối đa 5 file, mỗi file &lt; 5MB (JPG, PNG, PDF, DOC)</small>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="resetForm()">
+                                    <i class="fas fa-undo"></i>
+                                    Đặt Lại
+                                </button>
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Gửi Yêu Cầu
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- My Tickets -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Lịch Sử Yêu Cầu
+                        </h2>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-status="all">Tất cả</button>
+                            <button class="filter-tab" data-status="pending">Đang chờ</button>
+                            <button class="filter-tab" data-status="in-progress">Đang xử lý</button>
+                            <button class="filter-tab" data-status="resolved">Đã giải quyết</button>
+                            <button class="filter-tab" data-status="closed">Đã đóng</button>
+                        </div>
+                    </div>
+
+                    <div id="ticketsContainer">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/notifications.js"></script>
+    <script src="../../assets/js/custom-modals.js"></script>
+    <script src="../../assets/js/contact-support.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài Đặt - Admin | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/settings.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span class="sidebar-brand-text">TutorMis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <div class="hamburger-icon" id="hamburgerIcon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <div class="menu-item" data-page="dashboard">
+                        <img src="../../assets/images/dashboard-admin/dashboard.png" alt="Dashboard">
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-page="users">
+                        <img src="../../assets/images/dashboard-admin/users.png" alt="users">
+                        <span>Người Dùng</span>
+                        <span class="badge" id="usersCount">0</span>
+                    </div>
+                    <div class="menu-item" data-page="tutors">
+                        <img src="../../assets/images/dashboard-admin/tutors.png" alt="tutors">
+                        <span>Duyệt Gia Sư</span>
+                        <span class="badge" id="pendingTutorsCount">0</span>
+                    </div>
+                    <div class="menu-item" data-page="courses">
+                        <img src="../../assets/images/dashboard-admin/courses.png" alt="courses">
+                        <span>Khóa Học</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <div class="menu-item" data-page="blog">
+                        <img src="../../assets/images/dashboard-admin/blog.png" alt="blog">
+                        <span>Quản Lý Blog</span>
+                        <span class="badge" id="pendingBlogsCount">0</span>
+                    </div>
+                    <div class="menu-item" data-page="reports">
+                        <img src="../../assets/images/dashboard-admin/reports.png" alt="reports">
+                        <span>Báo Cáo</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Tài Chính</div>
+                    <div class="menu-item" data-page="finance">
+                        <img src="../../assets/images/dashboard-admin/finance.png" alt="finance">
+                        <span>Thống Kê Tài Chính</span>
+                    </div>
+                    <div class="menu-item" data-page="transactions">
+                        <img src="../../assets/images/dashboard-admin/transactions.png" alt="transactions">
+                        <span>Giao Dịch</span>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Hệ Thống</div>
+                    <div class="menu-item active" data-page="settings">
+                        <img src="../../assets/images/dashboard-admin/settings.png" alt="settings">
+                        <span>Cài Đặt</span>
+                    </div>
+                    <div class="menu-item" data-page="logs">
+                        <img src="../../assets/images/dashboard-admin/logs.png" alt="logs">
+                        <span>Logs</span>
+                    </div>
+                    <div class="menu-item" onclick="logout()">
+                        <img src="../../assets/images/dashboard-admin/logout.png" alt="logout">
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1>Cài Đặt Hệ Thống</h1>
+                        <p id="currentDate"></p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=f56565&color=fff" alt="Admin" class="user-avatar" id="userAvatar">
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-cog"></i>
+                            Cài Đặt Tài Khoản & Hệ Thống
+                        </h2>
+                        <p class="section-subtitle">Quản lý cài đặt tài khoản admin và cấu hình hệ thống</p>
+                    </div>
+
+                    <div id="settingsContainer">
+                        <div class="empty-state">
+                            <i class="fas fa-tools"></i>
+                            <h3>Đang tải cài đặt...</h3>
+                            <p>Vui lòng đợi trong giây lát.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/settings.js"></script>
+</body>
+</html>

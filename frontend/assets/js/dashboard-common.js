@@ -90,7 +90,7 @@ document.querySelectorAll('.menu-item[data-page]').forEach(item => {
         messages: '/pages/student/messages.html',
         blog: '/pages/student/blog.html',
         profile: '/pages/student/profile_student.html',
-        settings: '/pages/setting.html'
+        settings: '/pages/student/settings.html'
       },
       tutor: {
         dashboard: '/pages/tutor/dashboard.html',
@@ -101,7 +101,7 @@ document.querySelectorAll('.menu-item[data-page]').forEach(item => {
         messages: '/pages/tutor/messages.html',
         blog: '/pages/tutor/blog.html',
         profile: '/pages/tutor/profile_tutor.html',
-        settings: '/pages/setting.html'
+        settings: '/pages/tutor/settings.html'
       },
       admin: {
         dashboard: '/pages/admin/dashboard.html',
@@ -112,7 +112,7 @@ document.querySelectorAll('.menu-item[data-page]').forEach(item => {
         reports: '/pages/admin/report.html',
         finance: '/pages/admin/financial_statistics.html',
         transactions: '/pages/admin/transaction.html',
-        settings: '/pages/setting.html',
+        settings: '/pages/admin/settings.html',
         logs: '/pages/admin/logs.html'
       }
     };

@@ -68,6 +68,9 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/blog', require('./routes/blog'));
 app.use('/api/bookings', require('./routes/booking'));
 app.use('/api/notifications', require('./routes/notification'));
+app.use('/api/support', require('./routes/support'));
+app.use('/api/ai', require('./routes/ai'));
+app.use('/api/settings', require('./routes/settings'));
 
 app.use(handleCorsError);
 

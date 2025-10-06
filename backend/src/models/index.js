@@ -7,6 +7,7 @@ const Course = require('./Course');
 const Message = require('./Message');
 const TutorRequest = require('./TutorRequest');
 const BlogPost = require('./BlogPost');
+const SupportTicket = require('./SupportTicket');
 const BookingRequest = require('./BookingRequest');
 const Notification = require('./Notification');
 
@@ -20,5 +21,6 @@ module.exports = {
   TutorRequest,
   BlogPost,
   BookingRequest,
-  Notification
+  Notification,
+  SupportTicket
 };

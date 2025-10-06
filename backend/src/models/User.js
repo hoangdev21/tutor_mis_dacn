@@ -85,6 +85,97 @@ const userSchema = new mongoose.Schema({
   },
   lockUntil: {
     type: Date
+  },
+  // User preferences/settings
+  preferences: {
+    language: {
+      type: String,
+      default: 'vi',
+      enum: ['vi', 'en']
+    },
+    timezone: {
+      type: String,
+      default: 'Asia/Ho_Chi_Minh'
+    },
+    theme: {
+      type: String,
+      default: 'light',
+      enum: ['light', 'dark', 'auto']
+    },
+    emailNotifications: {
+      newMessages: { type: Boolean, default: true },
+      newRequests: { type: Boolean, default: true },
+      scheduleUpdates: { type: Boolean, default: true },
+      blogPosts: { type: Boolean, default: false },
+      systemUpdates: { type: Boolean, default: true }
+    },
+    pushNotifications: {
+      type: Boolean,
+      default: false
+    },
+    emailDigest: {
+      type: String,
+      default: 'weekly',
+      enum: ['daily', 'weekly', 'monthly', 'never']
+    },
+    privacy: {
+      profileVisibility: {
+        type: String,
+        default: 'users',
+        enum: ['public', 'users', 'connections', 'private']
+      },
+      showPhone: { type: Boolean, default: true },
+      showEmail: { type: Boolean, default: false },
+      showOnlineStatus: { type: Boolean, default: true },
+      saveSearchHistory: { type: Boolean, default: true }
+    }
+  },
+  // Security settings
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false
+  },
+  twoFactorSecret: {
+    type: String
+  },
+  passwordChangedAt: {
+    type: Date
+  },
+  tokenVersion: {
+    type: Number,
+    default: 0
+  },
+  // Activity tracking
+  searchHistory: [{
+    query: String,
+    timestamp: { type: Date, default: Date.now }
+  }],
+  activityLog: [{
+    action: String,
+    timestamp: { type: Date, default: Date.now },
+    ipAddress: String,
+    userAgent: String
+  }],
+  loginHistory: [{
+    timestamp: { type: Date, default: Date.now },
+    ipAddress: String,
+    userAgent: String,
+    location: String
+  }],
+  // Account status
+  status: {
+    type: String,
+    default: 'active',
+    enum: ['active', 'inactive', 'suspended', 'deleted']
+  },
+  deactivatedAt: {
+    type: Date
+  },
+  name: {
+    type: String
+  },
+  phone: {
+    type: String
   }
 }, {
   timestamps: true,

@@ -6,6 +6,7 @@
     <title>Báo Cáo - Admin | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/custom-modals.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -122,19 +123,64 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTickets">0</h3>
+                            <p>Tổng Yêu Cầu</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pendingTickets">0</h3>
+                            <p>Đang Chờ</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="inProgressTickets">0</h3>
+                            <p>Đang Xử Lý</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="resolvedTickets">0</h3>
+                            <p>Đã Giải Quyết</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="content-section">
                     <div class="section-header">
                         <h2 class="section-title">
-                            <i class="fas fa-flag"></i>
-                            Danh Sách Báo Cáo
+                            <i class="fas fa-headset"></i>
+                            Yêu Cầu Hỗ Trợ Từ Người Dùng
                         </h2>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-status="all">Tất cả</button>
+                            <button class="filter-tab" data-status="pending">Đang chờ</button>
+                            <button class="filter-tab" data-status="in-progress">Đang xử lý</button>
+                            <button class="filter-tab" data-status="resolved">Đã giải quyết</button>
+                            <button class="filter-tab" data-status="closed">Đã đóng</button>
+                        </div>
                     </div>
 
-                    <div id="reportsContainer">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h3>Chưa có báo cáo</h3>
-                            <p>Hiện tại không có báo cáo nào.</p>
+                    <div id="ticketsContainer">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
                         </div>
                     </div>
                 </div>
@@ -142,8 +188,44 @@
         </main>
     </div>
 
+    <!-- Response Modal -->
+    <div class="modal" id="responseModal">
+        <div class="modal-overlay" onclick="closeResponseModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Phản Hồi Yêu Cầu Hỗ Trợ</h3>
+                <button class="close-btn" onclick="closeResponseModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="ticketDetails"></div>
+                <form id="responseForm">
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select id="ticketStatus" required>
+                            <option value="pending">Đang chờ</option>
+                            <option value="in-progress">Đang xử lý</option>
+                            <option value="resolved">Đã giải quyết</option>
+                            <option value="closed">Đã đóng</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Phản hồi của Admin</label>
+                        <textarea id="adminResponse" rows="6" placeholder="Nhập phản hồi của bạn..." required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeResponseModal()">Hủy</button>
+                        <button type="submit" class="btn-primary">Gửi Phản Hồi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <link rel="stylesheet" href="../../assets/css/admin-support.css">
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/custom-modals.js"></script>
+    <script src="../../assets/js/admin-support.js"></script>
 </body>
 </html>

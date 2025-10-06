@@ -6,6 +6,7 @@
     <title>Thu Nhập - Gia Sư | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/tutor-income.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -67,6 +68,18 @@
                 </div>
 
                 <div class="menu-section">
+                    <div class="menu-section-title">Hỗ Trợ</div>
+                    <a href="./contact_support.html" class="menu-item">
+                        <i class="fas fa-headset"></i>
+                        <span>Liên Hệ</span>
+                    </a>
+                    <a href="./ai_assistant.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-student/ai-chat.png" alt="ai">
+                        <span>Trợ Lý AI</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
                     <div class="menu-section-title">Cài Đặt</div>
                     <div class="menu-item" data-page="profile">
                         <img src="../../assets/images/dashboard-tutor/profile.png" alt="profile">
@@ -111,20 +124,111 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            <i class="fas fa-dollar-sign"></i>
-                            Thống Kê Thu Nhập
-                        </h2>
+                <!-- Period Filter -->
+                <div class="period-filter">
+                    <label for="periodFilter">
+                        <i class="fas fa-filter"></i> Thời gian:
+                    </label>
+                    <select id="periodFilter">
+                        <option value="month">1 tháng gần đây</option>
+                        <option value="3months">3 tháng gần đây</option>
+                        <option value="6months">6 tháng gần đây</option>
+                        <option value="year" selected>12 tháng gần đây</option>
+                    </select>
+                </div>
+
+                <div id="incomeContainer">
+                    <!-- Stats Cards -->
+                    <div class="income-stats-grid" id="statsContainer">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
                     </div>
 
-                    <div id="incomeContainer">
-                        <div class="empty-state">
-                            <i class="fas fa-chart-bar"></i>
-                            <h3>Chưa có dữ liệu thu nhập</h3>
-                            <p>Dữ liệu thu nhập của bạn sẽ hiển thị ở đây.</p>
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <!-- Monthly Income Chart -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>
+                                    <i class="fas fa-chart-line"></i>
+                                    Thu Nhập Theo Tháng
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="monthlyIncomeChart"></canvas>
+                            </div>
                         </div>
+
+                        <!-- Subject Breakdown -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>
+                                    <i class="fas fa-book"></i>
+                                    Theo Môn Học
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="subjectChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subject Breakdown List -->
+                    <div class="recent-bookings-section">
+                        <div class="section-header">
+                            <h3>
+                                <i class="fas fa-list-ul"></i>
+                                Chi Tiết Theo Môn
+                            </h3>
+                        </div>
+                        <div class="subject-breakdown" id="subjectList">
+                            <!-- Subject items will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Level Income Chart -->
+                    <div class="chart-card" style="margin-bottom: 30px;">
+                        <div class="chart-header">
+                            <h3>
+                                <i class="fas fa-graduation-cap"></i>
+                                Thu Nhập Theo Cấp Độ
+                            </h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="levelChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Bookings Table -->
+                    <div class="recent-bookings-section">
+                        <div class="section-header">
+                            <h3>
+                                <i class="fas fa-history"></i>
+                                Khóa Học Gần Đây
+                            </h3>
+                        </div>
+                        <table class="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Học Sinh</th>
+                                    <th>Môn Học</th>
+                                    <th>Cấp Độ</th>
+                                    <th>Giờ Dạy</th>
+                                    <th>Thu Nhập</th>
+                                    <th>Hoàn Thành</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px;">
+                                        <div class="loading-spinner">
+                                            <div class="spinner"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -135,5 +239,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/tutor-income.js"></script>
 </body>
 </html>
