@@ -34,13 +34,18 @@
   background: var(--white);
   border-radius: var(--border-radius-xl);
   box-shadow: var(--shadow-xl);
-  max-width: 500px;
+  max-width: 600px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
   transform: scale(0.9) translateY(20px);
   transition: var(--transition-normal);
+  scrollbar-width: none;
+  -ms-overflow-style: none;  /* Internet Explorer and Edge */
+}
+.modal__content::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
 }
 
 .modal.active .modal__content {
@@ -175,6 +180,10 @@
 .role__card span {
   font-weight: 500;
   color: var(--gray-700);
+}
+.role__image{
+  width: 30px;
+  height: 30px;
 }
 
 .role__option input[type="radio"]:checked + .role__card {

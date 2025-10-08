@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../../assets/css/notifications.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="dashboard">
@@ -17,7 +18,7 @@
         <aside class="dashboard-sidebar" id="dashboardSidebar">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
-                    <span>🎓</span>
+                    <span>🎓</span>&nbsp;
                     <span class="sidebar-brand-text">TutorMis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <div class="hamburger-icon" id="hamburgerIcon">
                         <span></span>
@@ -183,6 +184,48 @@
                     </div>
                 </div>
 
+                <!-- Dashboard Main Grid -->
+                <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    
+                    <!-- Learning Progress Chart - Left Side -->
+                    <div class="content-section" style="grid-column: 1;">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-chart-line"></i>
+                                Tiến Độ Học Tập
+                            </h2>
+                        </div>
+                        <div id="learningProgressContainer" style="padding: 20px; background: white; border-radius: 8px;">
+                            <canvas id="learningProgressChart" style="max-height: 300px;"></canvas>
+                            <div id="progressStats" style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                <!-- Progress stats will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Notifications - Right Side -->
+                    <div class="content-section" style="grid-column: 2;">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-bell"></i>
+                                Thông Báo Mới Nhất
+                            </h2>
+                            <div class="section-actions">
+                                <button class="action-btn secondary" onclick="window.location.href='notifications.html'" style="font-size: 12px; padding: 6px 12px;">
+                                    <i class="fas fa-eye"></i>
+                                    Xem Tất Cả
+                                </button>
+                            </div>
+                        </div>
+                        <div id="notificationsContainer" style="max-height: 400px; overflow-y: auto;">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
                 <!-- Recent Courses -->
                 <div class="content-section">
                     <div class="section-header">
@@ -199,28 +242,6 @@
                     </div>
 
                     <div id="coursesContainer">
-                        <div class="loading-spinner">
-                            <div class="spinner"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Requests -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            <i class="fas fa-paper-plane"></i>
-                            Yêu Cầu Đang Hoạt Động <div class="course-count">(<span id="activeRequestsCount">0</span>)</div>
-                        </h2>
-                        <div class="section-actions">
-                            <button class="action-btn secondary" onclick="window.location.href='tutor_request.html'">
-                                <i class="fas fa-eye"></i>
-                                Xem Tất Cả
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="requestsContainer">
                         <div class="loading-spinner">
                             <div class="spinner"></div>
                         </div>

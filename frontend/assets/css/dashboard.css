@@ -210,6 +210,14 @@
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  text-decoration: none; /* For <a> tags */
+}
+
+/* Ensure <a> menu items behave like <div> */
+a.menu-item {
+  display: flex;
+  text-decoration: none;
+  color: inherit;
 }
 
 .dashboard-sidebar.collapsed .menu-item {

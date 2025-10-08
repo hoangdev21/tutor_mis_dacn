@@ -58,17 +58,115 @@ const getDashboard = async (req, res) => {
       })
       .lean();
     
-    // Yêu cầu hoạt động (TutorRequest)
+    // Yêu cầu hoạt động (TutorRequest) - Job postings by student
+    // Valid statuses: open, in_progress, matched, closed, expired
     const activeRequests = await TutorRequest.find({ 
       studentId,
       status: { $in: ['open', 'in_progress'] }
     })
       .sort({ createdAt: -1 })
       .limit(5)
-      .select('title subject level status totalApplications applications createdAt expiryDate budgetRange location')
+      .select('title description subject level status totalApplications applications createdAt expiryDate budgetRange location preferredSchedule views')
       .lean();
     
-    console.log(`📋 [Student ${studentId}] Found ${activeRequests.length} active requests`);
+    console.log(`📋 [Student ${studentId}] Found ${activeRequests.length} active tutor requests (job postings)`);
+    
+    // Learning Progress Data - Tính toán tiến độ học tập
+    const totalHoursPlanned = await BookingRequest.aggregate([
+      {
+        $match: {
+          student: studentId,
+          status: { $in: ['accepted', 'completed'] }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalHours: {
+            $sum: {
+              $multiply: [
+                '$schedule.hoursPerSession',
+                '$schedule.daysPerWeek',
+                { $divide: ['$schedule.duration', 7] } // duration in weeks
+              ]
+            }
+          }
+        }
+      }
+    ]);
+    
+    const totalHoursCompleted = await BookingRequest.aggregate([
+      {
+        $match: {
+          student: studentId,
+          status: 'completed'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          completedHours: {
+            $sum: {
+              $multiply: [
+                '$schedule.hoursPerSession',
+                '$schedule.daysPerWeek',
+                { $divide: ['$schedule.duration', 7] }
+              ]
+            }
+          }
+        }
+      }
+    ]);
+    
+    // Subject-wise progress
+    const subjectProgress = await BookingRequest.aggregate([
+      {
+        $match: {
+          student: studentId,
+          status: { $in: ['accepted', 'completed'] }
+        }
+      },
+      {
+        $group: {
+          _id: '$subject.name',
+          total: { $sum: 1 },
+          completed: {
+            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+          },
+          active: {
+            $sum: { $cond: [{ $eq: ['$status', 'accepted'] }, 1, 0] }
+          }
+        }
+      },
+      {
+        $project: {
+          subject: '$_id',
+          total: 1,
+          completed: 1,
+          active: 1,
+          progress: {
+            $multiply: [
+              { $divide: ['$completed', '$total'] },
+              100
+            ]
+          }
+        }
+      },
+      {
+        $sort: { total: -1 }
+      },
+      {
+        $limit: 6
+      }
+    ]);
+    
+    // Recent Notifications
+    const { Notification } = require('../models');
+    const recentNotifications = await Notification.find({ recipient: studentId })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('type title message isRead createdAt')
+      .lean();
     
     // Tin nhắn gần đây - lấy conversations
     const conversations = await Message.aggregate([
@@ -144,6 +242,29 @@ const getDashboard = async (req, res) => {
           totalTutors,
           unreadMessages
         },
+        learningProgress: {
+          totalHours: totalHoursPlanned[0]?.totalHours || 0,
+          completedHours: totalHoursCompleted[0]?.completedHours || 0,
+          progressPercentage: totalHoursPlanned[0]?.totalHours > 0 
+            ? Math.round((totalHoursCompleted[0]?.completedHours || 0) / totalHoursPlanned[0].totalHours * 100)
+            : 0,
+          subjectProgress: subjectProgress.map(s => ({
+            subject: s.subject || 'Khác',
+            total: s.total,
+            completed: s.completed,
+            active: s.active,
+            progress: Math.round(s.progress || 0)
+          }))
+        },
+        recentNotifications: recentNotifications.map(notif => ({
+          _id: notif._id,
+          type: notif.type,
+          title: notif.title,
+          message: notif.message,
+          isRead: notif.isRead,
+          createdAt: notif.createdAt,
+          metadata: notif.metadata
+        })),
         recentCourses: recentCourses.map(booking => ({
           _id: booking._id,
           tutorId: booking.tutor?._id,
@@ -162,19 +283,6 @@ const getDashboard = async (req, res) => {
           duration: booking.schedule?.duration,
           createdAt: booking.createdAt,
           updatedAt: booking.updatedAt
-        })),
-        activeRequests: activeRequests.map(req => ({
-          _id: req._id,
-          title: req.title,
-          subject: req.subject,
-          level: req.level,
-          status: req.status,
-          totalApplications: req.applications?.length || req.totalApplications || 0,
-          applications: req.applications || [],
-          budget: req.budgetRange || { min: 0, max: 0 },
-          location: req.location,
-          createdAt: req.createdAt,
-          expiryDate: req.expiryDate
         })),
         recentMessages: recentMessages.map(msg => ({
           _id: msg._id,

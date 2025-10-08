@@ -416,7 +416,9 @@ function renderRecentUsers(users) {
     }
   ];
 
-  container.innerHTML = createTable(users, columns);
+  if (container) {
+    container.innerHTML = createTable(users, columns);
+  }
 }
 
 // Load pending blogs
@@ -449,6 +451,8 @@ async function loadPendingBlogs() {
 // Render pending blogs
 function renderPendingBlogs(blogs) {
   const container = document.getElementById('pendingBlogsContainer');
+  
+  if (!container) return;
   
   const columns = [
     {
@@ -937,7 +941,9 @@ function loadSystemActivities(activities) {
     `;
   }).join('');
   
-  container.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${activitiesHTML}</div>`;
+  if (container) {
+    container.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${activitiesHTML}</div>`;
+  }
 }
 
 // Format time ago helper

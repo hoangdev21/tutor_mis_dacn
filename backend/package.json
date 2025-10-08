@@ -11,7 +11,8 @@
     "test:blog:quick": "node test-blog-quick.js",
     "test:ai": "node test-ai-training.js",
     "demo:ai": "node demo-ai-training.js",
-    "quick:ai": "node quick-test-ai.js"
+    "quick:ai": "node quick-test-ai.js",
+    "test:dashboard": "node tests/test-dashboard-data.js"
   },
   "keywords": [
     "tutoring",
@@ -25,6 +26,7 @@
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
+    "chalk": "^4.1.2",
     "cloudinary": "^2.7.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",

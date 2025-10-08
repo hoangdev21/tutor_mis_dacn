@@ -9,6 +9,7 @@ const { setupSecurity, handleCorsError, sanitizeInput, requestSizeLimiter } = re
 const { swaggerSpec, swaggerUi, swaggerUiOptions } = require('./config/swagger');
 const { serveFavicon } = require('./middleware/favicon');
 const { initializeSocket } = require('./socket/socketHandler');
+const { requestLogger } = require('./middleware/logging');
 
 dotenv.config();
 connectDB();
@@ -42,6 +43,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
+// Activity logging middleware
+app.use(requestLogger);
+
 app.use('/uploads', express.static('uploads'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
@@ -71,6 +75,9 @@ app.use('/api/notifications', require('./routes/notification'));
 app.use('/api/support', require('./routes/support'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/contact', require('./routes/contact'));
+app.use('/api/financial', require('./routes/financial'));
+app.use('/api/logs', require('./routes/logs'));
 
 app.use(handleCorsError);
 

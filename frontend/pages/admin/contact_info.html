@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thông Tin Liên Hệ - Admin | TutorMis</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/admin-dashboard-enhanced.css">
+    <link rel="stylesheet" href="../../assets/css/admin-support.css">
+    <link rel="stylesheet" href="../../assets/css/admin-contact-fix.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <span>🎓</span>
+                    <span class="sidebar-brand-text">TutorMis&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <div class="hamburger-icon" id="hamburgerIcon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Chính</div>
+                    <a href="dashboard.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/dashboard.png" alt="Dashboard">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="user.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/users.png" alt="users">
+                        <span>Người Dùng</span>
+                        <span class="badge" id="usersCount">0</span>
+                    </a>
+                    <a href="approve.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/tutors.png" alt="tutors">
+                        <span>Duyệt Gia Sư</span>
+                        <span class="badge" id="pendingTutorsCount">0</span>
+                    </a>
+                    <a href="course.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/courses.png" alt="courses">
+                        <span>Khóa Học</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Nội Dung</div>
+                    <a href="blog_management.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/blog.png" alt="blog">
+                        <span>Quản Lý Blog</span>
+                        <span class="badge" id="pendingBlogsCount">0</span>
+                    </a>
+                    <a href="report.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/reports.png" alt="reports">
+                        <span>Báo Cáo</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Tài Chính</div>
+                    <a href="financial_statistics.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/finance.png" alt="finance">
+                        <span>Thống Kê Tài Chính</span>
+                    </a>
+                    <a href="contact_info.html" class="menu-item active">
+                        <img src="../../assets/images/dashboard-admin/contact.png" alt="contact info">
+                        <span>Thông Tin</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Hệ Thống</div>
+                    <a href="settings.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/settings.png" alt="settings">
+                        <span>Cài Đặt</span>
+                    </a>
+                    <a href="logs.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/logs.png" alt="logs">
+                        <span>Logs</span>
+                    </a>
+                    <div class="menu-item" onclick="logout()">
+                        <img src="../../assets/images/dashboard-admin/logout.png" alt="logout">
+                        <span>Đăng Xuất</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title">
+                    <h1>Quản Lý Thông Tin Liên Hệ</h1>
+                    <p>Xem và quản lý các yêu cầu liên hệ từ người dùng</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="Admin" class="user-avatar" id="userAvatar">
+                </div>
+            </div>
+        </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #e3e8fb 0%, #7a6b89 100%);">
+                        <img src="../../assets/images/dashboard-admin/information/notebook-tabs.png" alt="contact">
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalSubmissions">0</h3>
+                        <p>Tổng số liên hệ</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <img src="../../assets/images/dashboard-admin/information/pending.png" alt="pending">
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingSubmissions">0</h3>
+                        <p>Chưa xử lý</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <img src="../../assets/images/dashboard-admin/information/read.png" alt="read">
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="readSubmissions">0</h3>
+                        <p>Đã xem</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <img src="../../assets/images/dashboard-admin/information/feedback.png" alt="replied">
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="repliedSubmissions">0</h3>
+                        <p>Đã phản hồi</p>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-section">
+                <div class="filter-group">
+                    <label for="statusFilter">
+                        <i class="fas fa-filter"></i> Trạng thái:
+                    </label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">Tất cả</option>
+                        <option value="pending">Chưa xử lý</option>
+                        <option value="read">Đã xem</option>
+                        <option value="replied">Đã phản hồi</option>
+                        <option value="archived">Đã lưu trữ</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchInput">
+                        <i class="fas fa-search"></i> Tìm kiếm:
+                    </label>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="filter-input" 
+                        placeholder="Tìm theo tên, email, số điện thoại..."
+                    >
+                    </div>
+                </div>
+
+                <!-- Submissions Table -->
+                <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Danh sách liên hệ</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Người gửi</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Nội dung</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissionsTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- View Details Modal -->
+    <div class="modal" id="viewModal">
+        <div class="modal-overlay" onclick="closeViewModal()"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Chi tiết liên hệ</h3>
+                <button class="modal-close" onclick="closeViewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewModalBody">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" onclick="closeViewModal()">
+                    <i class="fas fa-times"></i> Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/token-manager.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/admin-contact.js"></script>
+    <script>
+        // Initialize contact info page on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContactInfo();
+        });
+    </script>
+</body>
+</html>

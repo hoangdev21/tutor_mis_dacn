@@ -3,11 +3,14 @@
 // API_BASE_URL is already defined in main.js
 // const API_BASE_URL = 'http://localhost:5000/api';
 
+// Global variable for chart instance
+let learningProgressChartInstance = null;
+
 // Load dashboard data
 async function loadDashboard() {
   try {
     showLoading('coursesContainer');
-    showLoading('requestsContainer');
+    showLoading('notificationsContainer');
     showLoading('messagesContainer');
     
     const token = localStorage.getItem('token');
@@ -23,34 +26,30 @@ async function loadDashboard() {
     const data = await response.json();
     
     if (data.success) {
-      const { stats, recentCourses, activeRequests, recentMessages } = data.data;
+      const { stats, learningProgress, recentNotifications, recentCourses, recentMessages } = data.data;
       
       // Debug log
-      console.log('📊 Dashboard Data:', {
-        statsCount: Object.keys(stats).length,
-        coursesCount: recentCourses?.length || 0,
-        requestsCount: activeRequests?.length || 0,
-        messagesCount: recentMessages?.length || 0
-      });
-      console.log('📋 Active Requests:', activeRequests);
+      console.log('📊 Dashboard Data:', data.data);
       
       // Update stats
       updateStats(stats);
       
-      // Render sections
+      // Render new sections
+      renderLearningProgressChart(learningProgress);
+      renderRecentNotifications(recentNotifications || []);
+      
+      // Render existing sections
       renderRecentCourses(recentCourses || []);
-      renderActiveRequests(activeRequests || []);
       renderRecentMessages(recentMessages || []);
       
       // Update counts
       document.getElementById('recentCoursesCount').textContent = recentCourses?.length || 0;
-      document.getElementById('activeRequestsCount').textContent = activeRequests?.length || 0;
       document.getElementById('recentMessagesCount').textContent = recentMessages?.length || 0;
     }
   } catch (error) {
     console.error('Load dashboard error:', error);
     showErrorState('coursesContainer', 'Không thể tải dữ liệu');
-    showErrorState('requestsContainer', 'Không thể tải dữ liệu');
+    showErrorState('notificationsContainer', 'Không thể tải dữ liệu');
     showErrorState('messagesContainer', 'Không thể tải dữ liệu');
   }
 }
@@ -150,89 +149,243 @@ function renderRecentCourses(courses) {
   `;
 }
 
-// Render Active Requests
-function renderActiveRequests(requests) {
-  const container = document.getElementById('requestsContainer');
+// Render Learning Progress Chart
+function renderLearningProgressChart(progressData) {
+  console.log('📈 Rendering learning progress chart:', progressData);
   
-  if (!requests || requests.length === 0) {
+  const ctx = document.getElementById('learningProgressChart');
+  if (!ctx) {
+    console.error('Chart canvas not found');
+    return;
+  }
+  
+  // Destroy existing chart if exists
+  if (learningProgressChartInstance) {
+    learningProgressChartInstance.destroy();
+  }
+  
+  const subjectProgress = progressData.subjectProgress || [];
+  
+  // Prepare data for chart
+  const labels = subjectProgress.map(s => s.subject);
+  const completedData = subjectProgress.map(s => s.completed);
+  const activeData = subjectProgress.map(s => s.active);
+  
+  // Create chart
+  learningProgressChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels.length > 0 ? labels : ['Chưa có dữ liệu'],
+      datasets: [
+        {
+          label: 'Hoàn thành',
+          data: completedData.length > 0 ? completedData : [0],
+          backgroundColor: 'rgba(16, 185, 129, 0.8)',
+          borderColor: 'rgba(16, 185, 129, 1)',
+          borderWidth: 2,
+          borderRadius: 6
+        },
+        {
+          label: 'Đang học',
+          data: activeData.length > 0 ? activeData : [0],
+          backgroundColor: 'rgba(59, 130, 246, 0.8)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2,
+          borderRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            font: {
+              size: 12,
+              family: 'Inter, sans-serif'
+            },
+            padding: 15,
+            usePointStyle: true
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          padding: 12,
+          titleFont: {
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': ' + context.parsed.y + ' khóa học';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            font: {
+              size: 11
+            }
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              size: 11
+            }
+          },
+          grid: {
+            display: false
+          }
+        }
+      }
+    }
+  });
+  
+  // Render progress stats
+  const statsContainer = document.getElementById('progressStats');
+  if (statsContainer) {
+    const totalHours = progressData.totalHours || 0;
+    const completedHours = progressData.completedHours || 0;
+    const progressPercentage = progressData.progressPercentage || 0;
+    
+    statsContainer.innerHTML = `
+      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
+        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${Math.round(totalHours)}h</div>
+        <div style="font-size: 12px; opacity: 0.9;">Tổng giờ học</div>
+      </div>
+      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; color: white;">
+        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${Math.round(completedHours)}h</div>
+        <div style="font-size: 12px; opacity: 0.9;">Đã hoàn thành</div>
+      </div>
+      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 8px; color: white;">
+        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${progressPercentage}%</div>
+        <div style="font-size: 12px; opacity: 0.9;">Tiến độ</div>
+      </div>
+    `;
+  }
+}
+
+// Render Recent Notifications
+function renderRecentNotifications(notifications) {
+  console.log('🔔 Rendering recent notifications:', notifications);
+  
+  const container = document.getElementById('notificationsContainer');
+  
+  if (!notifications || notifications.length === 0) {
     container.innerHTML = `
-      <div class="empty-state" style="padding: 30px; text-align: center;">
-        <i class="fas fa-paper-plane" style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;"></i>
-        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Chưa có yêu cầu</h3>
-        <p style="font-size: 14px; color: #94a3b8; margin-bottom: 16px;">Bạn chưa đăng yêu cầu tìm gia sư nào</p>
-        <a href="tutor_request.html" class="action-btn primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; text-decoration: none;">
-          <i class="fas fa-plus"></i>
-          Tạo Yêu Cầu Mới
-        </a>
+      <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+        <i class="fas fa-bell-slash" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;"></i>
+        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Chưa có thông báo</h3>
+        <p style="font-size: 14px; color: #94a3b8;">Các thông báo mới sẽ xuất hiện ở đây</p>
       </div>
     `;
     return;
   }
   
+  // Map notification types to icons (matching backend enum)
+  const typeIcons = {
+    'booking_request': 'fa-calendar-plus',
+    'booking_accepted': 'fa-calendar-check',
+    'booking_rejected': 'fa-calendar-times',
+    'booking_completed': 'fa-trophy',
+    'booking_cancelled': 'fa-calendar-xmark',
+    'blog_approved': 'fa-check-circle',
+    'blog_rejected': 'fa-times-circle',
+    'blog_comment': 'fa-comment',
+    'message_received': 'fa-envelope',
+    'profile_approved': 'fa-user-check',
+    'profile_rejected': 'fa-user-times',
+    'system': 'fa-info-circle'
+  };
+  
+  const typeColors = {
+    'booking_request': '#3b82f6',
+    'booking_accepted': '#10b981',
+    'booking_rejected': '#ef4444',
+    'booking_completed': '#f59e0b',
+    'booking_cancelled': '#6b7280',
+    'blog_approved': '#10b981',
+    'blog_rejected': '#ef4444',
+    'blog_comment': '#8b5cf6',
+    'message_received': '#8b5cf6',
+    'profile_approved': '#10b981',
+    'profile_rejected': '#ef4444',
+    'system': '#6b7280'
+  };
+  
   container.innerHTML = `
-    <div class="requests-list" style="display: grid; gap: 12px;">
-      ${requests.map(req => {
-        const statusMap = {
-          'open': { text: 'Đang mở', class: 'success', icon: 'fa-check-circle' },
-          'reviewing': { text: 'Đang xem xét', class: 'warning', icon: 'fa-clock' },
-          'closed': { text: 'Đã đóng', class: 'secondary', icon: 'fa-times-circle' }
-        };
-        const status = statusMap[req.status] || { text: req.status, class: 'secondary', icon: 'fa-info-circle' };
-        const applicationsCount = req.totalApplications || 0;
-        const budgetText = req.budget ? `${formatCurrency(req.budget.min || 0)} - ${formatCurrency(req.budget.max || 0)}` : 'Chưa xác định';
-        const locationText = req.location ? `${req.location.district || ''}, ${req.location.city || ''}`.trim().replace(/^,\s*/, '') : 'Chưa xác định';
+    <div class="notifications-list" style="display: flex; flex-direction: column; gap: 12px;">
+      ${notifications.map(notif => {
+        const icon = typeIcons[notif.type] || 'fa-bell';
+        const color = typeColors[notif.type] || '#6b7280';
+        const isUnread = !notif.isRead;
         
         return `
-          <div class="request-card" style="padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid var(--color-${status.class});">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-              <div style="flex: 1;">
-                <h4 style="font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 6px;">
-                  ${req.title || 'Không có tiêu đề'}
-                </h4>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">
-                  <i class="fas fa-book" style="margin-right: 6px; color: #667eea;"></i>
-                  <strong>${req.subject || 'N/A'}</strong> ${req.level ? `- ${req.level}` : ''}
-                </p>
-                <p style="font-size: 13px; color: #64748b;">
-                  <i class="fas fa-map-marker-alt" style="margin-right: 6px; color: #f59e0b;"></i>
-                  ${locationText}
-                </p>
+          <div class="notification-item" 
+               style="display: flex; gap: 12px; padding: 12px; background: ${isUnread ? '#eff6ff' : '#f9fafb'}; border-radius: 8px; border-left: 3px solid ${color}; cursor: pointer; transition: all 0.2s;"
+               onclick="markNotificationAsRead('${notif._id}')"
+               onmouseover="this.style.background='#f1f5f9'"
+               onmouseout="this.style.background='${isUnread ? '#eff6ff' : '#f9fafb'}'">
+            <div style="flex-shrink: 0;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: ${color}15; display: flex; align-items: center; justify-content: center;">
+                <i class="fas ${icon}" style="color: ${color}; font-size: 16px;"></i>
               </div>
-              <span class="status-badge ${status.class}" style="font-size: 12px; padding: 4px 10px;">
-                <i class="fas ${status.icon}" style="margin-right: 4px;"></i>${status.text}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: start; justify-content: space-between; margin-bottom: 4px;">
+                <h4 style="font-size: 14px; font-weight: ${isUnread ? '700' : '600'}; color: #1e293b; margin: 0;">${notif.title || 'Thông báo'}</h4>
+                ${isUnread ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; margin-top: 4px;"></div>' : ''}
+              </div>
+              <p style="font-size: 13px; color: #64748b; margin: 0 0 6px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                ${notif.message || ''}
+              </p>
+              <span style="font-size: 11px; color: #94a3b8;">
+                <i class="fas fa-clock" style="margin-right: 4px;"></i>${formatTimeAgo(notif.createdAt)}
               </span>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-              <div>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Ứng tuyển</p>
-                <p style="font-size: 15px; font-weight: 600; color: #667eea;">
-                  <i class="fas fa-users" style="margin-right: 4px;"></i>${applicationsCount}
-                </p>
-              </div>
-              <div>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Ngân sách</p>
-                <p style="font-size: 13px; font-weight: 500; color: #059669;">${budgetText}</p>
-              </div>
-              <div>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Ngày tạo</p>
-                <p style="font-size: 13px; color: #64748b;">${formatRelativeTime(req.createdAt)}</p>
-              </div>
-            </div>
-            
-            <div style="display: flex; gap: 8px;">
-              <button class="action-btn primary" onclick="viewRequestDetail('${req._id}')" style="flex: 1; padding: 8px 12px; font-size: 13px;">
-                <i class="fas fa-eye"></i> Chi tiết
-              </button>
-              <button class="action-btn success" onclick="viewApplications('${req._id}')" style="flex: 1; padding: 8px 12px; font-size: 13px;">
-                <i class="fas fa-users"></i> Ứng tuyển (${applicationsCount})
-              </button>
             </div>
           </div>
         `;
       }).join('')}
     </div>
   `;
+}
+
+// Mark notification as read
+async function markNotificationAsRead(notificationId) {
+  try {
+    const token = localStorage.getItem('token');
+    await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    // Reload notifications
+    loadDashboard();
+  } catch (error) {
+    console.error('Mark notification as read error:', error);
+  }
+}
+
+// Render Active Requests (REMOVED - Kept for backwards compatibility)
+function renderActiveRequests(requests) {
+  // This function is no longer used in the dashboard
+  console.log('⚠️ renderActiveRequests called but is deprecated:', requests);
 }
 
 // Render Recent Messages
@@ -458,14 +611,24 @@ function showCourseDetailModal(booking) {
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// View request detail
+// View request detail (old booking-based - kept for compatibility)
 function viewRequestDetail(requestId) {
   window.location.href = `../student/tutor_request.html?id=${requestId}`;
 }
 
-// View applications
+// View applications (old booking-based - kept for compatibility)
 function viewApplications(requestId) {
   window.location.href = `../student/tutor_request.html?id=${requestId}&tab=applications`;
+}
+
+// View tutor request detail (for TutorRequest job postings)
+function viewTutorRequestDetail(requestId) {
+  window.location.href = `tutor_request.html?requestId=${requestId}`;
+}
+
+// View tutor applications (for TutorRequest job postings)
+function viewTutorApplications(requestId) {
+  window.location.href = `tutor_request.html?requestId=${requestId}`;
 }
 
 // Open chat

@@ -10,6 +10,9 @@ const BlogPost = require('./BlogPost');
 const SupportTicket = require('./SupportTicket');
 const BookingRequest = require('./BookingRequest');
 const Notification = require('./Notification');
+const ContactSubmission = require('./ContactSubmission');
+const Transaction = require('./Transaction');
+const ActivityLog = require('./ActivityLog');
 
 module.exports = {
   User,
@@ -22,5 +25,8 @@ module.exports = {
   BlogPost,
   BookingRequest,
   Notification,
-  SupportTicket
+  SupportTicket,
+  ContactSubmission,
+  Transaction,
+  ActivityLog
 };

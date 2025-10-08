@@ -330,9 +330,7 @@
     </style>
 </head>
 <body>
-    <!-- Dashboard Layout -->
-    <div class="dashboard">
-        <!-- Sidebar -->
+    <!-- Sidebar -->
         <aside class="dashboard-sidebar" id="dashboardSidebar">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
@@ -345,65 +343,64 @@
                     </div>
                 </div>
             </div>
-
             <nav class="sidebar-menu">
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
-                    <div class="menu-item" data-page="dashboard">
+                    <a href="dashboard.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/dashboard.png" alt="Dashboard">
                         <span>Dashboard</span>
-                    </div>
-                    <div class="menu-item" data-page="users">
+                    </a>
+                    <a href="user.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/users.png" alt="users">
                         <span>Người Dùng</span>
                         <span class="badge" id="usersCount">0</span>
-                    </div>
-                    <div class="menu-item" data-page="tutors">
+                    </a>
+                    <a href="approve.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/tutors.png" alt="tutors">
                         <span>Duyệt Gia Sư</span>
                         <span class="badge" id="pendingTutorsCount">0</span>
-                    </div>
-                    <div class="menu-item" data-page="courses">
+                    </a>
+                    <a href="course.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/courses.png" alt="courses">
                         <span>Khóa Học</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
-                    <div class="menu-item active" data-page="blog">
+                    <a href="blog_management.html" class="menu-item active">
                         <img src="../../assets/images/dashboard-admin/blog.png" alt="blog">
                         <span>Quản Lý Blog</span>
                         <span class="badge" id="pendingBlogsCount">0</span>
-                    </div>
-                    <div class="menu-item" data-page="reports">
+                    </a>
+                    <a href="report.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/reports.png" alt="reports">
                         <span>Báo Cáo</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Tài Chính</div>
-                    <div class="menu-item" data-page="finance">
+                    <a href="financial_statistics.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/finance.png" alt="finance">
                         <span>Thống Kê Tài Chính</span>
-                    </div>
-                    <div class="menu-item" data-page="transactions">
-                        <img src="../../assets/images/dashboard-admin/transactions.png" alt="transactions">
-                        <span>Giao Dịch</span>
-                    </div>
+                    </a>
+                    <a href="contact_info.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/contact.png" alt="contact info">
+                        <span>Thông Tin</span>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Hệ Thống</div>
-                    <div class="menu-item" data-page="settings">
+                    <a href="settings.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/settings.png" alt="settings">
                         <span>Cài Đặt</span>
-                    </div>
-                    <div class="menu-item" data-page="logs">
+                    </a>
+                    <a href="logs.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/logs.png" alt="logs">
                         <span>Logs</span>
-                    </div>
+                    </a>
                     <div class="menu-item" onclick="logout()">
                         <img src="../../assets/images/dashboard-admin/logout.png" alt="logout">
                         <span>Đăng Xuất</span>

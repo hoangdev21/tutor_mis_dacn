@@ -111,7 +111,7 @@ document.querySelectorAll('.menu-item[data-page]').forEach(item => {
         blog: '/pages/admin/blog_management.html',
         reports: '/pages/admin/report.html',
         finance: '/pages/admin/financial_statistics.html',
-        transactions: '/pages/admin/transaction.html',
+        contact: '/pages/admin/contact_info.html',
         settings: '/pages/admin/settings.html',
         logs: '/pages/admin/logs.html'
       }

@@ -2,7 +2,7 @@
 // Handles smooth page transitions without reloading the sidebar
 // Created: 2025 - Professional Navigation System
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// API_BASE_URL is already defined in main.js
 
 // Page mapping - định nghĩa các trang và file HTML tương ứng
 const PAGE_MAPPING = {
@@ -48,11 +48,11 @@ const PAGE_MAPPING = {
     icon: 'finance.png',
     loadFunction: 'loadFinance'
   },
-  transactions: {
-    title: 'Giao Dịch',
-    file: 'transactions.html',
-    icon: 'transactions.png',
-    loadFunction: 'loadTransactions'
+  contact_info: {
+    title: 'Thông Tin Liên Hệ',
+    file: 'contact_info.html',
+    icon: 'contact.png',
+    loadFunction: 'loadContactInfo'
   },
   settings: {
     title: 'Cài Đặt',

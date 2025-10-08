@@ -6,6 +6,7 @@
     <title>Thống Kê Tài Chính - Admin | TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/financial-statistics.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -24,65 +25,64 @@
                     </div>
                 </div>
             </div>
-
             <nav class="sidebar-menu">
                 <div class="menu-section">
                     <div class="menu-section-title">Menu Chính</div>
-                    <div class="menu-item" data-page="dashboard">
+                    <a href="dashboard.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/dashboard.png" alt="Dashboard">
                         <span>Dashboard</span>
-                    </div>
-                    <div class="menu-item" data-page="users">
+                    </a>
+                    <a href="user.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/users.png" alt="users">
                         <span>Người Dùng</span>
                         <span class="badge" id="usersCount">0</span>
-                    </div>
-                    <div class="menu-item" data-page="tutors">
+                    </a>
+                    <a href="approve.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/tutors.png" alt="tutors">
                         <span>Duyệt Gia Sư</span>
                         <span class="badge" id="pendingTutorsCount">0</span>
-                    </div>
-                    <div class="menu-item" data-page="courses">
+                    </a>
+                    <a href="course.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/courses.png" alt="courses">
                         <span>Khóa Học</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Nội Dung</div>
-                    <div class="menu-item" data-page="blog">
+                    <a href="blog_management.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/blog.png" alt="blog">
                         <span>Quản Lý Blog</span>
                         <span class="badge" id="pendingBlogsCount">0</span>
-                    </div>
-                    <div class="menu-item" data-page="reports">
+                    </a>
+                    <a href="report.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/reports.png" alt="reports">
                         <span>Báo Cáo</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Tài Chính</div>
-                    <div class="menu-item active" data-page="finance">
+                    <a href="financial_statistics.html" class="menu-item active">
                         <img src="../../assets/images/dashboard-admin/finance.png" alt="finance">
                         <span>Thống Kê Tài Chính</span>
-                    </div>
-                    <div class="menu-item" data-page="transactions">
-                        <img src="../../assets/images/dashboard-admin/transactions.png" alt="transactions">
-                        <span>Giao Dịch</span>
-                    </div>
+                    </a>
+                    <a href="contact_info.html" class="menu-item">
+                        <img src="../../assets/images/dashboard-admin/contact.png" alt="contact info">
+                        <span>Thông Tin</span>
+                    </a>
                 </div>
 
                 <div class="menu-section">
                     <div class="menu-section-title">Hệ Thống</div>
-                    <div class="menu-item" data-page="settings">
+                    <a href="settings.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/settings.png" alt="settings">
                         <span>Cài Đặt</span>
-                    </div>
-                    <div class="menu-item" data-page="logs">
+                    </a>
+                    <a href="logs.html" class="menu-item">
                         <img src="../../assets/images/dashboard-admin/logs.png" alt="logs">
                         <span>Logs</span>
-                    </div>
+                    </a>
                     <div class="menu-item" onclick="logout()">
                         <img src="../../assets/images/dashboard-admin/logout.png" alt="logout">
                         <span>Đăng Xuất</span>
@@ -122,21 +122,155 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Báo Cáo Tài Chính
-                        </h2>
-                    </div>
-
-                    <div id="financeContainer">
-                        <div class="empty-state">
-                            <i class="fas fa-chart-pie"></i>
-                            <h3>Chưa có dữ liệu</h3>
-                            <p>Dữ liệu tài chính sẽ hiển thị ở đây.</p>
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                            <span class="stat-badge up" id="growthRate"><i class="fas fa-arrow-up"></i> 0%</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Tổng Doanh Thu</h3>
+                            <div class="stat-value" id="totalRevenue">0 ₫</div>
+                            <div class="stat-change">So với kỳ trước</div>
                         </div>
                     </div>
+
+                    <div class="stat-card warning">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-percent"></i></div>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Hoa Hồng</h3>
+                            <div class="stat-value" id="totalCommission">0 ₫</div>
+                            <div class="stat-change">Thu nhập hệ thống</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card success">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Doanh Thu Ròng</h3>
+                            <div class="stat-value" id="netRevenue">0 ₫</div>
+                            <div class="stat-change">Sau khi trừ hoa hồng</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card info">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Số Giao Dịch</h3>
+                            <div class="stat-value" id="transactionCount">0</div>
+                            <div class="stat-change">Giao dịch hoàn thành</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card danger">
+                        <div class="stat-header">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Đặt Lịch Chờ</h3>
+                            <div class="stat-value" id="pendingBookings">0</div>
+                            <div class="stat-change"><span id="pendingValue">0 ₫</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Chart -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <h2 class="chart-title">Biểu Đồ Doanh Thu</h2>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active" data-type="monthly">Theo Tháng</button>
+                            <button class="chart-tab" data-type="category">Theo Loại</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <div class="filter-item">
+                            <label>Trạng thái</label>
+                            <select id="filterStatus">
+                                <option value="">Tất cả</option>
+                                <option value="completed">Hoàn thành</option>
+                                <option value="pending">Đang xử lý</option>
+                                <option value="failed">Thất bại</option>
+                                <option value="cancelled">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>Loại giao dịch</label>
+                            <select id="filterType">
+                                <option value="">Tất cả</option>
+                                <option value="booking">Đặt lịch</option>
+                                <option value="commission">Hoa hồng</option>
+                                <option value="refund">Hoàn tiền</option>
+                                <option value="withdrawal">Rút tiền</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>Từ ngày</label>
+                            <input type="date" id="filterStartDate">
+                        </div>
+                        <div class="filter-item">
+                            <label>Đến ngày</label>
+                            <input type="date" id="filterEndDate">
+                        </div>
+                        <div class="filter-actions">
+                            <button class="btn-filter" id="btnApplyFilters">
+                                <i class="fas fa-filter"></i> Lọc
+                            </button>
+                            <button class="btn-reset" id="btnResetFilters">
+                                <i class="fas fa-redo"></i> Đặt lại
+                            </button>
+                            <button class="btn-export" id="btnExport">
+                                <i class="fas fa-file-export"></i> Xuất CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions Table -->
+                <div class="table-section">
+                    <div class="table-header">
+                        <h2 class="table-title">Danh Sách Giao Dịch</h2>
+                        <div class="table-search">
+                            <input type="text" id="searchTransactions" placeholder="Tìm kiếm...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    <table class="transaction-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Ngày</th>
+                                <th>Loại</th>
+                                <th>Người dùng</th>
+                                <th>Số tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Mô tả</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <p>Đang tải dữ liệu...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="paginationContainer"></div>
                 </div>
             </div>
         </main>
@@ -146,5 +280,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/dashboard-common.js"></script>
+    <script src="../../assets/js/financial-statistics.js"></script>
 </body>
 </html>
