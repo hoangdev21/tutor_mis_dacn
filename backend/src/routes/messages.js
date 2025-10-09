@@ -3,18 +3,27 @@ const {
   getConversations,
   getMessages,
   sendMessage,
+  uploadAttachment,
   markAsRead,
   searchUsers,
   createConversation,
   getUserStatus,
-  getUsersStatus
+  getUsersStatus,
+  downloadFileProxy
 } = require('../controllers/messageController');
 const { authenticateToken } = require('../middleware/auth');
+const { uploadMessageAttachment, handleMulterError } = require('../middleware/upload');
 
 const router = express.Router();
 
 // All routes require authentication
 router.use(authenticateToken);
+
+// @route   GET /api/messages/download-proxy
+// @desc    Proxy download file from Cloudinary (handles private files)
+// @access  Private
+// NOTE: Must be before other routes to avoid conflicts
+router.get('/download-proxy', downloadFileProxy);
 
 // @route   GET /api/messages/search/users
 // @desc    Search users to start conversation
@@ -31,6 +40,11 @@ router.get('/user-status/:userId', getUserStatus);
 // @desc    Get multiple users status (batch request)
 // @access  Private
 router.post('/users-status', getUsersStatus);
+
+// @route   POST /api/messages/upload
+// @desc    Upload message attachment
+// @access  Private
+router.post('/upload', uploadMessageAttachment, handleMulterError, uploadAttachment);
 
 // @route   GET /api/messages/conversations
 // @desc    Get all conversations for logged in user

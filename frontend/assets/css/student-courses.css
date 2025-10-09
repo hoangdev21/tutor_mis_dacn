@@ -74,7 +74,7 @@
 }
 
 .stat-value.ongoing {
-  color: #4ade80;
+  color: #2f9724;
   text-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
 }
 
@@ -117,7 +117,7 @@
 }
 
 .course-tab.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d5b9a9 0%, #cf3f80 50%, #d5b9a9 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   transform: translateY(-2px);

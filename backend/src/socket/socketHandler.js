@@ -1,8 +1,6 @@
 // Socket.IO Handler for Real-time Messaging
 const jwt = require('jsonwebtoken');
 const { Message, User } = require('../models');
-
-// Store online users: userId -> socketId
 const onlineUsers = new Map();
 
 // Socket.IO authentication middleware
@@ -31,7 +29,6 @@ const authenticateSocket = async (socket, next) => {
 
 // Initialize Socket.IO
 const initializeSocket = (io) => {
-  // Apply authentication middleware
   io.use(authenticateSocket);
 
   io.on('connection', async (socket) => {
@@ -42,13 +39,11 @@ const initializeSocket = (io) => {
     onlineUsers.set(userId, socket.id);
     console.log(`📊 Online users now: ${onlineUsers.size}`);
     
-    // DEBUG: Log ALL events received from this socket
     socket.onAny((eventName, ...args) => {
       console.log(`🎯 [Socket ${socket.id}] Event received: "${eventName}"`, 
         args.length > 0 ? `with ${args.length} arg(s)` : '');
     });
 
-    // Update lastSeen in database to current time (user is now online)
     try {
       await User.findByIdAndUpdate(userId, { 
         lastSeen: new Date(),
@@ -58,7 +53,6 @@ const initializeSocket = (io) => {
       console.error('Error updating user lastSeen on connect:', error);
     }
 
-    // Broadcast user online status to all clients
     io.emit('user_online', { 
       userId,
       lastSeen: new Date()
@@ -129,13 +123,10 @@ const initializeSocket = (io) => {
           return socket.emit('error', { message: 'Missing required fields' });
         }
 
-        // Check if recipient exists
         const recipient = await User.findById(recipientId);
         if (!recipient) {
           return socket.emit('error', { message: 'Recipient not found' });
         }
-
-        // Create message in database
         const message = await Message.create({
           sender: userId,
           recipient: recipientId,
@@ -143,10 +134,8 @@ const initializeSocket = (io) => {
           read: false
         });
 
-        // Populate sender info
         await message.populate('sender', 'name avatar email role');
 
-        // Prepare message object
         const messageData = {
           _id: message._id,
           sender: {
@@ -178,8 +167,7 @@ const initializeSocket = (io) => {
             message.read = true;
             message.readAt = new Date();
             await message.save();
-            
-            // Notify sender that message was read
+          
             socket.emit('message_read', {
               messageId: message._id,
               readAt: message.readAt

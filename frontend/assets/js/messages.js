@@ -681,6 +681,45 @@ function renderMessages() {
       });
     }
     
+    // Render attachments
+    let attachmentHTML = '';
+    if (msg.attachments && msg.attachments.length > 0) {
+      msg.attachments.forEach(att => {
+        const isImage = att.mimeType && att.mimeType.startsWith('image/');
+        
+        if (isImage) {
+          // Display image directly - click to view in lightbox
+          attachmentHTML += `
+            <div class="message-attachment message-image">
+              <img src="${att.url}" 
+                   alt="${escapeHtml(att.originalName || att.filename)}" 
+                   onclick="openImageLightbox('${att.url}', '${escapeHtml(att.originalName || att.filename)}')">
+            </div>
+          `;
+        } else {
+          // Display file with icon and download link
+          const fileIcon = getFileIcon(att.mimeType, att.originalName || att.filename);
+          const fileSize = att.size ? formatFileSize(att.size) : '';
+          
+          attachmentHTML += `
+            <div class="message-attachment message-file">
+              <a href="${att.url}" 
+                 download="${escapeHtml(att.originalName || att.filename)}" 
+                 class="file-link"
+                 onclick="handleFileDownload(event, '${att.url}', '${escapeHtml(att.originalName || att.filename)}')">
+                <i class="fas ${fileIcon} file-icon"></i>
+                <div class="file-info">
+                  <span class="file-name">${escapeHtml(att.originalName || att.filename)}</span>
+                  ${fileSize ? `<span class="file-size">${fileSize}</span>` : ''}
+                </div>
+                <i class="fas fa-download download-icon"></i>
+              </a>
+            </div>
+          `;
+        }
+      });
+    }
+    
     html += `
       <div class="message ${isSent ? 'sent' : 'received'}">
         ${!isSent ? `
@@ -692,13 +731,8 @@ function renderMessages() {
         </div>
         ` : ''}
         <div class="message-content">
-          <p class="message-text">${escapeHtml(msg.content)}</p>
-          ${msg.attachment ? `
-            <div class="message-file">
-              <i class="fas fa-file"></i>
-              <a href="${msg.attachment.url}" target="_blank">${msg.attachment.name}</a>
-            </div>
-          ` : ''}
+          ${msg.content ? `<p class="message-text">${escapeHtml(msg.content)}</p>` : ''}
+          ${attachmentHTML}
           <span class="message-time">${formatTime(msg.createdAt)}</span>
         </div>
       </div>
@@ -719,7 +753,10 @@ async function sendMessage(event) {
   const input = document.getElementById('messageInput');
   const content = input.value.trim();
   
-  if (!content) return;
+  // Check if we have content or attachment
+  if (!content && !currentFileAttachment) {
+    return;
+  }
   
   // Check if we have recipient (for new conversations) or conversationId (for existing)
   if (!currentRecipient && !currentConversationId) {
@@ -734,12 +771,35 @@ async function sendMessage(event) {
       return;
     }
     
+    // Prepare message data
+    const messageData = {
+      recipientId: currentRecipient._id,
+      content: content || ''
+    };
+    
+    // Add attachment if exists
+    if (currentFileAttachment) {
+      messageData.messageType = currentFileAttachment.messageType;
+      messageData.attachments = [currentFileAttachment];
+      
+      console.log('📎 Sending message with attachment:', {
+        messageType: messageData.messageType,
+        attachments: messageData.attachments,
+        hasContent: !!content
+      });
+    }
+    
+    console.log('📤 Sending message data:', {
+      recipientId: messageData.recipientId,
+      contentLength: messageData.content.length,
+      messageType: messageData.messageType,
+      hasAttachments: !!messageData.attachments,
+      attachmentsCount: messageData.attachments?.length || 0
+    });
+    
     const response = await apiRequest('/messages', {
       method: 'POST',
-      body: JSON.stringify({ 
-        recipientId: currentRecipient._id,
-        content 
-      })
+      body: JSON.stringify(messageData)
     });
 
     if (response.success) {
@@ -752,6 +812,9 @@ async function sendMessage(event) {
       // Clear input
       input.value = '';
       input.style.height = 'auto';
+      
+      // Clear file attachment and preview
+      clearFilePreview();
       
       // Update conversation list
       await loadConversations();
@@ -770,6 +833,9 @@ function handleKeyPress(event) {
   }
 }
 
+// Global variable to store current file attachment
+let currentFileAttachment = null;
+
 // Attach file
 function attachFile() {
   document.getElementById('fileInput').click();
@@ -780,42 +846,350 @@ async function handleFileSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  // Validate file size (5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    showNotification('File không được vượt quá 5MB', 'error');
+  // Check file size (max 10MB)
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    showError('File quá lớn. Kích thước tối đa là 10MB');
+    event.target.value = '';
     return;
   }
 
   try {
+    // Show file preview
+    showFilePreview(file);
+    
+    // Upload file to server
+    showNotification('Đang tải file lên...', 'info');
+    
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('conversationId', currentConversationId);
+    formData.append('attachment', file);
 
+    // Get token for Authorization header
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    
+    console.log('🔑 Upload file - Token check:', {
+      hasToken: !!token,
+      tokenLength: token ? token.length : 0,
+      tokenStart: token ? token.substring(0, 20) + '...' : 'N/A'
+    });
+    
+    if (!token) {
+      showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+      clearFilePreview();
+      setTimeout(() => {
+        // Determine correct login path based on current page
+        const currentPath = window.location.pathname;
+        const loginPath = currentPath.includes('/student/') 
+          ? '../../pages/auth/login.html'
+          : currentPath.includes('/tutor/')
+            ? '../../pages/auth/login.html'
+            : '/frontend/pages/auth/login.html';
+        window.location.href = loginPath;
+      }, 2000);
+      return;
+    }
+
+    // Use fetch directly for FormData upload (tokenManager doesn't handle FormData well)
+    console.log('📤 Uploading file to:', `${API_BASE_URL}/messages/upload`);
+    
     const response = await fetch(`${API_BASE_URL}/messages/upload`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        'Authorization': `Bearer ${token}`
+        // Don't set Content-Type - browser will set it with multipart boundary
       },
       body: formData
     });
 
+    console.log('📥 Upload response status:', response.status);
+    
     const data = await response.json();
+    console.log('📥 Upload response data:', data);
 
-    if (data.success) {
-      messages.push(data.data);
-      renderMessages();
-      scrollToBottom();
-      await loadConversations();
+    if (response.ok && data.success) {
+      // Store file attachment data
+      currentFileAttachment = {
+        url: data.data.url,
+        fileName: data.data.fileName,
+        fileType: data.data.fileType,
+        fileSize: data.data.fileSize,
+        messageType: data.data.messageType
+      };
+
+      showNotification('File đã được tải lên thành công', 'success');
     } else {
-      showNotification(data.message || 'Không thể tải file lên', 'error');
+      // Handle token expiration
+      if (response.status === 401) {
+        console.error('❌ Token expired or invalid');
+        showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+        clearFilePreview();
+        
+        // Clear invalid token
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('token');
+        
+        setTimeout(() => {
+          // Determine correct login path based on current page
+          const currentPath = window.location.pathname;
+          const loginPath = currentPath.includes('/student/') 
+            ? '../../pages/auth/login.html'
+            : currentPath.includes('/tutor/')
+              ? '../../pages/auth/login.html'
+              : '/frontend/pages/auth/login.html';
+          window.location.href = loginPath;
+        }, 2000);
+        return;
+      }
+      
+      showError(data.message || 'Không thể tải file lên');
+      clearFilePreview();
     }
   } catch (error) {
-    console.error('Error uploading file:', error);
-    showNotification('Lỗi khi tải file lên', 'error');
+    console.error('File upload error:', error);
+    showError('Không thể tải file lên: ' + (error.message || 'Lỗi không xác định'));
+    clearFilePreview();
+  } finally {
+    // Clear file input
+    event.target.value = '';
   }
+}
 
-  // Clear input
-  event.target.value = '';
+// Show file preview
+function showFilePreview(file) {
+  const previewContainer = document.getElementById('filePreviewContainer');
+  const previewContent = document.getElementById('filePreviewContent');
+  
+  previewContainer.style.display = 'block';
+  
+  if (file.type.startsWith('image/')) {
+    // Image preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewContent.innerHTML = `
+        <div class="file-preview-image">
+          <img src="${e.target.result}" alt="${escapeHtml(file.name)}">
+          <p class="file-preview-name">${escapeHtml(file.name)}</p>
+        </div>
+      `;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // File icon and name preview
+    const fileIcon = getFileIcon(file.type, file.name);
+    const fileSize = formatFileSize(file.size);
+    
+    previewContent.innerHTML = `
+      <div class="file-preview-file">
+        <i class="fas ${fileIcon} file-preview-icon"></i>
+        <div class="file-preview-info">
+          <p class="file-preview-name">${escapeHtml(file.name)}</p>
+          <p class="file-preview-size">${fileSize}</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Clear file preview
+function clearFilePreview() {
+  const previewContainer = document.getElementById('filePreviewContainer');
+  const previewContent = document.getElementById('filePreviewContent');
+  
+  previewContainer.style.display = 'none';
+  previewContent.innerHTML = '';
+  currentFileAttachment = null;
+  
+  // Clear file input
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput) {
+    fileInput.value = '';
+  }
+}
+
+// Get file icon based on type
+function getFileIcon(mimeType, fileName) {
+  if (mimeType.startsWith('image/')) return 'fa-image';
+  if (mimeType.startsWith('video/')) return 'fa-video';
+  if (mimeType.startsWith('audio/')) return 'fa-music';
+  if (mimeType.includes('pdf')) return 'fa-file-pdf';
+  if (mimeType.includes('word') || fileName.endsWith('.doc') || fileName.endsWith('.docx')) return 'fa-file-word';
+  if (mimeType.includes('text') || fileName.endsWith('.txt')) return 'fa-file-alt';
+  if (fileName.endsWith('.py')) return 'fa-file-code';
+  if (fileName.endsWith('.cpp') || fileName.endsWith('.c') || fileName.endsWith('.java') || fileName.endsWith('.js')) return 'fa-file-code';
+  if (fileName.endsWith('.html')) return 'fa-file-code';
+  return 'fa-file';
+}
+
+// Format file size
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// ===== IMAGE LIGHTBOX FUNCTIONS =====
+
+/**
+ * Open image in lightbox modal
+ * @param {string} imageUrl - URL of the image
+ * @param {string} caption - Image caption/filename
+ */
+function openImageLightbox(imageUrl, caption) {
+  const lightbox = document.getElementById('imageLightbox');
+  const lightboxImg = document.getElementById('lightboxImage');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  
+  if (lightbox && lightboxImg) {
+    lightboxImg.src = imageUrl;
+    lightboxCaption.textContent = caption || '';
+    lightbox.style.display = 'flex';
+    
+    // Prevent body scroll when lightbox is open
+    document.body.style.overflow = 'hidden';
+    
+    console.log('📸 Opened image lightbox:', imageUrl);
+  }
+}
+
+/**
+ * Close image lightbox
+ */
+function closeImageLightbox() {
+  const lightbox = document.getElementById('imageLightbox');
+  const lightboxImg = document.getElementById('lightboxImage');
+  
+  if (lightbox) {
+    lightbox.style.display = 'none';
+    
+    // Restore body scroll
+    document.body.style.overflow = 'auto';
+    
+    // Clear image src to free memory
+    if (lightboxImg) {
+      lightboxImg.src = '';
+    }
+    
+    console.log('✖️ Closed image lightbox');
+  }
+}
+
+// ===== FILE DOWNLOAD FUNCTION =====
+
+/**
+ * Handle file download
+ * @param {Event} event - Click event
+ * @param {string} fileUrl - URL of the file
+ * @param {string} fileName - Name of the file
+ */
+async function handleFileDownload(event, fileUrl, fileName) {
+  event.preventDefault();
+  
+  console.log('📥 Downloading file:', fileName);
+  
+  // For Cloudinary URLs, use backend proxy
+  if (fileUrl.includes('cloudinary.com')) {
+    try {
+      // Try direct download first (for new public files)
+      console.log('🔗 Attempting direct download from:', fileUrl);
+      const directResponse = await fetch(fileUrl, {
+        method: 'GET',
+        mode: 'cors'
+      });
+
+      // If 401/403, use backend proxy (for old private files)
+      if (directResponse.status === 401 || directResponse.status === 403) {
+        console.warn('⚠️ 401/403 error, using backend proxy...');
+        
+        // Use backend proxy to download file
+        const proxyUrl = `${API_BASE_URL}/messages/download-proxy?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName)}`;
+        
+        console.log('🔄 Downloading via proxy:', proxyUrl);
+        
+        const response = await fetch(proxyUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Proxy download failed: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        downloadBlob(blob, fileName);
+        showNotification('Đang tải file xuống...', 'info');
+        return;
+      }
+
+      // If direct download works, use it
+      if (directResponse.ok) {
+        const blob = await directResponse.blob();
+        downloadBlob(blob, fileName);
+        showNotification('Đang tải file xuống...', 'info');
+      } else {
+        throw new Error(`HTTP error! status: ${directResponse.status}`);
+      }
+
+    } catch (error) {
+      console.error('❌ Download error:', error);
+      
+      // Final fallback: try proxy anyway
+      try {
+        console.warn('⚠️ Trying backend proxy as fallback...');
+        const proxyUrl = `${API_BASE_URL}/messages/download-proxy?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(fileName)}`;
+        
+        const response = await fetch(proxyUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          downloadBlob(blob, fileName);
+          showNotification('Đang tải file xuống...', 'info');
+          return;
+        }
+      } catch (proxyError) {
+        console.error('❌ Proxy fallback failed:', proxyError);
+      }
+      
+      // Last resort: open in new tab
+      console.warn('⚠️ All methods failed, opening in new tab');
+      window.open(fileUrl, '_blank');
+      showNotification('Mở file trong tab mới', 'warning');
+    }
+  } else {
+    // For non-Cloudinary URLs, use direct download
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileName;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showNotification('Đang tải file xuống...', 'info');
+  }
+}
+
+/**
+ * Helper function to download blob as file
+ */
+function downloadBlob(blob, fileName) {
+  const blobUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // Clean up blob URL after a short delay
+  setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
 }
 
 // Mark conversation as read - Backend tự động xử lý khi load messages
@@ -2339,6 +2713,16 @@ window.addEventListener('beforeunload', () => {
   }
   
   stopCallDuration();
+});
+
+// Keyboard support for lightbox (ESC to close)
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' || event.key === 'Esc') {
+    const lightbox = document.getElementById('imageLightbox');
+    if (lightbox && lightbox.style.display === 'flex') {
+      closeImageLightbox();
+    }
+  }
 });
 
 console.log('Messages page initialized');

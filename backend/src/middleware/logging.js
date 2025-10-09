@@ -108,7 +108,7 @@ const requestLogger = async (req, res, next) => {
         type: logType,
         action,
         user: req.user?._id,
-        userRole: req.user?.role || 'guest',
+        userRole: req.user?.role,
         resource,
         description,
         severity,
@@ -135,7 +135,8 @@ const requestLogger = async (req, res, next) => {
         req.path.includes('/admin') || // Log all admin requests
         req.path.includes('/auth'); // Log all auth requests
       
-      if (shouldLog) {
+      // Only log if we have a valid user (avoid guest role issue)
+      if (shouldLog && req.user && req.user.role) {
         await ActivityLog.logActivity(logData);
       }
       

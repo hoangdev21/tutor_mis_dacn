@@ -208,7 +208,7 @@ function showTicketDetailModal(ticket) {
         <!-- Subject -->
         <div class="ticket-description">
           <h4>
-            <i class="fas fa-heading"></i>
+            <i class="fas fa-heading"></i>&nbsp;&nbsp;
             Tiêu đề
           </h4>
           <p><strong>${ticket.subject}</strong></p>
@@ -217,7 +217,7 @@ function showTicketDetailModal(ticket) {
         <!-- Description -->
         <div class="ticket-description">
           <h4>
-            <i class="fas fa-align-left"></i>
+            <i class="fas fa-align-left"></i>&nbsp;&nbsp;
             Mô tả chi tiết
           </h4>
           <p>${ticket.description}</p>

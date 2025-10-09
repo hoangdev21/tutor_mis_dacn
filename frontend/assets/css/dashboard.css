@@ -236,10 +236,11 @@ a.menu-item {
 }
 
 .menu-item.active {
-  background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(43, 56, 115, 0.1) 0%, transparent 100%);
   color: var(--primary-color);
   border-left-color: var(--primary-color);
   font-weight: 600;
+  border-radius: 12px;
 }
 
 .menu-item i {
@@ -309,6 +310,7 @@ a.menu-item {
   width: calc(100% - 280px);
   max-width: calc(100% - 280px);
   overflow-x: hidden;
+  background-color: #e8edf5;
 }
 
 .dashboard-sidebar.collapsed ~ .dashboard-main {
@@ -464,16 +466,20 @@ a.menu-item {
 }
 
 .stat-card.blue{
-  background: linear-gradient(135deg, #a6afd9 0%, #f5abd0 100%);
+  background: linear-gradient(135deg, #edeeef 0%, #c0e6eb 100%);
+  border: 1px solid rgb(241, 241, 241);
 }
 .stat-card.green{
-  background: linear-gradient(135deg, #6bbfb8 0%, #62e494 100%);
-}
+  background: linear-gradient(135deg, #edeeef 0%, #c3ebc0 100%);
+  border: 1px solid rgb(241, 241, 241);
+} 
 .stat-card.orange{
-  background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+  background: linear-gradient(135deg, #edeeef 0%, #ebd7c0 100%);
+  border: 1px solid rgb(241, 241, 241);
 }
 .stat-card.purple{
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  background: linear-gradient(135deg, #edeeef 0%, #ebc0c9 100%);
+  border: 1px solid rgb(241, 241, 241);  
 }
 
 .stat-card {
@@ -504,17 +510,17 @@ a.menu-item {
 }
 
 .stat-icon.blue {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7a6e82 0%, #d3cdda 100%);
   border-radius: 50%;
 }
 
 .stat-icon.green {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #70d690 0%, #d3cdda 100%);
   border-radius: 50%;
 }
 
 .stat-icon.orange {
-  background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+  background: linear-gradient(135deg, #e4936a 0%, #d3cdda 100%);
   border-radius: 50%;
 }
 .stat-icon.yellow {
@@ -523,7 +529,7 @@ a.menu-item {
 }
 
 .stat-icon.purple {
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  background: linear-gradient(135deg, #d985b8 0%, #d3cdda 100%);
   border-radius: 50%;
   color: #764ba2;
 }
@@ -548,7 +554,7 @@ a.menu-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #a4e1ed;
+    background: linear-gradient(135deg, #a6afd9 0%, #f5abd0 100%);
 }
 .stat-icon.white1 {
     border: 2px solid black; 
@@ -557,7 +563,7 @@ a.menu-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #31c560;
+    background: linear-gradient(135deg, #6bbfb8 0%, #62e494 100%);
 }
 .stat-icon.white2 {
     border: 2px solid black; 
@@ -566,7 +572,7 @@ a.menu-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #4d8dfb;
+    background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
 }
 .stat-icon.white3 {
     border: 2px solid black; 
@@ -575,7 +581,7 @@ a.menu-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: 33333#b56ea1;
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
 }
 
 

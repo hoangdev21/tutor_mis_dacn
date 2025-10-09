@@ -129,7 +129,7 @@ function renderStats(stats) {
   
   statsContainer.innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">
+      <div class="stat-icon blue">
         <i class="fas fa-users"></i>
       </div>
       <div class="stat-info">
@@ -139,7 +139,7 @@ function renderStats(stats) {
     </div>
     
     <div class="stat-card green">
-      <div class="stat-icon">
+      <div class="stat-icon green">
         <i class="fas fa-user-check"></i>
       </div>
       <div class="stat-info">
@@ -149,17 +149,17 @@ function renderStats(stats) {
     </div>
     
     <div class="stat-card orange">
-      <div class="stat-icon">
+      <div class="stat-icon orange">
         <i class="fas fa-graduation-cap"></i>
       </div>
-      <div class="stat-info">
+      <div class="stat-info orange">
         <h3>${stats.completedBookings || 0}</h3>
         <p>Đã Hoàn Thành</p>
       </div>
     </div>
     
     <div class="stat-card purple">
-      <div class="stat-icon">
+      <div class="stat-icon purple">
         <i class="fas fa-clock"></i>
       </div>
       <div class="stat-info">

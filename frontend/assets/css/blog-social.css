@@ -278,7 +278,7 @@
 
 /* Create Post Card - Clean, professional design */
 .create-post-card {
-    background: #ffffff;
+    background: linear-gradient(135deg, #eeeff4 0%, #9c9699 100%);
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     padding: 20px;
@@ -400,7 +400,7 @@
 }
 
 .filter-btn.active {
-    background: #007bff;
+    background: linear-gradient(135deg, #667eea 0%, #c3498e 100%);
     color: #ffffff;
     border-color: #007bff;
 }

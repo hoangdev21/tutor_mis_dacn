@@ -1,5 +1,6 @@
 const { Message, User, StudentProfile, TutorProfile } = require('../models');
 const mongoose = require('mongoose');
+const { uploadMessageAttachment } = require('../utils/cloudinaryUpload');
 
 // @desc    Get all conversations for logged in user
 // @route   GET /api/messages/conversations
@@ -252,18 +253,99 @@ const getMessages = async (req, res) => {
   }
 };
 
+// @desc    Upload message attachment
+// @route   POST /api/messages/upload
+// @access  Private
+const uploadAttachment = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    const { buffer, originalname, mimetype, size } = req.file;
+
+    // Upload to Cloudinary
+    const uploadResult = await uploadMessageAttachment(
+      buffer,
+      userId.toString(),
+      originalname,
+      mimetype
+    );
+
+    if (!uploadResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload file'
+      });
+    }
+
+    // Determine message type based on MIME type
+    let messageType = 'file';
+    if (mimetype.startsWith('image/')) {
+      messageType = 'image';
+    } else if (mimetype.startsWith('video/')) {
+      messageType = 'video';
+    } else if (mimetype.startsWith('audio/')) {
+      messageType = 'audio';
+    }
+
+    // Return file information
+    res.json({
+      success: true,
+      data: {
+        url: uploadResult.url,
+        fileName: originalname,
+        fileType: mimetype,
+        fileSize: size,
+        messageType: messageType
+      }
+    });
+  } catch (error) {
+    console.error('Upload attachment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload attachment',
+      error: error.message
+    });
+  }
+};
+
 // @desc    Send a message
 // @route   POST /api/messages
 // @access  Private
 const sendMessage = async (req, res) => {
   try {
-    const { recipientId, content } = req.body;
+    const { recipientId, content, messageType, attachments } = req.body;
     const userId = req.user._id;
 
-    if (!recipientId || !content) {
+    console.log('📨 Received message data:', {
+      recipientId,
+      content: content ? `"${content}"` : 'EMPTY',
+      contentLength: content?.length || 0,
+      messageType,
+      hasAttachments: !!attachments,
+      attachmentsCount: attachments?.length || 0,
+      attachments: attachments
+    });
+
+    if (!recipientId) {
       return res.status(400).json({
         success: false,
-        message: 'Recipient ID and content are required'
+        message: 'Recipient ID is required'
+      });
+    }
+
+    // Content is required unless there are attachments
+    if (!content && (!attachments || attachments.length === 0)) {
+      console.log('❌ Validation failed: No content and no attachments');
+      return res.status(400).json({
+        success: false,
+        message: 'Message content or attachment is required'
       });
     }
 
@@ -276,13 +358,41 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    // Create message
-    const message = await Message.create({
+    // Prepare message data
+    const messageData = {
       senderId: userId,
       receiverId: recipientId,
-      content: content.trim(),
+      content: content ? content.trim() : '',
+      messageType: messageType || 'text',
       isRead: false
+    };
+
+    // Add attachments if provided
+    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+      messageData.attachments = attachments.map(att => ({
+        filename: att.fileName,
+        originalName: att.fileName,
+        mimeType: att.fileType,
+        size: att.fileSize,
+        url: att.url
+      }));
+      
+      console.log('📎 Attachments mapped:', messageData.attachments);
+    }
+
+    console.log('💾 Creating message with data:', {
+      senderId: messageData.senderId,
+      receiverId: messageData.receiverId,
+      content: messageData.content ? `"${messageData.content}"` : 'EMPTY',
+      messageType: messageData.messageType,
+      hasAttachments: !!messageData.attachments,
+      attachmentsCount: messageData.attachments?.length || 0
     });
+
+    // Create message
+    const message = await Message.create(messageData);
+    
+    console.log('✅ Message created successfully:', message._id);
 
     // Message will be auto-populated by pre-find hook
     // Reload to get populated data
@@ -302,6 +412,8 @@ const sendMessage = async (req, res) => {
         },
         recipient: recipientId,
         content: populatedMessage.content,
+        messageType: populatedMessage.messageType,
+        attachments: populatedMessage.attachments,
         isRead: populatedMessage.isRead,
         createdAt: populatedMessage.createdAt
       });
@@ -517,14 +629,120 @@ const getUsersStatus = async (req, res) => {
   }
 };
 
+// @desc    Proxy download file from Cloudinary (handles private files)
+// @route   GET /api/messages/download-proxy
+// @access  Private
+const downloadFileProxy = async (req, res) => {
+  try {
+    const { url, filename } = req.query;
+
+    if (!url) {
+      return res.status(400).json({
+        success: false,
+        message: 'URL is required'
+      });
+    }
+
+    console.log('📥 Proxying download for:', filename || 'file');
+
+    // Import cloudinary
+    const { cloudinary } = require('../config/cloudinary');
+    const { extractPublicId } = require('../utils/cloudinaryUpload');
+
+    // Determine resource type from URL
+    let resourceType = 'raw';
+    let keepExtension = true; // Keep extension for raw files
+    
+    if (url.includes('/image/')) {
+      resourceType = 'image';
+      keepExtension = false; // Images don't need extension in public_id
+    } else if (url.includes('/video/')) {
+      resourceType = 'video';
+      keepExtension = false; // Videos don't need extension in public_id
+    }
+
+    // Extract public ID from URL (keep extension for raw files)
+    const publicId = extractPublicId(url, keepExtension);
+    
+    if (!publicId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Cloudinary URL'
+      });
+    }
+
+    console.log('📦 Fetching from Cloudinary:', { publicId, resourceType, keepExtension });
+
+    // Generate authenticated URL using Cloudinary SDK
+    const cloudinaryUrl = cloudinary.url(publicId, {
+      resource_type: resourceType,
+      type: 'upload',
+      secure: true,
+      sign_url: true
+    });
+
+    // Fetch file from Cloudinary
+    const https = require('https');
+    const http = require('http');
+    const urlModule = require('url');
+    
+    const parsedUrl = urlModule.parse(cloudinaryUrl);
+    const protocol = parsedUrl.protocol === 'https:' ? https : http;
+
+    protocol.get(cloudinaryUrl, (cloudinaryRes) => {
+      if (cloudinaryRes.statusCode !== 200) {
+        console.error('❌ Cloudinary returned status:', cloudinaryRes.statusCode);
+        return res.status(cloudinaryRes.statusCode).json({
+          success: false,
+          message: 'Failed to fetch file from Cloudinary'
+        });
+      }
+
+      // Set headers for download
+      const contentType = cloudinaryRes.headers['content-type'] || 'application/octet-stream';
+      const contentLength = cloudinaryRes.headers['content-length'];
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename || 'file')}"`);
+      
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+
+      // Stream file to client
+      cloudinaryRes.pipe(res);
+
+      console.log('✅ Streaming file to client:', filename);
+
+    }).on('error', (error) => {
+      console.error('❌ Error fetching from Cloudinary:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error downloading file from Cloudinary',
+        error: error.message
+      });
+    });
+
+  } catch (error) {
+    console.error('❌ Error in download proxy:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error downloading file',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getConversations,
   getMessages,
   sendMessage,
+  uploadAttachment,
   markAsRead,
   searchUsers,
   createConversation,
   getUserStatus,
-  getUsersStatus
+  getUsersStatus,
+  downloadFileProxy
 };
 

@@ -41,7 +41,7 @@ class HybridChatbotService {
         return [
             {
                 name: 'find_tutor',
-                description: 'TÌM KIẾM GIA SƯ TỪ DATABASE. BẮT BUỘC phải gọi function này khi người dùng nói: "tìm gia sư", "cho tôi gia sư", "có gia sư nào", "gợi ý gia sư". Tìm theo môn học, địa điểm, học phí, giới tính, kinh nghiệm.',
+                description: 'TÌM KIẾM GIA SƯ TỪ DATABASE. BẮT BUỘC phải gọi function này khi người dùng nói: "tìm gia sư", "kiếm gia sư", "cho tôi gia sư", "có gia sư nào", "gợi ý gia sư". Tìm theo môn học, địa điểm, học phí, giới tính, kinh nghiệm.',
                 parameters: {
                     type: 'object',
                     properties: {
@@ -232,7 +232,7 @@ class HybridChatbotService {
             }
 
             const model = genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-2.5-flash',
                 tools: [{ functionDeclarations: this.getFunctionDeclarations() }],
                 // Force AI to MUST use function calling - ANY mode forces function usage
                 toolConfig: {
@@ -1043,7 +1043,7 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
             if (blog.excerpt) {
                 response += `📄 **Tóm tắt**: ${blog.excerpt.substring(0, 100)}...\n`;
             }
-            response += `\n[**Đọc bài viết →**](/pages/student/blog.html?id=${blog._id})\n\n`;
+            response += `\n[**Đọc bài viết →**](/pages/student/blog.html?id=${blog._id})\n\n`; 
             response += `---\n\n`;
         });
 

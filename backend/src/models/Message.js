@@ -18,9 +18,10 @@ const messageSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true,
+    required: false, // Not required if attachments exist
     trim: true,
-    maxlength: 2000
+    maxlength: 2000,
+    default: ''
   },
   messageType: {
     type: String,
@@ -80,6 +81,14 @@ const messageSchema = new mongoose.Schema({
 messageSchema.index({ senderId: 1, receiverId: 1, createdAt: -1 });
 messageSchema.index({ courseId: 1, createdAt: -1 });
 messageSchema.index({ isRead: 1, receiverId: 1 });
+
+// Validation: Message phải có content hoặc attachments
+messageSchema.pre('validate', function(next) {
+  if (!this.content && (!this.attachments || this.attachments.length === 0)) {
+    this.invalidate('content', 'Message must have either content or attachments');
+  }
+  next();
+});
 
 // Populate thông tin sender và receiver
 messageSchema.pre(/^find/, function(next) {

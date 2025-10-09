@@ -31,6 +31,7 @@
   font-size: 28px;
   font-weight: 700;
   color: #050505;
+  
   margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -1031,3 +1032,380 @@
   color: #65676b;
   margin: 0;
 }
+
+/* ===== FILE ATTACHMENT STYLES ===== */
+
+/* File Preview Container (before sending) */
+.file-preview-container {
+  padding: 12px 16px;
+  background: #f0f2f5;
+  border-top: 1px solid #e4e6eb;
+  position: relative;
+}
+
+.file-preview-content {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.file-preview-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #F02849;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.file-preview-close:hover {
+  background: #d02040;
+  transform: scale(1.1);
+}
+
+/* Image Preview */
+.file-preview-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview-image img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.file-preview-name {
+  font-size: 13px;
+  color: #050505;
+  text-align: center;
+  word-break: break-word;
+  margin: 0;
+}
+
+/* File Preview (non-image) */
+.file-preview-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview-icon {
+  font-size: 32px;
+  color: #667eea;
+}
+
+.file-preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-preview-info .file-preview-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #050505;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-size {
+  font-size: 12px;
+  color: #65676b;
+  margin: 0;
+}
+
+/* Message Attachments (after sending) */
+.message-attachment {
+  margin-top: 8px;
+}
+
+/* Image Attachment in Message */
+.message-image {
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 300px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.message-image:hover {
+  transform: scale(1.02);
+}
+
+.message-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+/* File Attachment in Message */
+.message-file {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+
+.message-file:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.file-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  background: linear-gradient(135deg, #2770de 0%, #425687 100%);
+  
+}
+
+.file-link:hover {
+  background: linear-gradient(135deg, #607abc 0%, #2e4669 100%);
+}
+
+.file-icon {
+  font-size: 28px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #050505;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 12px;
+  color: #65676b;
+}
+
+.download-icon {
+  font-size: 16px;
+  color: #667eea;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.file-link:hover .download-icon {
+  transform: scale(1.2);
+}
+
+/* Different file type icons colors */
+.fa-file-pdf {
+  color: #F02849;
+}
+
+.fa-file-word {
+  color: #2b579a;
+}
+
+.fa-file-code {
+  color: #667eea;
+}
+
+.fa-video {
+  color: #764ba2;
+}
+
+.fa-music {
+  color: #f093fb;
+}
+
+/* Sent message attachments styling */
+.message.sent .message-file {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.message.sent .message-file:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.message.sent .file-name,
+.message.sent .file-icon,
+.message.sent .download-icon {
+  color: white;
+}
+
+.message.sent .file-size {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .message-image {
+    max-width: 220px;
+  }
+  
+  .file-preview-image img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+}
+
+/* ===== IMAGE LIGHTBOX MODAL ===== */
+
+.image-lightbox {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.95);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+  z-index: 10001;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+  color: #bbb;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 85vh;
+  object-fit: contain;
+  animation: zoomIn 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.lightbox-caption {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px 24px;
+  border-radius: 8px;
+  max-width: 80%;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* Close lightbox when clicking outside image */
+.image-lightbox:not(.lightbox-content):not(.lightbox-caption) {
+  cursor: pointer;
+}
+
+/* Responsive lightbox */
+@media (max-width: 768px) {
+  .lightbox-close {
+    top: 10px;
+    right: 20px;
+    font-size: 32px;
+  }
+  
+  .lightbox-content {
+    max-width: 95%;
+    max-height: 80vh;
+  }
+  
+  .lightbox-caption {
+    font-size: 14px;
+    padding: 8px 16px;
+    bottom: 20px;
+    max-width: 90%;
+  }
+}
+
+/* Enhanced cursor for clickable images */
+.message-image img {
+  cursor: zoom-in;
+}
+
+/* Enhanced download link styling */
+.file-link {
+  cursor: pointer;
+  position: relative;
+}
+
+.file-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.file-link:hover::after {
+  width: 80%;
+}
+

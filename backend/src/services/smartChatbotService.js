@@ -95,7 +95,11 @@ class SmartChatbotService {
             'da nang': 'đà nẵng',
             'tp hcm': 'tp hồ chí minh',
             'tphcm': 'tp hồ chí minh',
-            'sai gon': 'tp hồ chí minh'
+            'sai gon': 'tp hồ chí minh',
+            'saigon': 'tp hồ chí minh',
+            'quang nam': 'quảng nam',
+            'quang ngai': 'quảng ngãi',
+            'thac si': 'thạc sĩ',
         };
         
         for (const [wrong, correct] of Object.entries(typos)) {

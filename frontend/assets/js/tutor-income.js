@@ -138,7 +138,7 @@ function renderStats(summary) {
   
   statsContainer.innerHTML = `
     <div class="income-stat-card">
-      <div class="stat-icon">
+      <div class="stat-icon blue">
         <i class="fas fa-wallet"></i>
       </div>
       <div class="stat-info">
@@ -149,7 +149,7 @@ function renderStats(summary) {
     </div>
     
     <div class="income-stat-card green">
-      <div class="stat-icon">
+      <div class="stat-icon green">
         <i class="fas fa-clock"></i>
       </div>
       <div class="stat-info">
@@ -160,7 +160,7 @@ function renderStats(summary) {
     </div>
     
     <div class="income-stat-card orange">
-      <div class="stat-icon">
+      <div class="stat-icon orange">
         <i class="fas fa-calendar-alt"></i>
       </div>
       <div class="stat-info">
@@ -171,7 +171,7 @@ function renderStats(summary) {
     </div>
     
     <div class="income-stat-card blue">
-      <div class="stat-icon">
+      <div class="stat-icon purple">
         <i class="fas fa-graduation-cap"></i>
       </div>
       <div class="stat-info">
@@ -417,8 +417,8 @@ function renderLevelChart(levelData) {
       datasets: [{
         label: 'Thu nhập',
         data: data,
-        backgroundColor: 'rgba(102, 126, 234, 0.8)',
-        borderColor: '#667eea',
+        backgroundColor: 'rgba(197, 171, 132, 0.8)',
+        borderColor: '#424349ff',
         borderWidth: 2,
         borderRadius: 8
       }]

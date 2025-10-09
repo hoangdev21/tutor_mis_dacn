@@ -113,11 +113,84 @@ const deleteFromCloudinary = async (publicId) => {
 };
 
 /**
+ * Upload message attachment to Cloudinary (supports various file types)
+ * @param {Buffer} fileBuffer - File buffer from multer
+ * @param {String} userId - User ID for unique naming
+ * @param {String} originalName - Original filename
+ * @param {String} mimeType - File MIME type
+ * @returns {Promise<Object>} Upload result with secure_url
+ */
+const uploadMessageAttachment = async (fileBuffer, userId, originalName, mimeType) => {
+  try {
+    // Determine resource type based on MIME type
+    let resourceType = 'auto';
+    if (mimeType.startsWith('image/')) {
+      resourceType = 'image';
+    } else if (mimeType.startsWith('video/')) {
+      resourceType = 'video';
+    } else if (mimeType.startsWith('audio/')) {
+      resourceType = 'video'; // Cloudinary uses 'video' for audio files
+    } else {
+      resourceType = 'raw'; // For documents and other files
+    }
+
+    // Clean filename for public_id
+    const cleanName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const timestamp = Date.now();
+
+    const uploadOptions = {
+      folder: `${process.env.CLOUDINARY_FOLDER}/messages`,
+      public_id: `msg_${userId}_${timestamp}_${cleanName}`,
+      resource_type: resourceType,
+      type: 'upload', // Public access for all file types
+      access_mode: 'public' // Ensure public access
+    };
+
+    // Add transformation for images only
+    if (resourceType === 'image') {
+      uploadOptions.transformation = [
+        { width: 1200, height: 1200, crop: 'limit' },
+        { quality: 'auto:good' },
+        { fetch_format: 'auto' }
+      ];
+    }
+
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        uploadOptions,
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+
+      streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+    });
+
+    return {
+      success: true,
+      url: result.secure_url,
+      publicId: result.public_id,
+      format: result.format,
+      bytes: result.bytes,
+      resourceType: result.resource_type
+    };
+  } catch (error) {
+    console.error('Cloudinary message attachment upload error:', error);
+    throw new Error(`Failed to upload attachment: ${error.message}`);
+  }
+};
+
+/**
  * Extract public ID from Cloudinary URL
  * @param {String} url - Cloudinary URL
+ * @param {Boolean} keepExtension - Keep file extension (true for raw files, false for images)
  * @returns {String|null} Public ID or null
  */
-const extractPublicId = (url) => {
+const extractPublicId = (url, keepExtension = false) => {
   if (!url || !url.includes('cloudinary.com')) {
     return null;
   }
@@ -132,8 +205,15 @@ const extractPublicId = (url) => {
     // Remove version (v1234567890) if present
     const relevantParts = pathParts.filter(part => !part.startsWith('v'));
     
-    // Join and remove file extension
-    const publicId = relevantParts.join('/').replace(/\.[^/.]+$/, '');
+    // Join parts
+    let publicId = relevantParts.join('/');
+    
+    // For raw files (PDFs, docs, etc.), keep the extension as part of public_id
+    // For images/videos, Cloudinary can work without extension
+    if (!keepExtension) {
+      publicId = publicId.replace(/\.[^/.]+$/, '');
+    }
+    
     return publicId;
   } catch (error) {
     console.error('Error extracting public ID:', error);
@@ -141,10 +221,59 @@ const extractPublicId = (url) => {
   }
 };
 
+/**
+ * Generate signed URL for private Cloudinary resources
+ * @param {String} publicId - Cloudinary public ID
+ * @param {String} resourceType - Resource type (image/video/raw)
+ * @param {Number} expiresIn - Expiration time in seconds (default: 1 hour)
+ * @returns {String} Signed URL
+ */
+const generateSignedUrl = (publicId, resourceType = 'raw', expiresIn = 3600) => {
+  try {
+    const timestamp = Math.floor(Date.now() / 1000) + expiresIn;
+    
+    const signedUrl = cloudinary.url(publicId, {
+      resource_type: resourceType,
+      type: 'upload',
+      sign_url: true,
+      expires_at: timestamp,
+      secure: true
+    });
+
+    return signedUrl;
+  } catch (error) {
+    console.error('Error generating signed URL:', error);
+    return null;
+  }
+};
+
+/**
+ * Convert existing private URL to public URL (re-upload if needed)
+ * @param {String} url - Cloudinary URL
+ * @returns {String} Updated URL or original URL
+ */
+const convertToPublicUrl = (url) => {
+  if (!url || !url.includes('cloudinary.com')) {
+    return url;
+  }
+
+  // If URL already uses /upload/ delivery type, it should work
+  // If it uses /authenticated/, we need to convert it
+  if (url.includes('/authenticated/')) {
+    // Replace /authenticated/ with /upload/
+    return url.replace('/authenticated/', '/upload/');
+  }
+
+  return url;
+};
+
 module.exports = {
   uploadToCloudinary,
   uploadAvatar,
   uploadCertificate,
+  uploadMessageAttachment,
   deleteFromCloudinary,
-  extractPublicId
+  extractPublicId,
+  generateSignedUrl,
+  convertToPublicUrl
 };

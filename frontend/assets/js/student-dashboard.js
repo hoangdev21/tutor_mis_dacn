@@ -171,7 +171,7 @@ function renderLearningProgressChart(progressData) {
   const completedData = subjectProgress.map(s => s.completed);
   const activeData = subjectProgress.map(s => s.active);
   
-  // Create chart
+// Create chart
   learningProgressChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -180,50 +180,70 @@ function renderLearningProgressChart(progressData) {
         {
           label: 'Hoàn thành',
           data: completedData.length > 0 ? completedData : [0],
-          backgroundColor: 'rgba(16, 185, 129, 0.8)',
-          borderColor: 'rgba(16, 185, 129, 1)',
-          borderWidth: 2,
-          borderRadius: 6
+          backgroundColor: '#10B981',
+          borderColor: '#059669',
+          borderWidth: 1.5,
+          borderRadius: 8,
+          hoverBackgroundColor: '#059669'
         },
         {
           label: 'Đang học',
           data: activeData.length > 0 ? activeData : [0],
-          backgroundColor: 'rgba(59, 130, 246, 0.8)',
-          borderColor: 'rgba(59, 130, 246, 1)',
-          borderWidth: 2,
-          borderRadius: 6
+          backgroundColor: '#cf597fff',
+          borderColor: '#1D4ED8',
+          borderWidth: 1.5,
+          borderRadius: 8,
+          hoverBackgroundColor: '#7182b1ff'
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      animation: {
+        duration: 800,
+        easing: 'easeInOutQuart'
+      },
       plugins: {
         legend: {
           display: true,
           position: 'top',
           labels: {
             font: {
-              size: 12,
-              family: 'Inter, sans-serif'
+              size: 13,
+              weight: '600',
+              family: 'Inter, -apple-system, sans-serif'
             },
-            padding: 15,
-            usePointStyle: true
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            color: '#374151'
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          padding: 12,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          padding: 14,
           titleFont: {
             size: 14,
-            weight: 'bold'
+            weight: 'bold',
+            family: 'Inter, sans-serif'
           },
           bodyFont: {
-            size: 13
+            size: 13,
+            family: 'Inter, sans-serif'
           },
+          titleColor: '#FFFFFF',
+          bodyColor: '#E5E7EB',
+          borderColor: 'rgba(255, 255, 255, 0.2)',
+          borderWidth: 1,
+          displayColors: true,
+          padding: 12,
           callbacks: {
             label: function(context) {
               return context.dataset.label + ': ' + context.parsed.y + ' khóa học';
+            },
+            afterLabel: function() {
+              return '';
             }
           }
         }
@@ -234,21 +254,32 @@ function renderLearningProgressChart(progressData) {
           ticks: {
             stepSize: 1,
             font: {
-              size: 11
-            }
+              size: 12,
+              weight: '500',
+              family: 'Inter, sans-serif'
+            },
+            color: '#6B7280',
+            padding: 10
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.08)',
+            drawBorder: false,
+            lineWidth: 1
           }
         },
         x: {
           ticks: {
             font: {
-              size: 11
-            }
+              size: 12,
+              weight: '500',
+              family: 'Inter, sans-serif'
+            },
+            color: '#6B7280',
+            padding: 8
           },
           grid: {
-            display: false
+            display: false,
+            drawBorder: false
           }
         }
       }
@@ -263,15 +294,15 @@ function renderLearningProgressChart(progressData) {
     const progressPercentage = progressData.progressPercentage || 0;
     
     statsContainer.innerHTML = `
-      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
+      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #73b2bbff 0%, #b52976ff 100%); border-radius: 8px; color: white;">
         <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${Math.round(totalHours)}h</div>
         <div style="font-size: 12px; opacity: 0.9;">Tổng giờ học</div>
       </div>
-      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; color: white;">
+      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #8cd2baff 0%, #0f4131ff 100%); border-radius: 8px; color: white;">
         <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${Math.round(completedHours)}h</div>
         <div style="font-size: 12px; opacity: 0.9;">Đã hoàn thành</div>
       </div>
-      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 8px; color: white;">
+      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #b1c1dbff 0%, #646e83ff 100%); border-radius: 8px; color: white;">
         <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${progressPercentage}%</div>
         <div style="font-size: 12px; opacity: 0.9;">Tiến độ</div>
       </div>

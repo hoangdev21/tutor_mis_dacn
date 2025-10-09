@@ -68,6 +68,32 @@ const uploadMultiple = multer({
   }
 }).array('attachments', 5);
 
+// Message attachment upload middleware (supports various file types)
+const uploadMessageAttachment = multer({
+  storage: memoryStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB per file
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow images, documents, videos, and audio files
+    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|html|py|cpp|c|java|js|mp4|mp3|wav|avi|mov/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    
+    // Check mimetype patterns
+    const isImage = /^image\//i.test(file.mimetype);
+    const isDocument = /pdf|msword|vnd\.openxmlformats-officedocument|text\/plain|text\/html/i.test(file.mimetype);
+    const isVideo = /^video\//i.test(file.mimetype);
+    const isAudio = /^audio\//i.test(file.mimetype);
+    const isCode = /text\/(plain|html|x-python|x-c|x-java|javascript)/i.test(file.mimetype);
+    
+    if (extname && (isImage || isDocument || isVideo || isAudio || isCode)) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Định dạng file không được hỗ trợ'));
+    }
+  }
+}).single('attachment');
+
 // Error handler for multer
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -94,5 +120,6 @@ module.exports = {
   uploadAvatar,
   uploadCertificate,
   uploadMultiple,
+  uploadMessageAttachment,
   handleMulterError
 };

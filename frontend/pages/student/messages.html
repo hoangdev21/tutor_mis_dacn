@@ -187,9 +187,20 @@
                             <!-- Messages will be rendered here -->
                         </div>
 
+                        <!-- File Preview Area -->
+                        <div class="file-preview-container" id="filePreviewContainer" style="display: none;">
+                            <div class="file-preview-content">
+                                <button class="file-preview-close" onclick="clearFilePreview()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div id="filePreviewContent"></div>
+                            </div>
+                        </div>
+
                         <!-- Message Input -->
                         <div class="message-input-area">
-                            <button class="icon-btn" title="Đính kèm">
+                            <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+                            <button class="icon-btn" title="Đính kèm" onclick="document.getElementById('fileInput').click()">
                                 <i class="fas fa-paperclip"></i>
                             </button>
                             <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." autocomplete="off" onkeypress="if(event.key==='Enter') sendMessage()">
@@ -307,6 +318,13 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div class="image-lightbox" id="imageLightbox" onclick="closeImageLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightboxImage">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
     </div>
 
     <!-- Scripts -->

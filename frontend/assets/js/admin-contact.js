@@ -6,23 +6,16 @@ let currentFilter = 'all';
 let currentSearch = '';
 let submissions = [];
 
-// Main initialization function - called by navigation system
 function loadContactInfo() {
   console.log('🚀 Loading Contact Info page...');
-  
-  // Setup event listeners first
   setupEventListeners();
-  
-  // Then load data
   loadStats();
   loadSubmissions();
   
   console.log('✅ Contact Info initialized');
 }
 
-// Also support DOMContentLoaded for standalone page
 document.addEventListener('DOMContentLoaded', () => {
-  // Only run if we're on contact_info page directly
   if (window.location.pathname.includes('contact_info.html')) {
     loadContactInfo();
   }

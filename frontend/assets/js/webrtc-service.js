@@ -1,6 +1,4 @@
 // ===== WEBRTC SERVICE =====
-// Professional WebRTC implementation for voice and video calls
-// Using STUN servers for NAT traversal
 
 class WebRTCService {
   constructor(socket) {

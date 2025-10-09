@@ -27,7 +27,7 @@
 .search-box-large input {
     width: 100%;
     padding: 14px 48px 14px 20px;
-    border: 2px solid var(--border-color);
+    border: 2px solid #b1c0b1;
     border-radius: 10px;
     font-size: 15px;
     transition: all 0.3s ease;
@@ -36,7 +36,7 @@
 .search-box-large input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(136, 147, 195, 0.1);
 }
 
 .search-box-large i {
@@ -63,7 +63,7 @@
 
 .filter-group select {
     padding: 12px 16px;
-    border: 2px solid var(--border-color);
+    border: 2px solid #b1c0b1;
     border-radius: 8px;
     font-size: 14px;
     font-family: inherit;
