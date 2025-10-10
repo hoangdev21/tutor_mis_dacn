@@ -392,57 +392,59 @@ async function validateSession() {
   }
 }
 
+// Typed.js effects - only run if Typed library is available
+if (typeof Typed !== 'undefined') {
+    // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
+    document.addEventListener('DOMContentLoaded', function() {
+        var options = {
+            strings: ["Tìm kiếm dễ dàng", "Tìm kiếm thông minh", "Kết nối nhanh chóng", "Lọc theo nhu cầu"],
+            typeSpeed: 50,  // Tốc độ gõ chữ (ms)
+            backSpeed: 25,  // Tốc độ xóa chữ (ms)
+            backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
+            loop: true,      // Lặp lại vô hạn
+            showCursor: false // Hiển thị con trỏ nhấp nháy
+        };
+        var typed = new Typed('.feature__title', options);
+    });
+  
+    // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
+    document.addEventListener('DOMContentLoaded', function() {
+        var options = {
+            strings: ["Gia sư chất lượng","Gia sư tận tâm","Gia sư uy tín","Gia sư chuyên nghiệp"],
+            typeSpeed: 50,  // Tốc độ gõ chữ (ms)
+            backSpeed: 25,  // Tốc độ xóa chữ (ms)
+            backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
+            loop: true,      // Lặp lại vô hạn
+            showCursor: false // Hiển thị con trỏ nhấp nháy
+        };
+        var typed = new Typed('.feature__title_1', options);
+    });
 
-// Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
-        document.addEventListener('DOMContentLoaded', function() {
-            var options = {
-                strings: ["Tìm kiếm dễ dàng", "Tìm kiếm thông minh", "Kết nối nhanh chóng", "Lọc theo nhu cầu"],
-                typeSpeed: 50,  // Tốc độ gõ chữ (ms)
-                backSpeed: 25,  // Tốc độ xóa chữ (ms)
-                backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
-                loop: true,      // Lặp lại vô hạn
-                showCursor: false // Hiển thị con trỏ nhấp nháy
-            };
-            var typed = new Typed('.feature__title', options);
-        });
-      
-        // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
-        document.addEventListener('DOMContentLoaded', function() {
-            var options = {
-                strings: ["Gia sư chất lượng","Gia sư tận tâm","Gia sư uy tín","Gia sư chuyên nghiệp"],
-                typeSpeed: 50,  // Tốc độ gõ chữ (ms)
-                backSpeed: 25,  // Tốc độ xóa chữ (ms)
-                backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
-                loop: true,      // Lặp lại vô hạn
-                showCursor: false // Hiển thị con trỏ nhấp nháy
-            };
-            var typed = new Typed('.feature__title_1', options);
-        });
+    // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
+    document.addEventListener('DOMContentLoaded', function() {
+        var options = {
+            strings: ["An toàn và bảo mật","Bảo vệ dữ liệu cá nhân","Hệ thống bảo mật tiên tiến","Cam kết bảo mật tuyệt đối"],
+            typeSpeed: 50,  // Tốc độ gõ chữ (ms)
+            backSpeed: 25,  // Tốc độ xóa chữ (ms)
+            backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
+            loop: true,      // Lặp lại vô hạn
+            showCursor: false // Hiển thị con trỏ nhấp nháy
+        };
+        var typed = new Typed('.feature__title_2', options);
+    });
 
-        // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
-        document.addEventListener('DOMContentLoaded', function() {
-            var options = {
-                strings: ["An toàn và bảo mật","Bảo vệ dữ liệu cá nhân","Hệ thống bảo mật tiên tiến","Cam kết bảo mật tuyệt đối"],
-                typeSpeed: 50,  // Tốc độ gõ chữ (ms)
-                backSpeed: 25,  // Tốc độ xóa chữ (ms)
-                backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
-                loop: true,      // Lặp lại vô hạn
-                showCursor: false // Hiển thị con trỏ nhấp nháy
-            };
-            var typed = new Typed('.feature__title_2', options);
-        });
-
-        // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
-        document.addEventListener('DOMContentLoaded', function() {
-            var options = {
-                strings: ["Hỗ trợ 24/7","Hỗ trợ mọi lúc mọi nơi","Đội ngũ hỗ trợ chuyên nghiệp","Luôn sẵn sàng giúp đỡ"],
-                typeSpeed: 50,  // Tốc độ gõ chữ (ms)
-                backSpeed: 25,  // Tốc độ xóa chữ (ms)
-                backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
-                loop: true,      // Lặp lại vô hạn
-                showCursor: false // Hiển thị con trỏ nhấp nháy
-            };
-            var typed = new Typed('.feature__title_3', options);
-        });
+    // Tôi đang dùng thư viện Typed.js, yêu cầu viết hàm và tạo vòng lặp chữ cho hiệu tứng Typing effect cho feature__title trong section Features
+    document.addEventListener('DOMContentLoaded', function() {
+        var options = {
+            strings: ["Hỗ trợ 24/7","Hỗ trợ mọi lúc mọi nơi","Đội ngũ hỗ trợ chuyên nghiệp","Luôn sẵn sàng giúp đỡ"],
+            typeSpeed: 50,  // Tốc độ gõ chữ (ms)
+            backSpeed: 25,  // Tốc độ xóa chữ (ms)
+            backDelay: 1000, // Thời gian chờ trước khi xóa (ms)
+            loop: true,      // Lặp lại vô hạn
+            showCursor: false // Hiển thị con trỏ nhấp nháy
+        };
+        var typed = new Typed('.feature__title_3', options);
+    });
+}
 
         

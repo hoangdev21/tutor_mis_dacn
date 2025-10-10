@@ -1,6 +1,7 @@
 // ===== FIND TUTOR PAGE JAVASCRIPT =====
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// API_BASE_URL is already defined in main.js
+// const API_BASE_URL = 'http://localhost:5000/api';
 let allTutors = [];
 let filteredTutors = [];
 let currentPage = 1;
@@ -164,7 +165,7 @@ function renderTutorCard(tutor) {
     
     return `
         <div class="tutor-card">
-            <div class="tutor-card-header" style="background: linear-gradient(135deg, #64c0e1ff 0%, #ae5780ff 100%); position: relative;">
+            <div class="tutor-card-header" style="background: linear-gradient(135deg, #3ebd68ff 0%, #c9588dff 50%, #3b85a0ff 100%); position: relative;">
                 <img src="${avatarUrl}" 
                      alt="${profile.fullName || 'Tutor'}" 
                      class="tutor-avatar"

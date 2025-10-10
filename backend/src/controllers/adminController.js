@@ -1249,37 +1249,78 @@ const updateCourse = async (req, res) => {
     const { id } = req.params;
     const { status, notes, cancellationReason } = req.body;
 
-    const course = await Course.findById(id);
+    // First try to find in Course collection
+    let course = await Course.findById(id);
 
-    if (!course) {
-      return res.status(404).json({
-        success: false,
-        message: 'Course not found'
+    if (course) {
+      // It's a Course document
+      // Update fields
+      if (status) {
+        course.status = status;
+
+        if (status === 'cancelled') {
+          course.cancellationReason = cancellationReason || 'Cancelled by admin';
+          course.cancelledBy = req.user._id;
+          course.cancelledAt = new Date();
+        }
+      }
+
+      if (notes !== undefined) {
+        course.notes = notes;
+      }
+
+      await course.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Course updated successfully',
+        data: course
+      });
+    } else {
+      // Try to find in BookingRequest collection
+      const BookingRequest = require('../models/BookingRequest');
+      const booking = await BookingRequest.findById(id);
+
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Course not found'
+        });
+      }
+
+      // It's a BookingRequest document
+      // Map course status to booking status
+      let newStatus = status;
+      if (status === 'active' && booking.status === 'accepted') {
+        // Already active/accepted
+        newStatus = 'accepted';
+      } else if (status === 'completed') {
+        newStatus = 'completed';
+        booking.completedAt = new Date();
+      } else if (status === 'cancelled') {
+        newStatus = 'cancelled';
+        booking.cancellation = {
+          cancelledBy: req.user._id,
+          reason: cancellationReason || 'Cancelled by admin',
+          cancelledAt: new Date()
+        };
+      } else if (status === 'paused') {
+        // Bookings don't have paused status, keep as accepted
+        return res.status(400).json({
+          success: false,
+          message: 'Cannot pause booking requests'
+        });
+      }
+
+      booking.status = newStatus;
+      await booking.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Booking updated successfully',
+        data: booking
       });
     }
-
-    // Update fields
-    if (status) {
-      course.status = status;
-      
-      if (status === 'cancelled') {
-        course.cancellationReason = cancellationReason || 'Cancelled by admin';
-        course.cancelledBy = req.user._id;
-        course.cancelledAt = new Date();
-      }
-    }
-
-    if (notes !== undefined) {
-      course.notes = notes;
-    }
-
-    await course.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Course updated successfully',
-      data: course
-    });
 
   } catch (error) {
     console.error('Update course error:', error);
@@ -1297,29 +1338,53 @@ const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const course = await Course.findById(id);
+    // First try to find in Course collection
+    let course = await Course.findById(id);
 
-    if (!course) {
-      return res.status(404).json({
-        success: false,
-        message: 'Course not found'
+    if (course) {
+      // It's a Course document
+      // Chỉ cho phép xóa course ở trạng thái pending hoặc cancelled
+      if (course.status !== 'pending' && course.status !== 'cancelled') {
+        return res.status(400).json({
+          success: false,
+          message: 'Can only delete courses with pending or cancelled status'
+        });
+      }
+
+      await course.deleteOne();
+
+      res.status(200).json({
+        success: true,
+        message: 'Course deleted successfully'
+      });
+    } else {
+      // Try to find in BookingRequest collection
+      const BookingRequest = require('../models/BookingRequest');
+      const booking = await BookingRequest.findById(id);
+
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Course not found'
+        });
+      }
+
+      // It's a BookingRequest document
+      // Only allow deletion of cancelled bookings
+      if (booking.status !== 'cancelled') {
+        return res.status(400).json({
+          success: false,
+          message: 'Can only delete cancelled booking requests'
+        });
+      }
+
+      await booking.deleteOne();
+
+      res.status(200).json({
+        success: true,
+        message: 'Booking deleted successfully'
       });
     }
-
-    // Chỉ cho phép xóa course ở trạng thái pending hoặc cancelled
-    if (course.status !== 'pending' && course.status !== 'cancelled') {
-      return res.status(400).json({
-        success: false,
-        message: 'Can only delete courses with pending or cancelled status'
-      });
-    }
-
-    await course.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: 'Course deleted successfully'
-    });
 
   } catch (error) {
     console.error('Delete course error:', error);

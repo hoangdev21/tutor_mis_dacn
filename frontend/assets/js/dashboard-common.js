@@ -538,4 +538,63 @@ window.addEventListener('resize', () => {
   }, 250);
 });
 
+// Update sidebar badges (courses count and messages count)
+async function updateSidebarBadges() {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    if (!token) return;
+
+    // Only update for student role
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    if (userData.role !== 'student') return;
+
+    const response = await fetch(`${window.API_BASE_URL}/student/dashboard`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        const { stats } = data.data;
+
+        // Update courses count badge
+        const coursesCountEl = document.getElementById('coursesCount');
+        if (coursesCountEl) {
+          coursesCountEl.textContent = stats.activeBookings || 0;
+        }
+
+        // Update messages count badge
+        const messagesCountEl = document.getElementById('messagesCount');
+        if (messagesCountEl) {
+          messagesCountEl.textContent = stats.unreadMessages || 0;
+        }
+
+        console.log('✅ Sidebar badges updated:', {
+          courses: stats.activeBookings || 0,
+          messages: stats.unreadMessages || 0
+        });
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error updating sidebar badges:', error);
+  }
+}
+
+// Expose function globally for other scripts to call
+window.updateSidebarBadges = updateSidebarBadges;
+
+// Update badges when page loads
+if (currentUser && currentUser.role === 'student') {
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateSidebarBadges);
+  } else {
+    updateSidebarBadges();
+  }
+}
+
 console.log('Dashboard common initialized for user:', currentUser.email);

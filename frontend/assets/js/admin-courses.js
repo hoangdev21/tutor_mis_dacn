@@ -383,7 +383,7 @@ function renderCourses(courses) {
               <i class="fas fa-check"></i> Kích hoạt
             </button>
           ` : ''}
-          ${course.status === 'active' ? `
+          ${course.status === 'active' && course._source !== 'booking' ? `
             <button class="action-btn warning" onclick="updateCourseStatus('${course._id}', 'paused')" title="Tạm dừng">
               <i class="fas fa-pause"></i> Tạm dừng
             </button>
@@ -398,7 +398,7 @@ function renderCourses(courses) {
               <i class="fas fa-trash"></i> Xóa
             </button>
           ` : ''}
-          ${(course.status === 'active' || course.status === 'paused') ? `
+          ${(course.status === 'active' || course.status === 'paused' || (course.status === 'accepted' && course._source === 'booking')) ? `
             <button class="action-btn danger" onclick="cancelCourse('${course._id}')" title="Hủy khóa học">
               <i class="fas fa-ban"></i> Hủy
             </button>
@@ -818,7 +818,7 @@ function showCourseDetailModal(course) {
               <i class="fas fa-check"></i> Kích hoạt
             </button>
           ` : ''}
-          ${course.status === 'active' ? `
+          ${course.status === 'active' && course._source !== 'booking' ? `
             <button class="btn btn-warning" onclick="updateCourseStatus('${course._id}', 'paused'); closeModal('courseDetailModal');">
               <i class="fas fa-pause"></i> Tạm dừng
             </button>
@@ -828,7 +828,7 @@ function showCourseDetailModal(course) {
               <i class="fas fa-play"></i> Tiếp tục
             </button>
           ` : ''}
-          ${(course.status === 'active' || course.status === 'paused') ? `
+          ${(course.status === 'active' || course.status === 'paused' || (course.status === 'accepted' && course._source === 'booking')) ? `
             <button class="btn btn-danger" onclick="cancelCourse('${course._id}'); closeModal('courseDetailModal');">
               <i class="fas fa-ban"></i> Hủy khóa học
             </button>

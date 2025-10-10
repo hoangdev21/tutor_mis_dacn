@@ -86,16 +86,10 @@ function updateStats(stats) {
     pendingRequestsEl.textContent = stats.pendingRequests || 0;
   }
 
-  // Update sidebar badges
-  const coursesCountEl = document.getElementById('coursesCount');
-  if (coursesCountEl) {
-    coursesCountEl.textContent = stats.activeBookings || 0;
-  }
-  
-  const messagesCountEl = document.getElementById('messagesCount');
-  if (messagesCountEl) {
-    messagesCountEl.textContent = stats.unreadMessages || 0;
-  }
+      // Update sidebar badges
+      if (window.updateSidebarBadges) {
+        window.updateSidebarBadges();
+      }
 }
 
 // Render recent courses

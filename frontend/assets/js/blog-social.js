@@ -1,6 +1,7 @@
 // ===== BLOG SOCIAL FEED JAVASCRIPT =====
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// API_BASE_URL is already defined in main.js
+// const API_BASE_URL = 'http://localhost:5000/api';
 let blogCurrentUser = null;
 let allPosts = [];
 let currentFilter = 'all';

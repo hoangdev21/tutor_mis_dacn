@@ -1,6 +1,7 @@
 // ===== MESSAGES PAGE JAVASCRIPT =====
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// API_BASE_URL is already defined in main.js
+// const API_BASE_URL = 'http://localhost:5000/api';
 let currentConversationId = null;
 let currentRecipient = null;
 let conversations = [];
