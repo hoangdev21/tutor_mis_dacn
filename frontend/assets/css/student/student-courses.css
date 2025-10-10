@@ -980,6 +980,143 @@
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
+/* ===== TIMETABLE STYLES ===== */
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+.timetable th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.timetable td {
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  vertical-align: top;
+  height: 60px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timetable td:hover {
+  background: #f8fafc;
+}
+
+.timetable td.time-slot {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #475569;
+  width: 80px;
+}
+
+.timetable .course-slot {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  padding: 4px;
+  margin: 2px;
+  font-size: 12px;
+  color: #1e40af;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.timetable .course-slot:hover {
+  background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.timetable .course-slot .subject {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.timetable .course-slot .tutor {
+  display: block;
+  font-size: 10px;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.timetable .course-slot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.timetable .course-slot.ongoing::before {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.timetable .course-slot.upcoming::before {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* Timetable responsive */
+@media (max-width: 768px) {
+  .timetable {
+    font-size: 12px;
+  }
+
+  .timetable th,
+  .timetable td {
+    padding: 6px 4px;
+  }
+
+  .timetable td.time-slot {
+    width: 60px;
+  }
+
+  .timetable .course-slot {
+    font-size: 10px;
+    padding: 2px;
+  }
+
+  .timetable .course-slot .subject {
+    font-size: 10px;
+  }
+
+  .timetable .course-slot .tutor {
+    font-size: 9px;
+  }
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
   .courses-grid {

@@ -268,6 +268,9 @@ function renderProfile() {
                 <div>
                   <strong>Địa chỉ:</strong>
                   <span>${addressStr}</span>
+                  <button class="location-btn" onclick="openLocationInMap('${encodeURIComponent(addressStr)}')" title="Xem trên bản đồ">
+                    <i class="fas fa-map-marker-alt"></i>
+                  </button>
                 </div>
               </div>
               <div class="info-row">
@@ -534,6 +537,21 @@ function goBack() {
   } else {
     window.location.href = 'find_tutor.html';
   }
+}
+
+// Open location in Google Maps
+function openLocationInMap(encodedAddress) {
+  if (!encodedAddress || encodedAddress === 'Chưa+cập+nhật') {
+    alert('Địa chỉ chưa được cập nhật');
+    return;
+  }
+  
+  // Decode the address for display
+  const address = decodeURIComponent(encodedAddress);
+  
+  // Open Google Maps with the address
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+  window.open(mapsUrl, '_blank');
 }
 
 console.log('✅ Tutor profile page script loaded');

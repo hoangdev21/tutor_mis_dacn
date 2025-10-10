@@ -153,6 +153,10 @@
                             Đang Học
                             <span id="countOngoing">0</span>
                         </button>
+                        <button class="course-tab" data-tab="timetable">
+                            <i class="fas fa-calendar-alt"></i>
+                            Thời Gian Biểu
+                        </button>
                         <button class="course-tab" data-tab="completed">
                             <i class="fas fa-check-circle"></i>
                             Đã Kết Thúc
@@ -179,6 +183,33 @@
                                     <div class="spinner"></div>
                                     <p>Đang tải khóa học...</p>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Timetable Panel -->
+                        <div class="course-panel" id="timetablePanel">
+                            <div id="timetableContainer" class="timetable-grid">
+                                <div class="loading-state">
+                                    <div class="spinner"></div>
+                                    <p>Đang tải thời gian biểu...</p>
+                                </div>
+                                <table class="timetable">
+                                    <thead>
+                                        <tr>
+                                            <th>Giờ</th>
+                                            <th>Thứ 2</th>
+                                            <th>Thứ 3</th>
+                                            <th>Thứ 4</th>
+                                            <th>Thứ 5</th>
+                                            <th>Thứ 6</th>
+                                            <th>Thứ 7</th>
+                                            <th>Chủ Nhật</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timetableBody">
+                                        <!-- Timetable rows will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 

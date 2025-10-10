@@ -372,64 +372,104 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
         try {
             console.log('[Find Tutor] Searching with criteria:', JSON.stringify(criteria));
             
-            // Build MongoDB query with ACTUAL existing fields
-            const dbQuery = { 
-                $or: [
-                    { isApproved: true },
-                    { isApproved: { $exists: false } }
-                ]
+            // Build MongoDB query for User model with approval status
+            const userQuery = { 
+                role: 'tutor',
+                approvalStatus: 'approved',
+                isActive: true
             };
+            
+            // Build TutorProfile query for filtering
+            const profileQuery = {};
             
             // Search by subjects - use ACTUAL field structure
             if (criteria.subjects && criteria.subjects.length > 0) {
                 // Use regex for flexible matching on existing 'subjects.subject' field
                 const subjectRegexes = criteria.subjects.map(s => new RegExp(s, 'i'));
-                dbQuery['subjects.subject'] = { $in: subjectRegexes };
+                profileQuery['subjects.subject'] = { $in: subjectRegexes };
                 console.log('[Find Tutor] Searching subjects:', criteria.subjects);
             }
             
             // Search by city - use ACTUAL field structure  
             if (criteria.city) {
                 // Use regex on existing 'address.city' field
-                dbQuery['address.city'] = new RegExp(criteria.city, 'i');
+                profileQuery['address.city'] = new RegExp(criteria.city, 'i');
                 console.log('[Find Tutor] Searching city:', criteria.city);
             }
             
             // Price range query
             if (criteria.minPrice || criteria.maxPrice) {
-                dbQuery.hourlyRate = {};
-                if (criteria.minPrice) dbQuery.hourlyRate.$gte = criteria.minPrice;
-                if (criteria.maxPrice) dbQuery.hourlyRate.$lte = criteria.maxPrice;
-                console.log('[Find Tutor] Price range:', dbQuery.hourlyRate);
+                profileQuery.hourlyRate = {};
+                if (criteria.minPrice) profileQuery.hourlyRate.$gte = criteria.minPrice;
+                if (criteria.maxPrice) profileQuery.hourlyRate.$lte = criteria.maxPrice;
+                console.log('[Find Tutor] Price range:', profileQuery.hourlyRate);
             }
             
             if (criteria.gender) {
-                dbQuery.gender = criteria.gender;
+                profileQuery.gender = criteria.gender;
             }
             
             if (criteria.minExperience) {
-                dbQuery.yearsOfExperience = { $gte: criteria.minExperience };
+                profileQuery.yearsOfExperience = { $gte: criteria.minExperience };
             }
             
             if (criteria.minRating) {
-                dbQuery.averageRating = { $gte: criteria.minRating };
+                profileQuery.averageRating = { $gte: criteria.minRating };
             }
 
-            // Execute query with actual database
-            console.log('[Find Tutor] Executing query:', JSON.stringify(dbQuery));
+            // Execute query with proper aggregation
+            console.log('[Find Tutor] Executing query:', JSON.stringify({ userQuery, profileQuery }));
             
-            const tutors = await TutorProfile.find(dbQuery)
-                .populate('userId', 'name email')
-                .sort({ averageRating: -1, totalReviews: -1 })
-                .limit(10)
-                .lean();
+            const tutors = await User.aggregate([
+                { $match: userQuery },
+                {
+                    $lookup: {
+                        from: 'tutorprofiles',
+                        localField: '_id',
+                        foreignField: 'userId',
+                        as: 'profile',
+                        pipeline: [
+                            { $match: profileQuery }
+                        ]
+                    }
+                },
+                { $match: { 'profile.0': { $exists: true } } }, // Ensure tutor has a profile matching criteria
+                {
+                    $lookup: {
+                        from: 'tutorprofiles',
+                        localField: '_id',
+                        foreignField: 'userId',
+                        as: 'profile'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        email: 1,
+                        'profile._id': 1,
+                        'profile.fullName': 1,
+                        'profile.phone': 1,
+                        'profile.avatar': 1,
+                        'profile.address': 1,
+                        'profile.subjects': 1,
+                        'profile.hourlyRate': 1,
+                        'profile.averageRating': 1,
+                        'profile.totalReviews': 1,
+                        'profile.yearsOfExperience': 1,
+                        'profile.isVerified': 1
+                    }
+                },
+                { $sort: { 'profile.averageRating': -1, 'profile.totalReviews': -1 } },
+                { $limit: 10 }
+            ]);
 
             console.log(`[Find Tutor] ✅ Found ${tutors.length} tutors from DATABASE`);
             if (tutors.length > 0) {
                 console.log('[Find Tutor] Sample tutor:', {
-                    name: tutors[0].userId?.name,
-                    city: tutors[0].address?.city,
-                    subjects: tutors[0].subjects?.map(s => s.subject)
+                    name: tutors[0].name,
+                    city: tutors[0].profile?.[0]?.address?.city,
+                    subjects: tutors[0].profile?.[0]?.subjects?.map(s => s.subject)
                 });
             }
 
@@ -520,7 +560,14 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
                     const projection = { score: { $meta: 'textScore' } };
                     
                     blogs = await BlogPost.find(dbQuery, projection)
-                        .populate('author', 'name')
+                        .populate({
+                            path: 'author',
+                            select: 'name email role',
+                            populate: {
+                                path: 'profile',
+                                select: 'fullName'
+                            }
+                        })
                         .sort({ score: { $meta: 'textScore' }, createdAt: -1 })
                         .limit(10)
                         .lean();
@@ -543,7 +590,14 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
                     }));
                     
                     blogs = await BlogPost.find(dbQuery)
-                        .populate('author', 'name')
+                        .populate({
+                            path: 'author',
+                            select: 'name email role',
+                            populate: {
+                                path: 'profile',
+                                select: 'fullName'
+                            }
+                        })
                         .sort({ createdAt: -1 })
                         .limit(10)
                         .lean();
@@ -565,7 +619,14 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
                 // No keywords - return recent blogs
                 console.log('[Find Blog] No keywords, returning recent blogs');
                 const blogs = await BlogPost.find(dbQuery)
-                    .populate('author', 'name')
+                    .populate({
+                        path: 'author',
+                        select: 'name email role',
+                        populate: {
+                            path: 'profile',
+                            select: 'fullName'
+                        }
+                    })
                     .sort({ createdAt: -1 })
                     .limit(10)
                     .lean();
@@ -983,14 +1044,19 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
         response += `Tôi tìm thấy **${tutors.length} gia sư** phù hợp với yêu cầu của bạn:\n\n`;
 
         tutors.forEach((tutor, idx) => {
-            const tutorName = tutor.userId?.name || tutor.fullName || 'Gia sư';
+            const tutorName = tutor.name || tutor.profile?.[0]?.fullName || 'Gia sư';
+            const profile = tutor.profile?.[0] || {};
+            const avatarUrl = profile.avatar ? `${process.env.BASE_URL || 'http://localhost:3000'}/uploads/avatars/${profile.avatar}` : null;
+            
             response += `### ${idx + 1}. ${tutorName}\n\n`;
-            response += `📍 **Địa điểm**: ${tutor.address?.city || 'Không rõ'}${tutor.address?.district ? ', ' + tutor.address.district : ''}\n`;
-            response += `📖 **Môn dạy**: ${tutor.subjects?.map(s => s.subject).join(', ') || 'Không rõ'}\n`;
-            response += `💰 **Học phí**: ${tutor.hourlyRate?.toLocaleString() || '0'}đ/giờ\n`;
-            response += `⭐ **Đánh giá**: ${tutor.averageRating || 0}/5.0 (${tutor.totalReviews || 0} đánh giá)\n`;
-            response += `✓ **Kinh nghiệm**: ${tutor.yearsOfExperience || 0} năm\n`;
-            if (tutor.isVerified) response += `✅ **Đã xác thực**\n`;
+            
+            
+            response += `📍 **Địa điểm**: ${profile.address?.city || 'Không rõ'}${profile.address?.district ? ', ' + profile.address.district : ''}\n`;
+            response += `📖 **Môn dạy**: ${profile.subjects?.map(s => s.subject).join(', ') || 'Không rõ'}\n`;
+            response += `💰 **Học phí**: ${profile.hourlyRate?.toLocaleString() || '0'}đ/giờ\n`;
+            response += `⭐ **Đánh giá**: ${profile.averageRating || 0}/5.0 (${profile.totalReviews || 0} đánh giá)\n`;
+            response += `✓ **Kinh nghiệm**: ${profile.yearsOfExperience || 0} năm\n`;
+            if (profile.isVerified) response += `✅ **Đã xác thực**\n`;
             response += `\n[**Xem hồ sơ chi tiết →**](/pages/student/tutor_profile.html?id=${tutor._id})\n\n`;
             response += `---\n\n`;
         });
@@ -1036,14 +1102,15 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
         response += `Tìm thấy **${blogs.length} bài viết** liên quan:\n\n`;
 
         blogs.forEach((blog, idx) => {
-            response += `### ${idx + 1}. ${blog.title}\n\n`;
-            response += `📂 **Danh mục**: ${blog.category}\n`;
-            response += `👤 **Tác giả**: ${blog.author?.name || 'TutorMis'}\n`;
+            const title = blog.title || 'Bài viết không có tiêu đề';
+            response += `### ${idx + 1}. ${title}\n\n`;
+            response += `📂 **Danh mục**: ${this.getCategoryNameInVietnamese(blog.category)}\n`;
+            response += `👤 **Tác giả**: ${blog.author?.profile?.fullName || blog.author?.name || blog.author?.email || 'TutorMis'}\n`;
             response += `📅 **Ngày đăng**: ${new Date(blog.createdAt).toLocaleDateString('vi-VN')}\n`;
             if (blog.excerpt) {
                 response += `📄 **Tóm tắt**: ${blog.excerpt.substring(0, 100)}...\n`;
             }
-            response += `\n[**Đọc bài viết →**](/pages/student/blog.html?id=${blog._id})\n\n`; 
+            response += `\n[**Đọc bài viết →**](/pages/student/blog-detail.html?id=${blog._id})\n\n`; 
             response += `---\n\n`;
         });
 
@@ -1144,10 +1211,41 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
      */
     async getSystemContext(userId, userRole) {
         try {
+            // Count approved tutors by joining with User model
+            const approvedTutorsResult = await User.aggregate([
+                {
+                    $match: {
+                        role: 'tutor',
+                        approvalStatus: 'approved',
+                        isActive: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'tutorprofiles',
+                        localField: '_id',
+                        foreignField: 'userId',
+                        as: 'profile'
+                    }
+                },
+                {
+                    $match: {
+                        'profile.0': { $exists: true } // Ensure tutor has a profile
+                    }
+                },
+                {
+                    $count: 'total'
+                }
+            ]);
+
+            const totalTutors = approvedTutorsResult.length > 0 ? approvedTutorsResult[0].total : 0;
+            const totalStudents = await StudentProfile.countDocuments();
+            const totalCourses = await Course.countDocuments();
+
             return {
-                totalTutors: await TutorProfile.countDocuments({ isApproved: true }),
-                totalStudents: await StudentProfile.countDocuments(),
-                totalCourses: await Course.countDocuments(),
+                totalTutors,
+                totalStudents,
+                totalCourses,
                 userRole
             };
         } catch (error) {
@@ -1159,6 +1257,20 @@ Hãy thân thiện, chuyên nghiệp và ƯU TIÊN GỌI FUNCTION!`
     // ========== UTILITY METHODS ==========
     // These methods are kept for potential future use or compatibility
     // but are no longer needed with Function Calling
+
+    /**
+     * Get category name in Vietnamese
+     */
+    getCategoryNameInVietnamese(category) {
+        const categoryMap = {
+            'education': 'Giáo dục',
+            'experience': 'Kinh nghiệm',
+            'tips': 'Mẹo hay',
+            'announcement': 'Thông báo',
+            'general': 'Chung'
+        };
+        return categoryMap[category] || category;
+    }
 
     /**
      * Normalize Vietnamese text (for compatibility)

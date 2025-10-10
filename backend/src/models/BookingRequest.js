@@ -42,6 +42,11 @@ const bookingRequestSchema = new mongoose.Schema({
       required: true,
       trim: true
     },
+    daysOfWeek: [{
+      type: String,
+      enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+      lowercase: true
+    }],
     daysPerWeek: {
       type: Number,
       min: 1,

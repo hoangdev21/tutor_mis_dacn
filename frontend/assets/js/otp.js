@@ -260,7 +260,25 @@ class OTPModal {
         
         setTimeout(() => {
           this.close();
-          window.location.href = '/index.html?verified=true';
+          
+          // Show special notification for tutors
+          if (this.role === 'tutor') {
+            if (typeof showSuccessModal === 'function') {
+              showSuccessModal('Tài khoản hồ sơ của bạn sẽ được duyệt trong 24h tới! Vui lòng chờ nhận thông báo sớm nhất.', () => {
+                window.location.href = '/index.html?verified=true';
+              });
+            } else {
+              // Fallback to notification if showSuccessModal not available
+              if (typeof showNotification === 'function') {
+                showNotification('Tài khoản hồ sơ của bạn sẽ được duyệt trong 24h tới! Vui lòng chờ nhận thông báo sớm nhất.', 'info');
+                setTimeout(() => {
+                  window.location.href = '/index.html?verified=true';
+                }, 3000);
+              }
+            }
+          } else {
+            window.location.href = '/index.html?verified=true';
+          }
         }, 2000);
       } else {
         this.showAlert(data.message || 'Mã OTP không đúng. Vui lòng thử lại.', 'error');
@@ -308,8 +326,9 @@ class OTPModal {
     }
   }
 
-  open(email) {
+  open(email, role = null) {
     this.email = email;
+    this.role = role;
     document.getElementById('otpEmail').textContent = email;
     this.modal.classList.add('active');
     this.clearInputs();

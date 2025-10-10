@@ -105,6 +105,7 @@ exports.createBookingRequest = async (req, res) => {
       schedule: {
         startDate: schedule.startDate,
         preferredTime: schedule.preferredTime,
+        daysOfWeek: schedule.daysOfWeek || [],
         daysPerWeek: schedule.daysPerWeek || 2,
         hoursPerSession: schedule.hoursPerSession || 1.5,
         duration: schedule.duration || 4

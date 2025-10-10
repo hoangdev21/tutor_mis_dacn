@@ -13,10 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load user info
 function loadUserInfo() {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
     const userAvatar = document.getElementById('userAvatar');
     
-    if (userData.name) {
-        userAvatar.src = userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=667eea&color=fff`;
+    if (userData.name || userProfile.fullName) {
+        const avatarUrl = userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.fullName || userData.name || 'User')}&background=667eea&color=fff`;
+        userAvatar.src = avatarUrl;
     }
 }
 
@@ -102,9 +104,10 @@ async function handleSendMessage(e) {
 // Get user context for better AI responses
 function getUserContext() {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
     return {
         role: userData.role || 'student',
-        name: userData.name || 'User'
+        name: userProfile.fullName || userData.name || 'User'
     };
 }
 
@@ -130,9 +133,13 @@ function addMessageToUI(text, sender) {
             </div>
         `;
     } else {
+        const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        const avatarUrl = userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.fullName || userData.name || 'User')}&background=667eea&color=fff`;
+        
         messageDiv.innerHTML = `
             <div class="message-avatar">
-                <i class="fas fa-user"></i>
+                <img src="${avatarUrl}" alt="Avatar" class="user-avatar">
             </div>
             <div class="message-content">
                 <div class="message-text">${escapeHtml(text)}</div>
@@ -248,8 +255,8 @@ function clearChat() {
                 </div>
                 <div class="message-content">
                     <div class="message-text">
-                        Xin chào! Tôi là trợ lý AI của TutorMis. 👋<br><br>
-                        Tôi có thể giúp bạn tìm gia sư, hướng dẫn sử dụng website, và trả lời mọi câu hỏi của bạn về TutorMis.<br><br>
+                        Xin chào! Tôi là trợ lý AI của TutorMis. 👋
+                        Tôi có thể giúp bạn tìm gia sư, hướng dẫn sử dụng website, và trả lời mọi câu hỏi của bạn về TutorMis.<br>
                         Bạn cần giúp đỡ gì hôm nay?
                     </div>
                     <div class="message-time">Bây giờ</div>

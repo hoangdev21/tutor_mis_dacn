@@ -169,7 +169,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         
         setTimeout(() => {
           if (window.otpModal) {
-            window.otpModal.open(data.email);
+            window.otpModal.open(data.email, data.role);
           }
         }, 500);
       } else {
@@ -280,29 +280,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Password confirmation validation
+  // ===== PASSWORD CONFIRMATION VALIDATION =====
+  function validateConfirmPassword() {
+    const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
+    const passwordInput = document.querySelector('input[name="password"]');
+    
+    if (!confirmPasswordInput || !passwordInput) return;
+    
+    const formGroup = confirmPasswordInput.closest('.form__group');
+    formGroup.classList.remove('error');
+    
+    if (confirmPasswordInput.value && confirmPasswordInput.value !== passwordInput.value) {
+      formGroup.classList.add('error');
+      let errorElement = formGroup.querySelector('.form__error');
+      if (!errorElement) {
+        errorElement = document.createElement('div');
+        errorElement.className = 'form__error';
+        formGroup.appendChild(errorElement);
+      }
+      errorElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Mật khẩu xác nhận không khớp';
+    } else {
+      const errorElement = formGroup.querySelector('.form__error');
+      if (errorElement) errorElement.remove();
+    }
+  }
+  
   const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
   const passwordInput = document.querySelector('input[name="password"]');
   
   if (confirmPasswordInput && passwordInput) {
-    confirmPasswordInput.addEventListener('blur', () => {
-      const formGroup = confirmPasswordInput.closest('.form__group');
-      formGroup.classList.remove('error');
-      
-      if (confirmPasswordInput.value && confirmPasswordInput.value !== passwordInput.value) {
-        formGroup.classList.add('error');
-        let errorElement = formGroup.querySelector('.form__error');
-        if (!errorElement) {
-          errorElement = document.createElement('div');
-          errorElement.className = 'form__error';
-          formGroup.appendChild(errorElement);
-        }
-        errorElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Mật khẩu xác nhận không khớp';
-      } else {
-        const errorElement = formGroup.querySelector('.form__error');
-        if (errorElement) errorElement.remove();
-      }
-    });
+    // Validate on confirmPassword blur
+    confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
+    
+    // Also validate when password changes (to handle edits to password field)
+    passwordInput.addEventListener('input', validateConfirmPassword);
   }
 });
 

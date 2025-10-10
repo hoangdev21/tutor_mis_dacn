@@ -54,6 +54,11 @@ function setupTabs() {
       const tabName = tab.dataset.tab;
       document.querySelectorAll('.course-panel').forEach(p => p.classList.remove('active'));
       document.getElementById(`${tabName}Panel`).classList.add('active');
+
+      // Re-render timetable if timetable tab is clicked
+      if (tabName === 'timetable') {
+        renderTimetable();
+      }
     });
   });
 }
@@ -116,6 +121,202 @@ function categorizeCourses(courses) {
   renderCourses('upcomingContainer', upcoming, 'upcoming');
   renderCourses('ongoingContainer', ongoing, 'ongoing');
   renderCourses('completedContainer', completed, 'completed');
+  
+  // Render timetable
+  renderTimetable();
+}
+
+// Render timetable
+function renderTimetable() {
+  const container = document.getElementById('timetableContainer');
+  const loadingState = container.querySelector('.loading-state');
+  const table = container.querySelector('.timetable');
+
+  // Show loading initially if not already rendered
+  if (!table.style.display || table.style.display === 'none') {
+    if (loadingState) loadingState.style.display = 'block';
+    if (table) table.style.display = 'none';
+  }
+
+  // Get upcoming and ongoing courses
+  const relevantCourses = allCourses.filter(course => {
+    const startDate = new Date(course.schedule?.startDate);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + (course.schedule?.duration || 0));
+    const now = new Date();
+    return (startDate > now) || (startDate <= now && now <= endDate); // upcoming or ongoing
+  });
+
+  console.log('📅 Rendering timetable with', relevantCourses.length, 'courses');
+
+  const tbody = document.getElementById('timetableBody');
+  tbody.innerHTML = '';
+
+  // Create rows for each hour from 7:00 to 22:00
+  for (let hour = 7; hour <= 22; hour++) {
+    const row = document.createElement('tr');
+
+    // Time column
+    const timeCell = document.createElement('td');
+    timeCell.className = 'time-slot';
+    timeCell.textContent = `${hour}:00`;
+    row.appendChild(timeCell);
+
+    // Day columns (Monday to Sunday)
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+    days.forEach((day) => {
+      const dayCell = document.createElement('td');
+      dayCell.dataset.day = day;
+      dayCell.dataset.hour = hour;
+
+      // Find courses for this day and hour
+      const coursesForSlot = relevantCourses.filter(course => {
+        return isCourseScheduledAt(course, day, hour);
+      });
+
+      // Add course slots
+      coursesForSlot.forEach(course => {
+        const courseSlot = createCourseSlot(course);
+        dayCell.appendChild(courseSlot);
+      });
+
+      row.appendChild(dayCell);
+    });
+
+    tbody.appendChild(row);
+  }
+
+  // Hide loading and show table
+  if (loadingState) loadingState.style.display = 'none';
+  if (table) table.style.display = 'table';
+}
+
+// Check if course is scheduled at specific day and hour
+function isCourseScheduledAt(course, day, hour) {
+  const schedule = course.schedule || {};
+
+  // Parse preferredTime - handle different formats
+  const preferredTime = schedule.preferredTime || '';
+  let startHour = 0;
+  let endHour = 0;
+  let courseDays = [];
+
+  // First, try the new format "19:00-21:00"
+  const timeMatch = preferredTime.match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);
+  if (timeMatch) {
+    startHour = parseInt(timeMatch[1]);
+    endHour = parseInt(timeMatch[3]);
+  } else {
+    // Handle descriptive format like "Tối thứ 5 ,6, Chủ nhật"
+    const timeDesc = preferredTime.toLowerCase();
+
+    // Determine time range based on keywords
+    if (timeDesc.includes('tối') || timeDesc.includes('evening')) {
+      startHour = 19;
+      endHour = 21;
+    } else if (timeDesc.includes('sáng') || timeDesc.includes('morning')) {
+      startHour = 7;
+      endHour = 9;
+    } else if (timeDesc.includes('chiều') || timeDesc.includes('afternoon')) {
+      startHour = 14;
+      endHour = 16;
+    } else {
+      // Default evening time
+      startHour = 19;
+      endHour = 21;
+    }
+  }
+
+  // Check if hour falls within the time range
+  if (hour < startHour || hour >= endHour) {
+    return false;
+  }
+
+  // Parse days from preferredTime or use daysOfWeek array
+  if (schedule.daysOfWeek && Array.isArray(schedule.daysOfWeek) && schedule.daysOfWeek.length > 0) {
+    courseDays = schedule.daysOfWeek.map(d => d.toLowerCase());
+  } else {
+    // Parse days from preferredTime text
+    courseDays = parseDaysFromText(preferredTime, schedule);
+  }
+
+  const dayMatch = courseDays.includes(day.toLowerCase());
+  return dayMatch;
+}
+
+// Parse days from descriptive text
+function parseDaysFromText(text, schedule) {
+  const days = [];
+  const lowerText = text.toLowerCase();
+
+  // Map Vietnamese day names to English
+  const dayMappings = {
+    'thứ 2': 'monday',
+    'thứ 3': 'tuesday',
+    'thứ 4': 'wednesday',
+    'thứ 5': 'thursday',
+    'thứ 6': 'friday',
+    'thứ 7': 'saturday',
+    'chủ nhật': 'sunday',
+    'thứ hai': 'monday',
+    'thứ ba': 'tuesday',
+    'thứ tư': 'wednesday',
+    'thứ năm': 'thursday',
+    'thứ sáu': 'friday',
+    'thứ bảy': 'saturday'
+  };
+
+  // Check for each day
+  Object.entries(dayMappings).forEach(([vietnamese, english]) => {
+    if (lowerText.includes(vietnamese) && !days.includes(english)) {
+      days.push(english);
+    }
+  });
+
+  // If no days found, fallback to old logic based on daysPerWeek
+  if (days.length === 0) {
+    const daysPerWeek = schedule.daysPerWeek || 2;
+    if (daysPerWeek >= 1) days.push('monday');
+    if (daysPerWeek >= 2) days.push('wednesday');
+    if (daysPerWeek >= 3) days.push('friday');
+    if (daysPerWeek >= 4) days.push('saturday');
+    if (daysPerWeek >= 5) days.push('sunday');
+    if (daysPerWeek >= 6) days.push('tuesday');
+    if (daysPerWeek >= 7) days.push('thursday');
+  }
+
+  return days;
+}
+
+// Create course slot element
+function createCourseSlot(course) {
+  const tutor = course.tutor || {};
+  const tutorProfile = tutor.profile || {};
+
+  const slot = document.createElement('div');
+  slot.className = `course-slot ${getCourseStatus(course)}`;
+  slot.dataset.courseId = course._id;
+  slot.onclick = () => viewCourseDetail(course._id);
+
+  slot.innerHTML = `
+    <span class="subject">${course.subject?.name || 'N/A'}</span>
+    <span class="tutor">${tutorProfile.fullName || 'Gia sư'}</span>
+  `;
+
+  return slot;
+}
+
+// Get course status for styling
+function getCourseStatus(course) {
+  const now = new Date();
+  const startDate = new Date(course.schedule?.startDate);
+  const endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + (course.schedule?.duration || 0));
+
+  if (startDate > now) return 'upcoming';
+  if (now <= endDate) return 'ongoing';
+  return 'completed';
 }
 
 // Render courses

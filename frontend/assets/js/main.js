@@ -165,9 +165,20 @@ function showRegisterModal(role = null) {
   }
 }
 
-function showSuccessModal(message) {
+function showSuccessModal(message, onClose = null) {
   document.getElementById('successMessage').textContent = message;
   showModal('successModal');
+  
+  if (onClose) {
+    // Override the close button to call onClose
+    const closeBtn = document.querySelector('#successModal .btn');
+    const originalOnClick = closeBtn.onclick;
+    closeBtn.onclick = () => {
+      closeModal('successModal');
+      if (onClose) onClose();
+      // Restore original onclick if needed
+    };
+  }
 }
 
 // Close modal when clicking outside
