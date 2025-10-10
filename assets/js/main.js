@@ -1,7 +1,7 @@
 // ===== MAIN JAVASCRIPT =====
 
 // Global variables - Expose to window for other scripts
-window.API_BASE_URL = 'http://localhost:5000/api';
+window.API_BASE_URL = '/api';
 const API_BASE_URL = window.API_BASE_URL;
 
 // DOM elements
