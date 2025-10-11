@@ -1,7 +1,9 @@
 // ===== MAIN JAVASCRIPT =====
 
 // Global variables - Expose to window for other scripts
-window.API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+// Production backend URL - Update this after Render deployment
+const PRODUCTION_BACKEND_URL = 'https://tutornis-backend.onrender.com/api';
+window.API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : PRODUCTION_BACKEND_URL;
 const API_BASE_URL = window.API_BASE_URL;
 
 // DOM elements
