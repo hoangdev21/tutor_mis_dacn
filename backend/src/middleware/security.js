@@ -7,6 +7,11 @@ const corsOptions = {
     console.log('🔍 CORS Check - Origin:', origin);
     console.log('🔍 CORS Check - FRONTEND_URL:', process.env.FRONTEND_URL);
     
+    // TEMPORARILY ALLOW ALL ORIGINS FOR TESTING
+    console.log('🔍 CORS Check - TEMPORARILY ALLOWING ALL ORIGINS');
+    callback(null, true);
+    
+    /*
     // Cho phép requests từ frontend và các domain được phép
     const allowedOrigins = [
       process.env.FRONTEND_URL,
@@ -27,6 +32,7 @@ const corsOptions = {
       console.log('❌ CORS Check - Origin blocked:', origin);
       callback(new Error('Not allowed by CORS'));
     }
+    */
   },
   credentials: true, // Cho phép cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
