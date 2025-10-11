@@ -65,6 +65,9 @@ const helmetOptions = {
 
 // Security middleware function
 const setupSecurity = (app) => {
+  // Handle preflight OPTIONS requests
+  app.options('*', cors(corsOptions));
+  
   // Basic security headers
   app.use(helmet(helmetOptions));
   
