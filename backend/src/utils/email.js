@@ -1,21 +1,30 @@
 const nodemailer = require('nodemailer');
 
-// Tạo transporter cho email (không cache)
+// Tạo transporter cho email
 const createTransporter = () => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT) || 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-  
-  return transporter;
+  // Use SendGrid if API key is provided, otherwise fallback to Gmail
+  if (process.env.SENDGRID_API_KEY) {
+    const sgTransport = require('nodemailer-sendgrid-transport');
+    return nodemailer.createTransporter(sgTransport({
+      auth: {
+        api_key: process.env.SENDGRID_API_KEY
+      }
+    }));
+  } else {
+    // Fallback to Gmail SMTP
+    return nodemailer.createTransporter({
+      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.EMAIL_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+  }
 };
 
 // Template email xác thực
