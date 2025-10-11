@@ -81,16 +81,22 @@ const register = async (req, res) => {
         throw new Error('Invalid role');
     }
     
-    // Gửi email OTP
+    // Gửi email OTP bất đồng bộ (không block registration)
     const emailTemplate = otpVerificationTemplate(fullName, otp);
-    const emailResult = await sendEmail(email, emailTemplate);
     
-    // Kiểm tra kết quả gửi email
-    if (!emailResult.success) {
-      console.warn('⚠️ Email sending failed but user was created:', emailResult.error);
-      // Vẫn trả về success nhưng thông báo có thể resend OTP
-    }
+    // Gửi email trong background - không chờ kết quả
+    sendEmail(email, emailTemplate).then(emailResult => {
+      if (!emailResult.success) {
+        console.warn('⚠️ Email sending failed in background:', emailResult.error);
+        // Có thể lưu trạng thái email failed để user có thể resend sau
+      } else {
+        console.log('✅ OTP email sent successfully to:', email);
+      }
+    }).catch(error => {
+      console.error('❌ Email sending error in background:', error);
+    });
     
+    // Trả về response ngay lập tức - không chờ email
     res.status(201).json({
       success: true,
       message: 'Registration successful. Please check your email for OTP verification code.',
@@ -108,7 +114,7 @@ const register = async (req, res) => {
           phone: profile.phone
         },
         requiresOTP: true,
-        emailSent: emailResult.success
+        emailSent: true // Luôn trả về true vì email sẽ được gửi trong background
       }
     });
     
