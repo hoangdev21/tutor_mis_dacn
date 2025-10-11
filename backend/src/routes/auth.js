@@ -11,7 +11,8 @@ const {
   resetPassword,
   getMe,
   getTutors,
-  getTutorById
+  getTutorById,
+  testEmail
 } = require('../controllers/authController');
 const {
   validateRegistration,
@@ -484,5 +485,62 @@ router.get('/tutors', getTutors);
  *         description: Không tìm thấy gia sư
  */
 router.get('/tutor/:id', getTutorById);
+
+/**
+ * @swagger
+ * /auth/test-email:
+ *   post:
+ *     summary: Test gửi email
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email để test
+ *     responses:
+ *       200:
+ *         description: Email test được gửi thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Test email sent successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     messageId:
+ *                       type: string
+ *                       description: ID của email message
+ *                     email:
+ *                       type: string
+ *                       description: Email nhận
+ *       400:
+ *         description: Email không hợp lệ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Lỗi gửi email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/test-email', emailLimiter, testEmail);
 
 module.exports = router;

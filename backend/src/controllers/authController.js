@@ -214,10 +214,18 @@ const verifyEmailOTP = async (req, res) => {
     user.otpLockUntil = undefined;
     await user.save();
     
-    // Gửi email chào mừng
+    // Gửi email chào mừng bất đồng bộ
     const profile = await user.populate('profile');
     const welcomeTemplate = welcomeEmailTemplate(profile.profile.fullName, user.role);
-    await sendEmail(user.email, welcomeTemplate);
+    sendEmail(user.email, welcomeTemplate).then(emailResult => {
+      if (!emailResult.success) {
+        console.warn('⚠️ Welcome email failed:', emailResult.error);
+      } else {
+        console.log('✅ Welcome email sent successfully to:', user.email);
+      }
+    }).catch(error => {
+      console.error('❌ Welcome email error:', error);
+    });
     
     res.status(200).json({
       success: true,
@@ -283,10 +291,19 @@ const resendOTP = async (req, res) => {
     user.otpAttempts = 0;
     await user.save();
     
-    // Gửi email OTP
+    // Gửi email OTP bất đồng bộ
     const emailTemplate = otpVerificationTemplate(user.profile.fullName, otp);
-    await sendEmail(email, emailTemplate);
+    sendEmail(email, emailTemplate).then(emailResult => {
+      if (!emailResult.success) {
+        console.warn('⚠️ Resend OTP email failed:', emailResult.error);
+      } else {
+        console.log('✅ Resend OTP email sent successfully to:', email);
+      }
+    }).catch(error => {
+      console.error('❌ Resend OTP email error:', error);
+    });
     
+    // Trả về response ngay lập tức
     res.status(200).json({
       success: true,
       message: 'New OTP has been sent to your email'
@@ -829,6 +846,87 @@ const getTutorById = async (req, res) => {
   }
 };
 
+// @desc    Test gửi email
+// @route   POST /api/auth/test-email
+// @access  Public
+const testEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+    
+    const testTemplate = {
+      subject: 'Test Email - TutorMis',
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">TutorMis</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Test Email Service</p>
+          </div>
+          
+          <div style="background: #ffffff; padding: 40px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-bottom: 20px;">Test Email Thành Công!</h2>
+            
+            <p style="color: #666; line-height: 1.6; margin-bottom: 30px;">
+              Email này được gửi để test dịch vụ email của TutorMis.
+              Nếu bạn nhận được email này, có nghĩa là email service đang hoạt động bình thường.
+            </p>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <p style="color: #666; margin: 0; font-size: 14px;">
+                <strong>Thời gian gửi:</strong> ${new Date().toLocaleString('vi-VN')}<br>
+                <strong>Email nhận:</strong> ${email}
+              </p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+            
+            <p style="color: #888; font-size: 12px; margin: 0;">
+              Email này được gửi tự động để test hệ thống.<br>
+              © 2024 TutorMis. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+    
+    console.log('🧪 Testing email service to:', email);
+    const emailResult = await sendEmail(email, testTemplate);
+    
+    if (emailResult.success) {
+      console.log('✅ Test email sent successfully:', emailResult.messageId);
+      res.status(200).json({
+        success: true,
+        message: 'Test email sent successfully',
+        data: {
+          messageId: emailResult.messageId,
+          email: email
+        }
+      });
+    } else {
+      console.error('❌ Test email failed:', emailResult.error);
+      res.status(500).json({
+        success: false,
+        message: 'Test email failed',
+        error: emailResult.error
+      });
+    }
+    
+  } catch (error) {
+    console.error('Test email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Test email failed',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
   verifyEmailOTP,
@@ -841,5 +939,6 @@ module.exports = {
   resetPassword,
   getMe,
   getTutors,
-  getTutorById
+  getTutorById,
+  testEmail
 };
