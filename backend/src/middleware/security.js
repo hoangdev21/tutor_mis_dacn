@@ -4,6 +4,9 @@ const cors = require('cors');
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
+    console.log('🔍 CORS Check - Origin:', origin);
+    console.log('🔍 CORS Check - FRONTEND_URL:', process.env.FRONTEND_URL);
+    
     // Cho phép requests từ frontend và các domain được phép
     const allowedOrigins = [
       process.env.FRONTEND_URL,
@@ -12,12 +15,16 @@ const corsOptions = {
       'http://localhost:8000',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:8000'
-    ];
+    ].filter(Boolean); // Remove undefined values
+    
+    console.log('🔍 CORS Check - Allowed Origins:', allowedOrigins);
     
     // Cho phép requests không có origin (mobile apps, postman, etc.)
     if (!origin || allowedOrigins.includes(origin)) {
+      console.log('✅ CORS Check - Origin allowed:', origin || 'no origin');
       callback(null, true);
     } else {
+      console.log('❌ CORS Check - Origin blocked:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
