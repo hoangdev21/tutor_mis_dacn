@@ -165,7 +165,7 @@ function renderTutorCard(tutor) {
     
     return `
         <div class="tutor-card">
-            <div class="tutor-card-header" style="background: linear-gradient(135deg, #3ebd68ff 0%, #c9588dff 50%, #3b85a0ff 100%); position: relative;">
+            <div class="tutor-card-header">
                 <img src="${avatarUrl}" 
                      alt="${profile.fullName || 'Tutor'}" 
                      class="tutor-avatar"
@@ -186,7 +186,7 @@ function renderTutorCard(tutor) {
                 <div class="tutor-info">
                     <div class="info-item">
                         <i class="fas fa-briefcase"></i>
-                        <span>${profile.yearsOfExperience || 0} năm kinh nghiệm</span>
+                        <span><strong>${profile.yearsOfExperience || 0}</strong> năm kinh nghiệm</span>
                     </div>
                     <div class="info-item">
                         <i class="fas fa-map-marker-alt"></i>
@@ -198,12 +198,12 @@ function renderTutorCard(tutor) {
                     ${subjectsList.slice(0, 3).map(subject => `
                         <span class="subject-tag">${subject}</span>
                     `).join('')}
-                    ${subjectsList.length > 3 ? `<span class="subject-tag">+${subjectsList.length - 3}</span>` : ''}
+                    ${subjectsList.length > 3 ? `<span class="subject-tag">+${subjectsList.length - 3} môn khác</span>` : ''}
                 </div>
                 
                 <div class="tutor-price">
-                    <span class="price-label">Học phí:</span>
-                    <span class="price-value">${formatCurrency(hourlyRate)}/giờ</span>
+                    <span class="price-label">Học phí/giờ:</span>
+                    <span class="price-value">${formatCurrency(hourlyRate)}</span>
                 </div>
             </div>
 
@@ -212,7 +212,7 @@ function renderTutorCard(tutor) {
                     <i class="fas fa-eye"></i>
                     Xem Hồ Sơ
                 </button>
-                <button class="btn btn-primary" onclick="sendMessage('${tutor._id}')" style="background: linear-gradient(135deg, #3a9286ff 0%, #4ebd62ff 100%);">
+                <button class="btn btn-primary" onclick="sendMessage('${tutor._id}')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <i class="fas fa-comment"></i>
                     Nhắn Tin
                 </button>
@@ -327,7 +327,12 @@ function applyFilters() {
         filteredTutors = allTutors.filter(tutor => {
             const profile = tutor.profile || {};
             const subjects = profile.subjects || [];
-            return subjects.some(s => s.toLowerCase().includes(subject.toLowerCase()));
+            // Normalize subjects to strings
+            const normalizedSubjects = subjects.map(s => {
+                if (typeof s === 'string') return s;
+                return s.subject || s.name || '';
+            }).filter(Boolean);
+            return normalizedSubjects.some(s => s.toLowerCase().includes(subject.toLowerCase()));
         });
     }
     

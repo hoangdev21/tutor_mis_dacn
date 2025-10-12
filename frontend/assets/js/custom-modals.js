@@ -8,6 +8,8 @@
  * @param {function} onClose - Callback when modal closes
  */
 function showSuccessModal(title, message, onClose) {
+  closeAllModals(); // Close any active modals
+  
   const modal = document.createElement('div');
   modal.className = 'custom-modal success-modal active';
   modal.innerHTML = `
@@ -53,6 +55,8 @@ function showSuccessModal(title, message, onClose) {
  * @param {function} onCancel - Callback when cancelled
  */
 function showConfirmModal(title, message, onConfirm, onCancel) {
+  closeAllModals(); // Close any active modals
+  
   const modal = document.createElement('div');
   modal.className = 'custom-modal confirm-modal active';
   
@@ -102,6 +106,8 @@ function showConfirmModal(title, message, onConfirm, onCancel) {
  * @param {object} ticket - Ticket data
  */
 function showTicketDetailModal(ticket) {
+  closeAllModals(); // Close any active modals
+  
   const modal = document.createElement('div');
   modal.className = 'custom-modal ticket-detail-modal active';
   
@@ -260,6 +266,45 @@ function showTicketDetailModal(ticket) {
 }
 
 /**
+ * Show error modal
+ * @param {string} title - Modal title
+ * @param {string} message - Error message
+ * @param {function} onClose - Callback when modal closes
+ */
+function showErrorModal(title, message, onClose) {
+  closeAllModals(); // Close any active modals
+  
+  const modal = document.createElement('div');
+  modal.className = 'custom-modal error-modal active';
+  modal.innerHTML = `
+    <div class="modal-content small">
+      <div class="modal-body">
+        <div class="error-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>${title}</h3>
+        <p>${message}</p>
+        <button class="modal-btn modal-btn-error" onclick="closeModal(this)">
+          <i class="fas fa-times"></i>
+          Đóng
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModalElement(modal, onClose);
+    }
+  });
+  
+  return modal;
+}
+
+/**
  * Close modal (called from button)
  */
 function closeModal(button) {
@@ -297,6 +342,16 @@ function closeModalElement(modal, callback) {
     }
     if (callback) callback();
   }, 200);
+}
+
+/**
+ * Close all active modals
+ */
+function closeAllModals() {
+  const modals = document.querySelectorAll('.custom-modal.active');
+  modals.forEach(modal => {
+    closeModalElement(modal);
+  });
 }
 
 /**
@@ -376,5 +431,8 @@ if (!document.getElementById('modal-fade-out-style')) {
 window.showSuccessModal = showSuccessModal;
 window.showConfirmModal = showConfirmModal;
 window.showTicketDetailModal = showTicketDetailModal;
+window.showErrorModal = showErrorModal;
 window.closeModal = closeModal;
 window.closeModalById = closeModalById;
+window.closeModalElement = closeModalElement;
+window.closeAllModals = closeAllModals;

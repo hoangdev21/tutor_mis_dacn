@@ -206,20 +206,6 @@ Base URL: `http://localhost:5000/api`
 }
 ```
 
-## Tài Khoản Test
-
-### Admin
-- Email: `admin@tutormis.com`
-- Password: `Admin123!`
-
-### Student
-- Email: `student@test.com`
-- Password: `Test123!`
-
-### Tutor
-- Email: `tutor@test.com`
-- Password: `Test123!`
-
 ## Cấu Trúc Thư Mục
 
 ```
