@@ -91,6 +91,13 @@
   color: #050505;
 }
 
+.no-conversations{
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  margin-top: 300px;
+}
+
 .search-conversations input:focus {
   outline: none;
   background: #e4e6eb;

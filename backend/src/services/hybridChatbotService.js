@@ -188,7 +188,6 @@ class HybridChatbotService {
                         break;
 
                     default:
-                        // If no function matched, use RAG for general questions
                         response = await this.handleGeneralQuestionWithRAG(query, chatHistory, systemContext);
                         metadata = { queryType: 'general_question' };
                 }

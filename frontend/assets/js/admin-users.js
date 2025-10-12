@@ -351,7 +351,7 @@ function updateStats(data) {
   statsContainer.innerHTML = `
     <div class="stats-summary">
       <div class="stat-item">
-        <div class="stat-icon primary">
+        <div class="stat-icon white">
           <i class="fas fa-users"></i>
         </div>
         <div class="stat-content">
@@ -360,7 +360,7 @@ function updateStats(data) {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-icon success">
+        <div class="stat-icon white1">
           <i class="fas fa-filter"></i>
         </div>
         <div class="stat-content">
@@ -369,7 +369,7 @@ function updateStats(data) {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-icon info">
+        <div class="stat-icon white2">
           <i class="fas fa-file-alt"></i>
         </div>
         <div class="stat-content">

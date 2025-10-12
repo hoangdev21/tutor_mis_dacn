@@ -233,14 +233,26 @@
             <!-- Modal Body -->
             <div class="modal-body">
                 <form id="createPostForm">
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="postTitle">Tiêu đề bài viết</label>
+                        <input type="text" id="postTitle" class="post-title-input" placeholder="Nhập tiêu đề chuyên nghiệp...">
+                    </div>
+
                     <!-- Content Textarea -->
                     <div class="form-group">
+                        <label for="postContent">Nội dung</label>
                         <textarea id="postContent" class="post-content-input" placeholder="Chia sẻ kinh nghiệm giảng dạy của bạn..." required></textarea>
                     </div>
 
-                    <!-- Title (Optional) -->
-                    <div class="form-group collapsible" id="titleGroup" style="display: none;">
-                        <input type="text" id="postTitle" class="post-title-input" placeholder="📝 Thêm tiêu đề cho bài viết...">
+                    <!-- Status Selection -->
+                    <div class="form-group">
+                        <label for="postStatus">Trạng thái bài viết</label>
+                        <select id="postStatus" class="status-select">
+                            <option value="draft">Nháp</option>
+                            <option value="pending">Chờ duyệt</option>
+                            <option value="published">Đã xuất bản</option>
+                        </select>
                     </div>
 
                     <!-- Image Preview -->
@@ -253,12 +265,12 @@
 
                     <!-- Add to Post Section -->
                     <div class="add-to-post">
-                        <span class="add-to-post-label">Thêm vào bài viết</span>
+                        <span class="add-to-post-label">Thêm yếu tố vào bài viết</span>
                         <div class="add-to-post-actions">
                             <button type="button" class="add-btn" id="addPhotoBtn" title="Ảnh/Video">
                                 <i class="fas fa-images" style="color: #45bd62;"></i>
                             </button>
-                            <button type="button" class="add-btn" id="addTitleBtn" title="Tiêu đề">
+                            <button type="button" class="add-btn" id="addTitleBtn" title="Tiêu đề" style="display: none;">
                                 <i class="fas fa-heading" style="color: #f3425f;"></i>
                             </button>
                             <button type="button" class="add-btn" id="addTagBtn" title="Thẻ tag">
@@ -273,22 +285,15 @@
                         </div>
                     </div>
 
-                    <!-- Category & Type (Hidden until needed) -->
-                    <div class="form-group" style="display: none;">
+                    <!-- Category -->
+                    <div class="form-group">
+                        <label for="postCategory">Danh mục</label>
                         <select id="postCategory">
                             <option value="general">Chung</option>
                             <option value="education">Giáo dục</option>
                             <option value="experience">Kinh nghiệm</option>
                             <option value="tips">Mẹo hay</option>
                             <option value="announcement">Thông báo</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" style="display: none;">
-                        <select id="postType">
-                            <option value="status">Trạng thái</option>
-                            <option value="article">Bài viết</option>
-                            <option value="photo">Ảnh</option>
                         </select>
                     </div>
 
