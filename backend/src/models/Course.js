@@ -138,13 +138,12 @@ const courseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index cho tìm kiếm và hiệu suất
 courseSchema.index({ tutorId: 1, status: 1 });
 courseSchema.index({ studentId: 1, status: 1 });
 courseSchema.index({ subject: 1, level: 1 });
 courseSchema.index({ status: 1, startDate: 1 });
 
-// Populate thông tin tutor và student
+// Điền thông tin người dùng khi tìm khóa học
 courseSchema.pre(/^find/, function(next) {
   this.populate([
     {

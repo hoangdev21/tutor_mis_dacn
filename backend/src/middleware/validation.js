@@ -7,7 +7,7 @@ const handleValidationErrors = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
-      message: 'Validation failed',
+      message: 'Xác thực dữ liệu không thành công',
       errors: errors.array().map(error => ({
         field: error.path,
         message: error.msg,
@@ -24,30 +24,30 @@ const validateRegistration = [
   body('email')
     .isEmail()
     .normalizeEmail()
-    .withMessage('Please provide a valid email address'),
+    .withMessage('Vui lòng cung cấp địa chỉ email hợp lệ'),
     
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
+    .withMessage('Mật khẩu phải có ít nhất 6 ký tự')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .withMessage('Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số'),
     
   body('role')
     .isIn(['student', 'tutor'])
-    .withMessage('Role must be either student or tutor'),
+    .withMessage('Vai trò phải là sinh viên hoặc gia sư'),
     
   body('fullName')
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage('Full name must be between 2 and 50 characters')
+    .withMessage('Họ và tên phải từ 2 đến 50 ký tự')
     .matches(/^[\p{L}\s]+$/u)
-    .withMessage('Full name can only contain letters and spaces'),
-    
+    .withMessage('Họ và tên chỉ được chứa chữ cái và khoảng trắng'),
+
   body('phone')
     .optional()
     .matches(/^[0-9]{10,11}$/)
-    .withMessage('Phone number must be 10-11 digits'),
-    
+    .withMessage('Số điện thoại phải từ 10 đến 11 chữ số'),
+
   handleValidationErrors
 ];
 
@@ -56,12 +56,12 @@ const validateLogin = [
   body('email')
     .isEmail()
     .normalizeEmail()
-    .withMessage('Please provide a valid email address'),
+    .withMessage('Vui lòng cung cấp địa chỉ email hợp lệ'),
     
   body('password')
     .notEmpty()
-    .withMessage('Password is required'),
-    
+    .withMessage('Mật khẩu là bắt buộc'),
+
   handleValidationErrors
 ];
 
@@ -71,37 +71,37 @@ const validateStudentProfile = [
     .optional()
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage('Full name must be between 2 and 50 characters'),
+    .withMessage('Họ và tên phải từ 2 đến 50 ký tự'),
     
   body('phone')
     .optional()
     .matches(/^[0-9]{10,11}$/)
-    .withMessage('Phone number must be 10-11 digits'),
+    .withMessage('Số điện thoại phải từ 10 đến 11 chữ số'),
     
   body('dateOfBirth')
     .optional()
     .isISO8601()
-    .withMessage('Date of birth must be a valid date'),
+    .withMessage('Ngày sinh phải là một ngày hợp lệ'),
     
   body('gender')
     .optional()
     .isIn(['male', 'female', 'other'])
-    .withMessage('Gender must be male, female, or other'),
+    .withMessage('Giới tính phải là nam, nữ hoặc khác'),
     
   body('currentEducationLevel')
     .optional()
     .isIn(['elementary', 'middle_school', 'high_school', 'university', 'other'])
-    .withMessage('Invalid education level'),
+    .withMessage('Cấp độ giáo dục không hợp lệ'),
     
   body('subjects')
     .optional()
     .isArray()
-    .withMessage('Subjects must be an array'),
+    .withMessage('Môn học phải là một mảng'),
     
   body('learningGoals')
     .optional()
     .isLength({ max: 500 })
-    .withMessage('Learning goals must not exceed 500 characters'),
+    .withMessage('Mục tiêu học tập không được vượt quá 500 ký tự'),
     
   handleValidationErrors
 ];
@@ -111,61 +111,61 @@ const validateTutorProfile = [
   body('fullName')
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage('Full name must be between 2 and 50 characters'),
+    .withMessage('Họ và tên phải từ 2 đến 50 ký tự'),
     
   body('phone')
     .matches(/^[0-9]{10,11}$/)
-    .withMessage('Phone number must be 10-11 digits'),
-    
+    .withMessage('Số điện thoại phải từ 10 đến 11 chữ số'),
+
   body('dateOfBirth')
     .isISO8601()
-    .withMessage('Date of birth must be a valid date'),
-    
+    .withMessage('Ngày sinh phải là một ngày hợp lệ'),
+
   body('gender')
     .isIn(['male', 'female'])
-    .withMessage('Gender must be male or female'),
-    
+    .withMessage('Giới tính phải là nam hoặc nữ'),
+
   body('education')
     .isArray({ min: 1 })
-    .withMessage('At least one education entry is required'),
-    
+    .withMessage('Ít nhất một mục giáo dục là bắt buộc'),
+
   body('education.*.degree')
     .notEmpty()
-    .withMessage('Degree is required'),
-    
+    .withMessage('Bằng cấp là bắt buộc'),
+
   body('education.*.major')
     .notEmpty()
-    .withMessage('Major is required'),
-    
+    .withMessage('Chuyên ngành là bắt buộc'),
+
   body('education.*.university')
     .notEmpty()
-    .withMessage('University is required'),
-    
+    .withMessage('Trường đại học là bắt buộc'),
+
   body('education.*.graduationYear')
     .isInt({ min: 1950, max: new Date().getFullYear() })
-    .withMessage('Invalid graduation year'),
-    
+    .withMessage('Năm tốt nghiệp không hợp lệ'),
+
   body('subjects')
     .isArray({ min: 1 })
-    .withMessage('At least one subject is required'),
-    
+    .withMessage('Ít nhất một môn học là bắt buộc'),
+
   body('subjects.*.subject')
     .notEmpty()
-    .withMessage('Subject name is required'),
-    
+    .withMessage('Tên môn học là bắt buộc'),
+
   body('subjects.*.level')
     .isIn(['elementary', 'middle_school', 'high_school', 'university'])
-    .withMessage('Invalid subject level'),
-    
+    .withMessage('Cấp độ môn học không hợp lệ'),
+
   body('subjects.*.hourlyRate')
     .isFloat({ min: 0 })
-    .withMessage('Hourly rate must be a positive number'),
-    
+    .withMessage('Mức lương theo giờ phải là một số dương'),
+
   body('bio')
     .optional()
     .isLength({ max: 1000 })
-    .withMessage('Bio must not exceed 1000 characters'),
-    
+    .withMessage('Thông tin tiểu sử không được vượt quá 1000 ký tự'),
+
   handleValidationErrors
 ];
 
@@ -173,28 +173,28 @@ const validateTutorProfile = [
 const validateCourse = [
   body('studentId')
     .isMongoId()
-    .withMessage('Valid student ID is required'),
-    
+    .withMessage('ID học sinh không hợp lệ'),
+
   body('subject')
     .notEmpty()
-    .withMessage('Subject is required'),
-    
+    .withMessage('Môn học là bắt buộc'),
+
   body('level')
     .isIn(['elementary', 'middle_school', 'high_school', 'university'])
-    .withMessage('Invalid level'),
-    
+    .withMessage('Cấp độ không hợp lệ'),
+
   body('title')
     .trim()
     .isLength({ min: 5, max: 100 })
-    .withMessage('Title must be between 5 and 100 characters'),
-    
+    .withMessage('Tiêu đề phải từ 5 đến 100 ký tự'),
+
   body('hourlyRate')
     .isFloat({ min: 0 })
-    .withMessage('Hourly rate must be a positive number'),
-    
+    .withMessage('Mức lương theo giờ phải là một số dương'),
+
   body('location.type')
     .isIn(['online', 'student_home', 'tutor_home', 'library', 'cafe', 'other'])
-    .withMessage('Invalid location type'),
+    .withMessage('Loại địa điểm không hợp lệ'),
     
   handleValidationErrors
 ];
@@ -203,38 +203,38 @@ const validateCourse = [
 const validateTutorRequest = [
   body('subject')
     .notEmpty()
-    .withMessage('Subject is required'),
-    
+    .withMessage('Môn học là bắt buộc'),
+
   body('level')
     .isIn(['elementary', 'middle_school', 'high_school', 'university'])
-    .withMessage('Invalid level'),
+    .withMessage('Cấp độ không hợp lệ'),
     
   body('title')
     .trim()
     .isLength({ min: 10, max: 200 })
-    .withMessage('Title must be between 10 and 200 characters'),
+    .withMessage('Tiêu đề phải từ 10 đến 200 ký tự'),
     
   body('description')
     .trim()
     .isLength({ min: 20, max: 1000 })
-    .withMessage('Description must be between 20 and 1000 characters'),
+    .withMessage('Mô tả phải từ 20 đến 1000 ký tự'),
     
   body('budgetRange.min')
     .isFloat({ min: 0 })
-    .withMessage('Minimum budget must be a positive number'),
-    
+    .withMessage('Mức ngân sách tối thiểu phải là một số dương'),
+
   body('budgetRange.max')
     .isFloat({ min: 0 })
-    .withMessage('Maximum budget must be a positive number'),
-    
+    .withMessage('Mức ngân sách tối đa phải là một số dương'),
+
   body('location.type')
     .isIn(['online', 'student_home', 'tutor_home', 'library', 'cafe', 'flexible'])
-    .withMessage('Invalid location type'),
-    
+    .withMessage('Loại địa điểm không hợp lệ'),
+
   // Kiểm tra max >= min
   body('budgetRange.max').custom((value, { req }) => {
     if (value < req.body.budgetRange.min) {
-      throw new Error('Maximum budget must be greater than or equal to minimum budget');
+      throw new Error('Mức ngân sách tối đa phải lớn hơn hoặc bằng mức ngân sách tối thiểu');
     }
     return true;
   }),
@@ -246,17 +246,17 @@ const validateTutorRequest = [
 const validateMessage = [
   body('receiverId')
     .isMongoId()
-    .withMessage('Valid receiver ID is required'),
+    .withMessage('ID người nhận không hợp lệ'),
     
   body('content')
     .trim()
     .isLength({ min: 1, max: 2000 })
-    .withMessage('Message content must be between 1 and 2000 characters'),
+    .withMessage('Nội dung tin nhắn phải từ 1 đến 2000 ký tự'),
     
   body('courseId')
     .optional()
     .isMongoId()
-    .withMessage('Course ID must be valid if provided'),
+    .withMessage('ID khóa học không hợp lệ nếu được cung cấp'),
     
   handleValidationErrors
 ];
@@ -266,26 +266,26 @@ const validateBlogPost = [
   body('title')
     .trim()
     .isLength({ min: 10, max: 200 })
-    .withMessage('Title must be between 10 and 200 characters'),
+    .withMessage('Tiêu đề phải từ 10 đến 200 ký tự'),
     
   body('content')
     .trim()
     .isLength({ min: 100 })
-    .withMessage('Content must be at least 100 characters'),
+    .withMessage('Nội dung phải từ 100 ký tự trở lên'),
     
   body('category')
     .isIn(['education', 'teaching_tips', 'student_guide', 'exam_prep', 'career_advice', 'technology', 'other'])
-    .withMessage('Invalid category'),
+    .withMessage('Danh mục không hợp lệ'),
     
   body('tags')
     .optional()
     .isArray()
-    .withMessage('Tags must be an array'),
+    .withMessage('Tags phải là một mảng'),
     
   body('excerpt')
     .optional()
     .isLength({ max: 300 })
-    .withMessage('Excerpt must not exceed 300 characters'),
+    .withMessage('Excerpt không được vượt quá 300 ký tự'),
     
   handleValidationErrors
 ];
@@ -295,7 +295,7 @@ const validatePasswordReset = [
   body('email')
     .isEmail()
     .normalizeEmail()
-    .withMessage('Please provide a valid email address'),
+    .withMessage('Vui lòng cung cấp một địa chỉ email hợp lệ'),
     
   handleValidationErrors
 ];
@@ -304,14 +304,14 @@ const validatePasswordReset = [
 const validateNewPassword = [
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
+    .withMessage('Mật khẩu phải có ít nhất 6 ký tự')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
-    
+    .withMessage('Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số'),
+
   body('confirmPassword')
     .custom((value, { req }) => {
       if (value !== req.body.password) {
-        throw new Error('Password confirmation does not match password');
+        throw new Error('Xác nhận mật khẩu không khớp với mật khẩu');
       }
       return true;
     }),

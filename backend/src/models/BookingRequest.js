@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const bookingRequestSchema = new mongoose.Schema({
-  // Student information
+  // Thông tin học viên
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
     index: true
   },
-  
-  // Tutor information
+
+  // Thông tin gia sư
   tutor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -31,7 +31,7 @@ const bookingRequestSchema = new mongoose.Schema({
     }
   },
   
-  // Schedule details
+  // lịch học
   schedule: {
     startDate: {
       type: Date,
@@ -60,7 +60,7 @@ const bookingRequestSchema = new mongoose.Schema({
       default: 1.5
     },
     duration: {
-      type: Number, // Number of weeks
+      type: Number, // Số tuần
       min: 1,
       default: 4
     }
@@ -125,7 +125,7 @@ const bookingRequestSchema = new mongoose.Schema({
     index: true
   },
   
-  // Response from tutor
+  // Response từ gia sư
   tutorResponse: {
     message: {
       type: String,
@@ -152,12 +152,12 @@ const bookingRequestSchema = new mongoose.Schema({
     }
   },
   
-  // Completion
+  // hoàn thành
   completedAt: {
     type: Date
   },
   
-  // Rating (after completion)
+  // đánh giá
   rating: {
     score: {
       type: Number,
@@ -179,13 +179,11 @@ const bookingRequestSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Indexes for better query performance
 bookingRequestSchema.index({ student: 1, status: 1 });
 bookingRequestSchema.index({ tutor: 1, status: 1 });
 bookingRequestSchema.index({ createdAt: -1 });
 bookingRequestSchema.index({ 'schedule.startDate': 1 });
 
-// Virtual for days remaining until start
 bookingRequestSchema.virtual('daysUntilStart').get(function() {
   if (!this.schedule.startDate) return null;
   const now = new Date();
@@ -195,7 +193,6 @@ bookingRequestSchema.virtual('daysUntilStart').get(function() {
   return diffDays;
 });
 
-// Calculate total amount before saving
 bookingRequestSchema.pre('save', function(next) {
   if (this.schedule && this.pricing) {
     const totalHours = (this.schedule.hoursPerSession || 0) * 

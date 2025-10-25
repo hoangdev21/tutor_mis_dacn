@@ -68,9 +68,9 @@ const getDashboard = async (req, res) => {
       .limit(5)
       .select('title description subject level status totalApplications applications createdAt expiryDate budgetRange location preferredSchedule views')
       .lean();
-    
-    console.log(`📋 [Student ${studentId}] Found ${activeRequests.length} active tutor requests (job postings)`);
-    
+
+    console.log(`[Student ${studentId}] Found ${activeRequests.length} hoạt động yêu cầu gia sư.`);
+
     // Learning Progress Data - Tính toán tiến độ học tập
     const totalHoursPlanned = await BookingRequest.aggregate([
       {
@@ -118,7 +118,7 @@ const getDashboard = async (req, res) => {
       }
     ]);
     
-    // Subject-wise progress
+    // tiến độ theo môn học
     const subjectProgress = await BookingRequest.aggregate([
       {
         $match: {
@@ -160,7 +160,7 @@ const getDashboard = async (req, res) => {
       }
     ]);
     
-    // Recent Notifications
+    // thông báo gần đây
     const { Notification } = require('../models');
     const recentNotifications = await Notification.find({ recipient: studentId })
       .sort({ createdAt: -1 })
@@ -215,7 +215,7 @@ const getDashboard = async (req, res) => {
       }
     ]);
     
-    // Populate user info cho conversations
+    // Lấy thông tin người dùng của các cuộc trò chuyện
     const recentMessages = await Promise.all(
       conversations.map(async (conv) => {
         const otherUser = await User.findById(conv._id)
@@ -299,10 +299,10 @@ const getDashboard = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Student dashboard error:', error);
+    console.error('Lỗi khi lấy data ở dashboard của học sinh:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get dashboard data'
+      message: 'Lỗi khi lấy dữ liệu dashboard',
     });
   }
 };
@@ -318,11 +318,11 @@ const getProfile = async (req, res) => {
     if (!profile) {
       return res.status(404).json({
         success: false,
-        message: 'Profile not found'
+        message: 'không tìm thấy profile'
       });
     }
     
-    // Include user information in response
+    // thông tin ng dùng phản hồi
     const user = await User.findById(req.user._id);
     
     res.status(200).json({
@@ -334,10 +334,10 @@ const getProfile = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get student profile error:', error);
+    console.error('Lỗi khi lấy profile của học sinh:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get profile'
+      message: 'Lỗi khi lấy profile'
     });
   }
 };
@@ -365,11 +365,11 @@ const updateProfile = async (req, res) => {
     if (!profile) {
       return res.status(404).json({
         success: false,
-        message: 'Profile not found'
+        message: 'không tìm thấy profile'
       });
     }
 
-    // Update profile with all fields including fullName and phone
+    // update hồ sơ theo trường được cung cấp
     if (fullName) profile.fullName = fullName;
     if (phone) profile.phone = phone;
     if (dateOfBirth) profile.dateOfBirth = dateOfBirth;
@@ -390,7 +390,7 @@ const updateProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Profile updated successfully',
+      message: 'Cập nhật profile thành công',
       data: {
         ...profile.toObject(),
         email: user.email
@@ -398,10 +398,10 @@ const updateProfile = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Update student profile error:', error);
+    console.error('Lỗi khi cập nhật profile của students:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update profile'
+      message: 'Lỗi khi cập nhật profile'
     });
   }
 };
@@ -449,10 +449,10 @@ const getCourses = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get student courses error:', error);
+    console.error('Lỗi khi lấy danh sách khóa học của học sinh:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get courses'
+      message: 'Lỗi khi lấy danh sách khóa học'
     });
   }
 };
@@ -478,7 +478,7 @@ const getCourseDetail = async (req, res) => {
     if (!course) {
       return res.status(404).json({
         success: false,
-        message: 'Course not found'
+        message: 'không tìm thấy khóa học'
       });
     }
     
@@ -488,10 +488,10 @@ const getCourseDetail = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get course detail error:', error);
+    console.error('Lỗi khi lấy chi tiết khóa học:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get course detail'
+      message: 'Lỗi khi lấy chi tiết khóa học'
     });
   }
 };
@@ -514,14 +514,14 @@ const rateCourse = async (req, res) => {
     if (!course) {
       return res.status(404).json({
         success: false,
-        message: 'Course not found or not completed'
+        message: 'không tìm thấy khóa học hoặc khóa học chưa hoàn thành'
       });
     }
     
     if (course.rating.studentRating.score) {
       return res.status(400).json({
         success: false,
-        message: 'Course already rated'
+        message: 'Khóa học đã được đánh giá'
       });
     }
     
@@ -537,15 +537,15 @@ const rateCourse = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      message: 'Course rated successfully',
+      message: 'Đánh giá khóa học thành công',
       data: course
     });
     
   } catch (error) {
-    console.error('Rate course error:', error);
+    console.error('Lỗi khi đánh giá khóa học:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to rate course'
+      message: 'Lỗi khi đánh giá khóa học'
     });
   }
 };
@@ -555,18 +555,18 @@ const rateCourse = async (req, res) => {
 // @access  Private (Student only)
 const uploadAvatar = async (req, res) => {
   try {
-    console.log('\n🔵 [Student Avatar Upload] Starting...');
-    console.log('📁 File received:', req.file ? 'Yes' : 'No');
+    console.log('\n [Student avatar upload] starting...');
+    console.log('Đã nhận được file:', req.file ? 'Yes' : 'No');
     
     if (!req.file) {
-      console.log('❌ No file in request');
+      console.log('Không có file được tải lên.');
       return res.status(400).json({
         success: false,
-        message: 'No file uploaded'
+        message: 'Không có file được tải lên.'
       });
     }
 
-    console.log('📂 File details:', {
+    console.log('Chi tiết file:', {
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
       size: `${(req.file.size / 1024).toFixed(2)} KB`,
@@ -575,78 +575,78 @@ const uploadAvatar = async (req, res) => {
     });
 
     const userId = req.user._id;
-    console.log('👤 User ID:', userId);
+    console.log(' User ID:', userId);
 
     // Import cloudinary upload utility
     const { uploadAvatar: uploadToCloudinary, deleteFromCloudinary, extractPublicId } = require('../utils/cloudinaryUpload');
 
     const profile = await StudentProfile.findOne({ userId });
     if (!profile) {
-      console.log('❌ Profile not found for user:', userId);
+      console.log('Không tìm thấy hồ sơ cho người dùng:', userId);
       return res.status(404).json({
         success: false,
-        message: 'Profile not found'
+        message: 'Không tìm thấy hồ sơ'
       });
     }
 
-    console.log('✅ Profile found:', profile.fullName);
-    console.log('📸 Current avatar:', profile.avatar || 'None');
+    console.log('Tìm thấy profile:', profile.fullName);
+    console.log('Avatar hiện tại:', profile.avatar || 'None');
 
-    // Delete old avatar from Cloudinary if exists
+    // xóa avatar cũ trên Cloudinary nếu có
     if (profile.avatar && profile.avatar.includes('cloudinary.com')) {
-      console.log('🗑️  Deleting old Cloudinary avatar...');
+      console.log(' Đang xóa avatar cũ trên Cloudinary...');
       const oldPublicId = extractPublicId(profile.avatar);
       if (oldPublicId) {
         try {
           await deleteFromCloudinary(oldPublicId);
-          console.log('✅ Old avatar deleted:', oldPublicId);
+          console.log('Đã xóa avatar cũ:', oldPublicId);
         } catch (deleteError) {
-          console.warn('⚠️  Could not delete old avatar:', deleteError.message);
+          console.warn('Không thể xóa avatar cũ:', deleteError.message);
         }
       }
     }
 
-    console.log('☁️  Uploading to Cloudinary...');
-    console.log('📦 Buffer size:', req.file.buffer.length, 'bytes');
-    
+    console.log('Đang tải lên Cloudinary...');
+    console.log('Kích thước buffer:', req.file.buffer.length, 'bytes');
+
     // Upload new avatar to Cloudinary
     const uploadResult = await uploadToCloudinary(req.file.buffer, userId);
 
-    console.log('📤 Upload result:', JSON.stringify(uploadResult, null, 2));
+    console.log('Kết quả tải lên:', JSON.stringify(uploadResult, null, 2));
 
     if (!uploadResult.success) {
-      console.log('❌ Upload failed - success=false');
+      console.log('Tải lên thất bại - success=false');
       return res.status(500).json({
         success: false,
-        message: 'Failed to upload avatar to cloud storage'
+        message: 'Tải lên avatar lên cloud storage thất bại'
       });
     }
 
     if (!uploadResult.url) {
-      console.log('❌ Upload failed - no URL returned');
+      console.log('Tải lên thất bại - không có URL trả về');
       return res.status(500).json({
         success: false,
-        message: 'Failed to get avatar URL from cloud storage'
+        message: 'Không thể lấy URL avatar từ cloud storage'
       });
     }
 
     if (!uploadResult.url.includes('cloudinary.com')) {
-      console.log('❌ Invalid URL - not Cloudinary:', uploadResult.url);
+      console.log('Invalid URL - not Cloudinary:', uploadResult.url);
       return res.status(500).json({
         success: false,
-        message: 'Invalid cloud storage URL'
+        message: 'url avatar không hợp lệ từ cloud storage'
       });
     }
 
-    console.log('✅ Upload successful!');
-    console.log('🔗 Cloudinary URL:', uploadResult.url);
+    console.log('Upload successful!');
+    console.log('Cloudinary URL:', uploadResult.url);
 
     // Update avatar URL in profile
     profile.avatar = uploadResult.url;
     await profile.save();
 
-    console.log('💾 Profile updated with new avatar');
-    console.log('✅ [Student Avatar Upload] Complete!\n');
+    console.log('profile update với avatar mới thành công.');
+    console.log('[Student Avatar Upload] Complete!\n');
 
     res.status(200).json({
       success: true,
@@ -657,11 +657,11 @@ const uploadAvatar = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [Student Avatar Upload] Error:', error.message);
+    console.error('[Student Avatar Upload] lỗi:', error.message);
     console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload avatar',
+      message: 'Lỗi khi upload avatar',
       error: error.message
     });
   }

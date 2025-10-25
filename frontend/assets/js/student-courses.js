@@ -500,7 +500,7 @@ function getEmptyState(type) {
       <h3>${msg.title}</h3>
       <p>${msg.description}</p>
       ${type === 'upcoming' || type === 'ongoing' ? `
-        <button class="btn btn-primary" onclick="window.location.href='./find_tutor.html'">
+        <button class="btn btn-primary btn-sm" onclick="window.location.href='./find_tutor.html'">
           <i class="fas fa-search"></i>
           Tìm Gia Sư
         </button>

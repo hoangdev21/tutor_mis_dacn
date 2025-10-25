@@ -145,34 +145,28 @@ const blogPostSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Indexes for better query performance
 blogPostSchema.index({ author: 1, createdAt: -1 });
 blogPostSchema.index({ status: 1, createdAt: -1 });
 blogPostSchema.index({ category: 1, status: 1 });
 blogPostSchema.index({ tags: 1 });
 blogPostSchema.index({ isPinned: -1, createdAt: -1 });
 
-// Virtual for like count
 blogPostSchema.virtual('likeCount').get(function() {
   return this.likes ? this.likes.length : 0;
 });
 
-// Virtual for comment count
 blogPostSchema.virtual('commentCount').get(function() {
   return this.comments ? this.comments.length : 0;
 });
 
-// Virtual for share count
 blogPostSchema.virtual('shareCount').get(function() {
   return this.shares ? this.shares.length : 0;
 });
 
-// Method to check if user liked the post
 blogPostSchema.methods.isLikedBy = function(userId) {
   return this.likes.some(like => like.user.toString() === userId.toString());
 };
 
-// Static method to get posts by status
 blogPostSchema.statics.getByStatus = function(status, limit = 10) {
   return this.find({ status })
     .populate('author', 'email role')
@@ -180,7 +174,6 @@ blogPostSchema.statics.getByStatus = function(status, limit = 10) {
     .limit(limit);
 };
 
-// Pre-save middleware to set authorRole
 blogPostSchema.pre('save', async function(next) {
   if (this.isNew || this.isModified('author')) {
     const User = mongoose.model('User');

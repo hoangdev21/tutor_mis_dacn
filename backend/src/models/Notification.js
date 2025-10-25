@@ -98,23 +98,20 @@ const notificationSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes for efficient queries
 notificationSchema.index({ recipient: 1, createdAt: -1 });
 notificationSchema.index({ recipient: 1, isRead: 1 });
 
-// Static method to create notification
 notificationSchema.statics.createNotification = async function(notificationData) {
   try {
     const notification = new this(notificationData);
     await notification.save();
     return notification;
   } catch (error) {
-    console.error('Error creating notification:', error);
+    console.error('Tạo thông báo thất bại:', error);
     throw error;
   }
 };
 
-// Static method to get unread count
 notificationSchema.statics.getUnreadCount = async function(userId) {
   try {
     const count = await this.countDocuments({
@@ -123,12 +120,12 @@ notificationSchema.statics.getUnreadCount = async function(userId) {
     });
     return count;
   } catch (error) {
-    console.error('Error getting unread count:', error);
+    console.error('Lỗi khi lấy số lượng thông báo chưa đọc:', error);
     return 0;
   }
 };
 
-// Instance method to mark as read
+// đánh dấu thông báo là đã đọc
 notificationSchema.methods.markAsRead = async function() {
   this.isRead = true;
   this.readAt = new Date();
@@ -136,7 +133,7 @@ notificationSchema.methods.markAsRead = async function() {
   return this;
 };
 
-// Static method to mark all as read for a user
+// đánh dấu tất cả thông báo của người dùng là đã đọc
 notificationSchema.statics.markAllAsRead = async function(userId) {
   try {
     await this.updateMany(
@@ -145,12 +142,12 @@ notificationSchema.statics.markAllAsRead = async function(userId) {
     );
     return true;
   } catch (error) {
-    console.error('Error marking all as read:', error);
+    console.error('Lỗi khi đánh dấu tất cả là đã đọc:', error);
     return false;
   }
 };
 
-// Auto-delete old read notifications (older than 30 days)
+// Tự động xóa thông báo cũ (trên 30 ngày)
 notificationSchema.statics.cleanupOldNotifications = async function() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -161,7 +158,7 @@ notificationSchema.statics.cleanupOldNotifications = async function() {
       readAt: { $lt: thirtyDaysAgo }
     });
   } catch (error) {
-    console.error('Error cleaning up old notifications:', error);
+    console.error('Lỗi khi xóa thông báo cũ:', error);
   }
 };
 

@@ -166,7 +166,6 @@ const tutorRequestSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index
 tutorRequestSchema.index({ studentId: 1, status: 1 });
 tutorRequestSchema.index({ subject: 1, level: 1, status: 1 });
 tutorRequestSchema.index({ 'location.city': 1, status: 1 });

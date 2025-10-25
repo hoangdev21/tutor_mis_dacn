@@ -15,7 +15,7 @@ const getProfile = async (req, res) => {
     if (!adminProfile) {
       return res.status(404).json({
         success: false,
-        message: 'Admin profile not found'
+        message: 'Không tìm thấy profile admin'
       });
     }
     
@@ -25,10 +25,10 @@ const getProfile = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get admin profile error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get admin profile'
+      message: 'Không thể lấy thông tin profile admin'
     });
   }
 };
@@ -149,7 +149,7 @@ const getDashboard = async (req, res) => {
       }
     }
     
-    // System activities (hoạt động gần đây)
+    // hoạt động hệ thống gần đây
     const recentUsers = await User.find()
       .sort({ createdAt: -1 })
       .limit(10)
@@ -229,7 +229,7 @@ const getDashboard = async (req, res) => {
       .limit(5)
       .lean();
     
-    // Populate author profiles cho blog posts
+    // Thêm thông tin profile cho bài viết
     for (let post of pendingBlogPostsList) {
       if (post.author && post.author._id) {
         let profile = null;
@@ -259,7 +259,7 @@ const getDashboard = async (req, res) => {
           pendingRequests,
           totalBlogPosts,
           pendingBlogPosts: pendingBlogPosts,
-          pendingBlogs: pendingBlogPosts, // Alias for frontend
+          pendingBlogs: pendingBlogPosts,
           totalRevenue,
           totalMessages
         },
@@ -278,10 +278,10 @@ const getDashboard = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Admin dashboard error:', error);
+    console.error('Admin dashboard lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get dashboard data'
+      message: 'Không thể lấy dữ liệu bảng điều khiển'
     });
   }
 };
@@ -298,7 +298,7 @@ const getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Người dùng không tồn tại'
       });
     }
     
@@ -308,10 +308,10 @@ const getUserById = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get user by ID error:', error);
+    console.error('Get user by ID lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get user'
+      message: 'Không thể lấy người dùng'
     });
   }
 };
@@ -370,10 +370,10 @@ const getUsers = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get users error:', error);
+    console.error('Get users lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get users'
+      message: 'Không thể lấy người dùng'
     });
   }
 };
@@ -392,14 +392,14 @@ const approveTutor = async (req, res) => {
     if (!user || user.role !== 'tutor') {
       return res.status(404).json({
         success: false,
-        message: 'Tutor not found'
+        message: 'Gia sư không tồn tại'
       });
     }
     
     if (user.approvalStatus !== 'pending') {
       return res.status(400).json({
         success: false,
-        message: 'Tutor is not pending approval'
+        message: 'Gia sư không đang chờ phê duyệt'
       });
     }
     
@@ -422,7 +422,7 @@ const approveTutor = async (req, res) => {
     );
     await sendEmail(user.email, emailTemplate);
     
-    // Create notification for tutor
+    // Tạo notification cho người dùng
     try {
       if (isApproved) {
         await notifyProfileApproved(userId);
@@ -430,7 +430,7 @@ const approveTutor = async (req, res) => {
         await notifyProfileRejected(userId, reason);
       }
     } catch (notifError) {
-      console.error('❌ Failed to create notification:', notifError);
+      console.error('❌ Lỗi:', notifError);
     }
     
     // Cập nhật stats admin
@@ -450,10 +450,10 @@ const approveTutor = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Approve tutor error:', error);
+    console.error(' lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to approve tutor'
+      message: 'Không thể phê duyệt gia sư'
     });
   }
 };
@@ -471,7 +471,7 @@ const toggleUserStatus = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Người dùng không tồn tại'
       });
     }
     
@@ -479,14 +479,13 @@ const toggleUserStatus = async (req, res) => {
     if (userId === req.user._id.toString()) {
       return res.status(400).json({
         success: false,
-        message: 'Cannot deactivate your own account'
+        message: 'Không thể vô hiệu hóa tài khoản của chính bạn'
       });
     }
     
     user.isActive = !user.isActive;
     
     if (!user.isActive && reason) {
-      // Lưu lý do vô hiệu hóa (có thể thêm field mới)
       user.deactivationReason = reason;
     }
     
@@ -502,10 +501,10 @@ const toggleUserStatus = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Toggle user status error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to toggle user status'
+      message: 'Không thể thay đổi trạng thái người dùng'
     });
   }
 };
@@ -515,7 +514,7 @@ const toggleUserStatus = async (req, res) => {
 // @access  Private (Admin only)
 const getBlogPosts = async (req, res) => {
   try {
-    console.log('📝 getBlogPosts called');
+    console.log('📝 getBlogPosts được gọi');
     console.log('Query params:', req.query);
     console.log('User:', req.user?._id, req.user?.role);
     console.log('User profile:', req.user?.profile);
@@ -542,7 +541,7 @@ const getBlogPosts = async (req, res) => {
     
     // Get total count
     const total = await BlogPost.countDocuments(query);
-    console.log('Total posts found:', total);
+    console.log('Tổng số bài viết tìm thấy:', total);
     
     // Get blog posts with author profiles
     const blogPosts = await BlogPost.find(query)
@@ -569,9 +568,9 @@ const getBlogPosts = async (req, res) => {
         post.authorProfile = profile;
       }
     }
-    
-    console.log('Blog posts retrieved:', blogPosts.length);
-    
+
+    console.log('Bài viết blog đã được lấy:', blogPosts.length);
+
     res.status(200).json({
       success: true,
       data: {
@@ -583,11 +582,11 @@ const getBlogPosts = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Get blog posts error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('❌ Lỗi lấy bài viết blog:', error);
+    console.error('Lỗi:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Failed to get blog posts',
+      message: 'Không thể lấy bài viết blog',
       error: error.message
     });
   }
@@ -618,15 +617,15 @@ const moderateBlogPost = async (req, res) => {
       });
     }
     
-    // Validate action
+    // xác nhận hành động
     if (action !== 'approve' && action !== 'reject') {
       return res.status(400).json({
         success: false,
-        message: 'Invalid action. Must be "approve" or "reject"'
+        message: 'Hành động không hợp lệ. Phải là "approve" hoặc "reject"'
       });
     }
     
-    // Update status
+    // cập nhật trạng thái bài viết 
     blogPost.status = action === 'approve' ? 'approved' : 'rejected';
     blogPost.moderatedBy = adminId;
     blogPost.moderatedAt = new Date();
@@ -637,7 +636,7 @@ const moderateBlogPost = async (req, res) => {
     
     await blogPost.save();
     
-    // Create notification for blog author
+    // Gửi email thông báo
     try {
       if (action === 'approve') {
         await notifyBlogApproved(blogPost, blogPost.author._id);
@@ -645,10 +644,10 @@ const moderateBlogPost = async (req, res) => {
         await notifyBlogRejected(blogPost, blogPost.author._id, reason);
       }
     } catch (notifError) {
-      console.error('❌ Failed to create notification:', notifError);
+      console.error('❌ Lỗi tạo thông báo:', notifError);
     }
     
-    // Update admin stats
+    // Cập nhật stats admin
     await AdminProfile.findOneAndUpdate(
       { userId: adminId },
       { $inc: { 'stats.contentModerated': 1 } }
@@ -661,10 +660,10 @@ const moderateBlogPost = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Moderate blog post error:', error);
+    console.error('Lỗi duyệt bài viết blog:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to moderate blog post'
+      message: 'Không thể duyệt bài viết blog'
     });
   }
 };
@@ -682,7 +681,7 @@ const updateBlogPost = async (req, res) => {
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        message: 'Blog post not found'
+        message: 'Bài viết blog không tồn tại'
       });
     }
     
@@ -697,15 +696,15 @@ const updateBlogPost = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      message: 'Blog post updated successfully',
+      message: 'Bài viết blog đã được cập nhật thành công',
       data: blogPost
     });
     
   } catch (error) {
-    console.error('Update blog post error:', error);
+    console.error('Lỗi cập nhật bài viết blog:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update blog post',
+      message: 'Không thể cập nhật bài viết blog',
       error: error.message
     });
   }
@@ -723,7 +722,7 @@ const deleteBlogPost = async (req, res) => {
     if (!blogPost) {
       return res.status(404).json({
         success: false,
-        message: 'Blog post not found'
+        message: 'Bài viết blog không tồn tại'
       });
     }
     
@@ -731,14 +730,14 @@ const deleteBlogPost = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      message: 'Blog post deleted successfully'
+      message: 'Bài viết blog đã được xóa thành công'
     });
     
   } catch (error) {
-    console.error('Delete blog post error:', error);
+    console.error('Lỗi xóa bài viết blog:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete blog post',
+      message: 'Không thể xóa bài viết blog',
       error: error.message
     });
   }
@@ -816,10 +815,10 @@ const getFinanceStats = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get finance stats error:', error);
+    console.error('Lỗi lấy thống kê tài chính:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get finance statistics'
+      message: 'Không thể lấy thống kê tài chính'
     });
   }
 };
@@ -878,14 +877,13 @@ const getCourses = async (req, res) => {
         ];
       }
 
-      // Course model has pre-find middleware, but we need to populate manually after lean()
+      // tìm kiếm trước, điền thủ công sau
       const courses = await Course.find(courseFilter)
         .populate('tutorId', 'email role')
         .populate('studentId', 'email role')
         .sort(sort)
         .lean();
 
-      // Populate profiles manually for courses
       const courseTutorIds = courses.map(c => c.tutorId?._id).filter(Boolean);
       const courseStudentIds = courses.map(c => c.studentId?._id).filter(Boolean);
       
@@ -894,7 +892,7 @@ const getCourses = async (req, res) => {
         courseStudentIds.length > 0 ? require('../models/StudentProfile').find({ userId: { $in: courseStudentIds } }).select('userId fullName phone avatar address educationLevel').lean() : []
       ]);
 
-      // Create lookup maps for courses
+      // bản đồ tra cứu hồ sơ
       const courseTutorProfileMap = {};
       courseTutorProfiles.forEach(p => {
         courseTutorProfileMap[p.userId.toString()] = p;
@@ -905,7 +903,7 @@ const getCourses = async (req, res) => {
         courseStudentProfileMap[p.userId.toString()] = p;
       });
 
-      // Attach profiles to courses and use tutor's hourlyRate
+      // Đính kèm hồ sơ vào từng khóa học
       const coursesWithProfiles = courses.map(course => {
         const tutorId = course.tutorId?._id;
         const studentId = course.studentId?._id;
@@ -913,10 +911,10 @@ const getCourses = async (req, res) => {
         const tutorProfile = tutorId ? courseTutorProfileMap[tutorId.toString()] : null;
         const studentProfile = studentId ? courseStudentProfileMap[studentId.toString()] : null;
 
-        // Attach profiles to user objects
+        // Đính kèm hồ sơ vào từng đối tượng người dùng
         if (course.tutorId && tutorProfile) {
           course.tutorId.profile = tutorProfile;
-          // Use tutor's hourlyRate if available
+          // Sử dụng hourlyRate của gia sư nếu có
           if (tutorProfile.hourlyRate) {
             course.hourlyRate = tutorProfile.hourlyRate;
           }
@@ -932,7 +930,7 @@ const getCourses = async (req, res) => {
       allItems.push(...coursesWithProfiles.map(c => ({ ...c, _source: 'course' })));
     }
 
-    // Get from BookingRequest collection (accepted bookings as "courses")
+    // nhận từ BookingRequest collection
     if (source === 'all' || source === 'bookings') {
       const BookingRequest = require('../models/BookingRequest');
       
@@ -946,13 +944,13 @@ const getCourses = async (req, res) => {
         bookingFilter['subject.level'] = level;
       }
 
-      // Map booking status to course status
+      // bộ lọc trạng thái
       if (status && status !== '') {
-        // Accepted bookings are like pending/active courses
+        // trạng thái khóa học sang trạng thái booking tương ứng
         if (status === 'active' || status === 'pending') {
           // Already filtered by status: accepted
         } else {
-          // Other statuses don't match accepted bookings
+          // không có trạng thái booking tương ứng
           bookingFilter.status = 'no_match';
         }
       }
@@ -979,7 +977,7 @@ const getCourses = async (req, res) => {
         .sort(sort)
         .lean();
 
-      // Populate profiles manually with FULL information including hourlyRate
+      // điền hồ sơ cho bookings
       const tutorIds = bookings.map(b => b.tutor?._id).filter(Boolean);
       const studentIds = bookings.map(b => b.student?._id).filter(Boolean);
       
@@ -988,27 +986,23 @@ const getCourses = async (req, res) => {
         studentIds.length > 0 ? require('../models/StudentProfile').find({ userId: { $in: studentIds } }).select('userId fullName phone avatar address educationLevel').lean() : []
       ]);
 
-      // Create lookup maps
+      // bản đồ tra cứu hồ sơ
       const tutorProfileMap = {};
       tutorProfiles.forEach(p => {
-        // Handle both ObjectId and plain object with _id
         const key = p.userId?._id ? p.userId._id.toString() : p.userId.toString();
         tutorProfileMap[key] = p;
       });
 
       const studentProfileMap = {};
       studentProfiles.forEach(p => {
-        // Handle both ObjectId and plain object with _id
         const key = p.userId?._id ? p.userId._id.toString() : p.userId.toString();
         studentProfileMap[key] = p;
       });
 
-      // Convert booking requests to course format
       const bookingsAsCourses = bookings.map(booking => {
         const tutorProfile = booking.tutor ? tutorProfileMap[booking.tutor._id.toString()] : null;
         const studentProfile = booking.student ? studentProfileMap[booking.student._id.toString()] : null;
 
-        // Use hourlyRate from tutor profile as primary source
         const hourlyRate = tutorProfile?.hourlyRate || booking.pricing?.hourlyRate || 0;
 
         return {
@@ -1044,7 +1038,7 @@ const getCourses = async (req, res) => {
             platform: null,
             notes: null
           },
-          status: 'active', // Accepted bookings are active courses
+          status: 'active', // active
           startDate: booking.schedule?.startDate,
           endDate: null,
           payment: {
@@ -1063,7 +1057,7 @@ const getCourses = async (req, res) => {
       allItems.push(...bookingsAsCourses);
     }
 
-    // Sort combined results
+    // sắp xếp kết hợp
     allItems.sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
@@ -1072,11 +1066,11 @@ const getCourses = async (req, res) => {
 
     total = allItems.length;
 
-    // Apply pagination
+    // phân trang
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const paginatedItems = allItems.slice(skip, skip + parseInt(limit));
 
-    // Calculate stats for each item
+    // tính toán các trường bổ sung
     const itemsWithStats = paginatedItems.map(item => {
       const result = {
         ...item,
@@ -1100,10 +1094,10 @@ const getCourses = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get courses error:', error);
+    console.error('lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get courses'
+      message: 'Không thể lấy danh sách khóa học',
     });
   }
 };
@@ -1115,7 +1109,7 @@ const getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if it's a booking request ID or course ID
+    // kiểm tra 
     let course = await Course.findById(id)
       .populate({
         path: 'tutorId',
@@ -1128,7 +1122,7 @@ const getCourseById = async (req, res) => {
       .lean();
 
     if (!course) {
-      // Try to find in BookingRequest collection
+      // tìm trong BookingRequest nếu không tìm thấy trong Course
       const BookingRequest = require('../models/BookingRequest');
       const booking = await BookingRequest.findById(id)
         .populate('tutor', 'email role')
@@ -1136,7 +1130,6 @@ const getCourseById = async (req, res) => {
         .lean();
 
       if (booking && booking.status === 'accepted') {
-        // Get profiles manually with FULL information including hourlyRate
         const tutorProfile = booking.tutor 
           ? await require('../models/TutorProfile').findOne({ userId: booking.tutor._id }).select('fullName phone avatar hourlyRate subjects yearsOfExperience stats').lean()
           : null;
@@ -1144,7 +1137,6 @@ const getCourseById = async (req, res) => {
           ? await require('../models/StudentProfile').findOne({ userId: booking.student._id }).select('fullName phone avatar address educationLevel').lean()
           : null;
 
-        // Convert booking to course format
         course = {
           _id: booking._id,
           _source: 'booking',
@@ -1164,7 +1156,6 @@ const getCourseById = async (req, res) => {
           level: booking.subject?.level || 'N/A',
           title: `${booking.subject?.name} - ${booking.subject?.level}`,
           description: booking.studentNote,
-          // Use hourlyRate from tutor profile as primary source
           hourlyRate: tutorProfile?.hourlyRate || booking.pricing?.hourlyRate || 0,
           totalHours: booking.pricing?.totalHours || 0,
           completedHours: 0,
@@ -1196,11 +1187,10 @@ const getCourseById = async (req, res) => {
       } else {
         return res.status(404).json({
           success: false,
-          message: 'Course not found'
+          message: 'Khóa học không tồn tại'
         });
       }
     } else {
-      // Populate profiles for Course model with FULL information
       const tutorProfile = course.tutorId 
         ? await require('../models/TutorProfile').findOne({ userId: course.tutorId._id }).select('fullName phone avatar hourlyRate subjects yearsOfExperience stats').lean()
         : null;
@@ -1210,7 +1200,6 @@ const getCourseById = async (req, res) => {
 
       if (tutorProfile && course.tutorId) {
         course.tutorId.profile = tutorProfile;
-        // Override hourlyRate with the one from tutor profile (most accurate)
         if (tutorProfile.hourlyRate) {
           course.hourlyRate = tutorProfile.hourlyRate;
         }
@@ -1220,7 +1209,7 @@ const getCourseById = async (req, res) => {
       }
     }
 
-    // Add calculated fields
+    // thêm trường tính toán
     course.completionRate = course.totalHours > 0 
       ? Math.round((course.completedHours / course.totalHours) * 100) 
       : 0;
@@ -1232,10 +1221,10 @@ const getCourseById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get course by id error:', error);
+    console.error('lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get course',
+      message: 'Không thể lấy khóa học',
       error: error.message
     });
   }
@@ -1249,17 +1238,14 @@ const updateCourse = async (req, res) => {
     const { id } = req.params;
     const { status, notes, cancellationReason } = req.body;
 
-    // First try to find in Course collection
     let course = await Course.findById(id);
 
     if (course) {
-      // It's a Course document
-      // Update fields
       if (status) {
         course.status = status;
 
         if (status === 'cancelled') {
-          course.cancellationReason = cancellationReason || 'Cancelled by admin';
+          course.cancellationReason = cancellationReason || 'bị hủy bởi admin';
           course.cancelledBy = req.user._id;
           course.cancelledAt = new Date();
         }
@@ -1273,26 +1259,21 @@ const updateCourse = async (req, res) => {
 
       res.status(200).json({
         success: true,
-        message: 'Course updated successfully',
+        message: 'Cập nhật khóa học thành công',
         data: course
       });
     } else {
-      // Try to find in BookingRequest collection
       const BookingRequest = require('../models/BookingRequest');
       const booking = await BookingRequest.findById(id);
 
       if (!booking) {
         return res.status(404).json({
           success: false,
-          message: 'Course not found'
+          message: 'Khóa học không tồn tại'
         });
       }
-
-      // It's a BookingRequest document
-      // Map course status to booking status
       let newStatus = status;
       if (status === 'active' && booking.status === 'accepted') {
-        // Already active/accepted
         newStatus = 'accepted';
       } else if (status === 'completed') {
         newStatus = 'completed';
@@ -1301,14 +1282,13 @@ const updateCourse = async (req, res) => {
         newStatus = 'cancelled';
         booking.cancellation = {
           cancelledBy: req.user._id,
-          reason: cancellationReason || 'Cancelled by admin',
+          reason: cancellationReason || 'bị hủy bởi admin',
           cancelledAt: new Date()
         };
       } else if (status === 'paused') {
-        // Bookings don't have paused status, keep as accepted
         return res.status(400).json({
           success: false,
-          message: 'Cannot pause booking requests'
+          message: 'Không thể tạm dừng yêu cầu đặt chỗ'
         });
       }
 
@@ -1317,16 +1297,16 @@ const updateCourse = async (req, res) => {
 
       res.status(200).json({
         success: true,
-        message: 'Booking updated successfully',
+        message: 'Cập nhật yêu cầu đặt chỗ thành công',
         data: booking
       });
     }
 
   } catch (error) {
-    console.error('Update course error:', error);
+    console.error('lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update course'
+      message: 'Không thể cập nhật khóa học'
     });
   }
 };
@@ -1338,16 +1318,13 @@ const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // First try to find in Course collection
     let course = await Course.findById(id);
 
     if (course) {
-      // It's a Course document
-      // Chỉ cho phép xóa course ở trạng thái pending hoặc cancelled
       if (course.status !== 'pending' && course.status !== 'cancelled') {
         return res.status(400).json({
           success: false,
-          message: 'Can only delete courses with pending or cancelled status'
+          message: 'Chỉ có thể xóa khóa học ở trạng thái đang chờ hoặc đã hủy'
         });
       }
 
@@ -1355,26 +1332,22 @@ const deleteCourse = async (req, res) => {
 
       res.status(200).json({
         success: true,
-        message: 'Course deleted successfully'
+        message: 'Khóa học đã được xóa thành công'
       });
     } else {
-      // Try to find in BookingRequest collection
       const BookingRequest = require('../models/BookingRequest');
       const booking = await BookingRequest.findById(id);
 
       if (!booking) {
         return res.status(404).json({
           success: false,
-          message: 'Course not found'
+          message: 'Khóa học không tồn tại'
         });
       }
-
-      // It's a BookingRequest document
-      // Only allow deletion of cancelled bookings
       if (booking.status !== 'cancelled') {
         return res.status(400).json({
           success: false,
-          message: 'Can only delete cancelled booking requests'
+          message: 'Chỉ có thể xóa yêu cầu đặt chỗ đã hủy'
         });
       }
 
@@ -1382,15 +1355,15 @@ const deleteCourse = async (req, res) => {
 
       res.status(200).json({
         success: true,
-        message: 'Booking deleted successfully'
+        message: 'Yêu cầu đặt chỗ đã được xóa thành công'
       });
     }
 
   } catch (error) {
-    console.error('Delete course error:', error);
+    console.error('lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete course'
+      message: 'Không thể xóa khóa học'
     });
   }
 };
@@ -1403,7 +1376,6 @@ const getCourseStats = async (req, res) => {
     const BookingRequest = require('../models/BookingRequest');
     
     const [
-      // Course stats
       totalCourses,
       activeCourses,
       completedCourses,
@@ -1412,7 +1384,6 @@ const getCourseStats = async (req, res) => {
       pendingPayments,
       subjectStats,
       levelStats,
-      // Booking stats
       acceptedBookings,
       bookingRevenue
     ] = await Promise.all([
@@ -1436,7 +1407,6 @@ const getCourseStats = async (req, res) => {
       Course.aggregate([
         { $group: { _id: '$level', count: { $sum: 1 } } }
       ]),
-      // Accepted bookings count as active courses
       BookingRequest.countDocuments({ status: 'accepted' }),
       BookingRequest.aggregate([
         { $match: { status: 'accepted' } },
@@ -1444,7 +1414,6 @@ const getCourseStats = async (req, res) => {
       ])
     ]);
 
-    // Combine stats from both sources
     const combinedTotal = totalCourses + acceptedBookings;
     const combinedActive = activeCourses + acceptedBookings;
     const combinedPending = (pendingPayments[0]?.total || 0) + (bookingRevenue[0]?.total || 0);
@@ -1472,10 +1441,10 @@ const getCourseStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get course stats error:', error);
+    console.error('lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get course statistics'
+      message: 'Không thể lấy thống kê khóa học'
     });
   }
 };
@@ -1492,7 +1461,6 @@ module.exports = {
   updateBlogPost,
   deleteBlogPost,
   getFinanceStats,
-  // Course management
   getCourses,
   getCourseById,
   updateCourse,

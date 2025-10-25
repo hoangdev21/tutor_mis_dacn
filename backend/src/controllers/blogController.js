@@ -1,4 +1,4 @@
-const { BlogPost, User, StudentProfile, TutorProfile } = require('../models');
+  const { BlogPost, User, StudentProfile, TutorProfile } = require('../models');
 const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/cloudinaryUpload');
 
 // @desc    Create new blog post
@@ -8,7 +8,7 @@ const createPost = async (req, res) => {
   try {
     const { title, content, type, category, tags, status } = req.body;
 
-    // Validate content
+    // xác thực nội dung
     if (!content || content.trim().length === 0) {
       return res.status(400).json({
         success: false,
@@ -16,7 +16,7 @@ const createPost = async (req, res) => {
       });
     }
 
-    // Process uploaded images
+    // Xử lý hình ảnh nếu có
     let images = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
@@ -35,12 +35,12 @@ const createPost = async (req, res) => {
             caption: file.originalname
           });
         } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
+          console.error('Lỗi tải lên hình ảnh:', uploadError);
         }
       }
     }
 
-    // Create post
+    // tạo bài viết
     const post = await BlogPost.create({
       author: req.user._id,
       authorRole: req.user.role,
@@ -54,7 +54,7 @@ const createPost = async (req, res) => {
       isPublic: true
     });
 
-    // Populate author info
+    // điền thông tin tác giả
     await post.populate([
       { path: 'author', select: 'email role' }
     ]);
@@ -66,7 +66,7 @@ const createPost = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error creating post:', error);
+    console.error('Lỗi khi tạo bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tạo bài viết',
@@ -92,7 +92,7 @@ const updatePost = async (req, res) => {
       });
     }
 
-    // Check ownership
+    // kiểm tra quyền sở hữu
     if (post.author.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
@@ -100,7 +100,7 @@ const updatePost = async (req, res) => {
       });
     }
 
-    // Cannot edit approved/rejected posts
+    // thông báo nếu bài viết đã được duyệt hoặc từ chối
     if (post.status === 'approved' || post.status === 'rejected') {
       return res.status(400).json({
         success: false,
@@ -108,7 +108,7 @@ const updatePost = async (req, res) => {
       });
     }
 
-    // Remove specified images
+    // xóa hình ảnh đã chọn
     if (removeImageIds && Array.isArray(removeImageIds)) {
       for (const publicId of removeImageIds) {
         const imageIndex = post.images.findIndex(img => img.publicId === publicId);
@@ -117,13 +117,13 @@ const updatePost = async (req, res) => {
             await deleteFromCloudinary(publicId);
             post.images.splice(imageIndex, 1);
           } catch (error) {
-            console.error('Error deleting image:', error);
+            console.error('Lỗi khi xóa hình ảnh:', error);
           }
         }
       }
     }
 
-    // Add new images
+    // thêm hình ảnh mới nếu có
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         try {
@@ -141,12 +141,12 @@ const updatePost = async (req, res) => {
             caption: file.originalname
           });
         } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
+          console.error('Lỗi khi tải lên hình ảnh:', uploadError);
         }
       }
     }
 
-    // Update fields
+    // cập nhật các trường khác
     if (title !== undefined) post.title = title;
     if (content !== undefined) post.content = content;
     if (type !== undefined) post.type = type;
@@ -154,8 +154,8 @@ const updatePost = async (req, res) => {
     if (tags !== undefined) {
       post.tags = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim());
     }
-    
-    // Update status - resubmit for moderation if was draft
+
+    // Cập nhật trạng thái - gửi lại để duyệt nếu là bản nháp
     if (status !== undefined) {
       post.status = status === 'draft' ? 'draft' : 'pending';
       if (post.status === 'pending') {
@@ -177,7 +177,7 @@ const updatePost = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error updating post:', error);
+    console.error('Lỗi khi cập nhật bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi cập nhật bài viết',
@@ -201,7 +201,7 @@ const deletePost = async (req, res) => {
       });
     }
 
-    // Check ownership or admin
+    // kiểm tra quyền sở hữu
     if (post.author.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
@@ -209,13 +209,13 @@ const deletePost = async (req, res) => {
       });
     }
 
-    // Delete images from Cloudinary
+    // Xóa hình ảnh từ Cloudinary
     if (post.images && post.images.length > 0) {
       for (const image of post.images) {
         try {
           await deleteFromCloudinary(image.publicId);
         } catch (error) {
-          console.error('Error deleting image:', error);
+          console.error('Lỗi khi xóa hình ảnh:', error);
         }
       }
     }
@@ -228,7 +228,7 @@ const deletePost = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error deleting post:', error);
+    console.error('Lỗi khi xóa bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa bài viết',
@@ -258,7 +258,7 @@ const getPost = async (req, res) => {
       });
     }
 
-    // Check if user can view post
+    // kiểm tra những bài viết chưa được duyệt
     if (post.status !== 'approved') {
       // Only author and admin can view non-approved posts
       if (!req.user || 
@@ -270,13 +270,13 @@ const getPost = async (req, res) => {
       }
     }
 
-    // Increment view count
+    // Tăng số lượt xem
     if (post.status === 'approved') {
       post.views += 1;
       await post.save();
     }
 
-    // Get author profile
+    // lấy thông tin hồ sơ tác giả
     let authorProfile = null;
     if (post.authorRole === 'student') {
       authorProfile = await StudentProfile.findOne({ userId: post.author._id })
@@ -295,7 +295,7 @@ const getPost = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error getting post:', error);
+    console.error('Lỗi khi lấy bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy bài viết',
@@ -323,7 +323,7 @@ const getAllPosts = async (req, res) => {
 
     const query = {};
 
-    // Public users only see approved posts
+    // ng dùng chỉ xem bài viết đã được duyệt và công khai
     if (!req.user || req.user.role !== 'admin') {
       query.status = 'approved';
       query.isPublic = true;
@@ -331,22 +331,22 @@ const getAllPosts = async (req, res) => {
       query.status = status;
     }
 
-    // Filter by author (for user's own posts)
+    // lọc theo tác giả
     if (author) {
       query.author = author;
     }
 
-    // Filter by category
+    // Lọc theo danh mục
     if (category && category !== 'all') {
       query.category = category;
     }
 
-    // Filter by type
+    // Lọc theo loại
     if (type && type !== 'all') {
       query.type = type;
     }
 
-    // Search in title and content
+    // tìm kiếm theo tiêu đề, nội dung, thẻ
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -357,8 +357,8 @@ const getAllPosts = async (req, res) => {
 
     const sortOrder = order === 'asc' ? 1 : -1;
     const sortOptions = {};
-    
-    // Pinned posts always first
+
+    // Ghim bài viết lên đầu
     sortOptions.isPinned = -1;
     sortOptions[sortBy] = sortOrder;
 
@@ -375,9 +375,9 @@ const getAllPosts = async (req, res) => {
       .limit(parseInt(limit))
       .lean();
 
-    // Get author profiles and commenter profiles
+    // Lấy hồ sơ tác giả và hồ sơ người bình luận cho mỗi bài viết
     for (const post of posts) {
-      // Get post author profile
+      // Lấy hồ sơ tác giả
       if (post.authorRole === 'student') {
         post.authorProfile = await StudentProfile.findOne({ userId: post.author._id })
           .select('fullName avatar bio')
@@ -388,7 +388,7 @@ const getAllPosts = async (req, res) => {
           .lean();
       }
 
-      // Get commenter profiles
+      // Lấy hồ sơ người bình luận
       if (post.comments && post.comments.length > 0) {
         for (const comment of post.comments) {
           if (comment.user) {
@@ -403,8 +403,8 @@ const getAllPosts = async (req, res) => {
                 .lean();
             }
           }
-          
-          // Get reply user profiles
+
+          // Lấy hồ sơ người trả lời
           if (comment.replies && comment.replies.length > 0) {
             for (const reply of comment.replies) {
               if (reply.user) {
@@ -424,7 +424,7 @@ const getAllPosts = async (req, res) => {
         }
       }
 
-      // Add isLiked flag for current user
+      // Kiểm tra xem người dùng đã thích bài viết chưa
       if (req.user) {
         post.isLiked = post.likes.some(like => 
           like.user.toString() === req.user._id.toString()
@@ -446,7 +446,7 @@ const getAllPosts = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error getting posts:', error);
+    console.error('Lỗi khi lấy danh sách bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy danh sách bài viết',
@@ -470,7 +470,7 @@ const toggleLike = async (req, res) => {
       });
     }
 
-    // Check if already liked
+    // kiểm tra nếu ng dùng đã thích bài viết
     const likeIndex = post.likes.findIndex(
       like => like.user.toString() === req.user._id.toString()
     );
@@ -501,7 +501,7 @@ const toggleLike = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error toggling like:', error);
+    console.error('lỗi khi thích bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi thích bài viết',
@@ -543,14 +543,14 @@ const addComment = async (req, res) => {
     post.comments.push(comment);
     await post.save();
 
-    // Populate the new comment
+    // điền bình luận mới
     await post.populate([
       { path: 'comments.user', select: 'email role' }
     ]);
 
     const newComment = post.comments[post.comments.length - 1];
 
-    // Get commenter profile
+    // Lấy hồ sơ người bình luận
     let commenterProfile = null;
     if (req.user.role === 'student') {
       commenterProfile = await StudentProfile.findOne({ userId: req.user._id })
@@ -573,7 +573,7 @@ const addComment = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error adding comment:', error);
+    console.error('Lỗi khi thêm bình luận:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi thêm bình luận',
@@ -610,7 +610,7 @@ const deleteComment = async (req, res) => {
 
     const comment = post.comments[commentIndex];
 
-    // Check permission
+    // kiểm tra quyền sở hữu
     if (comment.user.toString() !== req.user._id.toString() &&
         post.author.toString() !== req.user._id.toString() &&
         req.user.role !== 'admin') {
@@ -632,7 +632,7 @@ const deleteComment = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error deleting comment:', error);
+    console.error('Lỗi khi xóa bình luận:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa bình luận',
@@ -665,7 +665,7 @@ const likeComment = async (req, res) => {
       });
     }
 
-    // Check if user already liked this comment
+    // Kiểm tra xem người dùng đã thích bình luận này chưa
     const likeIndex = comment.likes.findIndex(
       like => like.user.toString() === req.user._id.toString()
     );
@@ -744,14 +744,14 @@ const replyToComment = async (req, res) => {
     comment.replies.push(reply);
     await post.save();
 
-    // Populate the new reply
+    // điền phản hồi mới
     await post.populate([
       { path: 'comments.replies.user', select: 'email role' }
     ]);
 
     const newReply = comment.replies[comment.replies.length - 1];
 
-    // Get replier profile
+    // Lấy hồ sơ người trả lời
     let replierProfile = null;
     if (req.user.role === 'student') {
       replierProfile = await StudentProfile.findOne({ userId: req.user._id })
@@ -774,7 +774,7 @@ const replyToComment = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error replying to comment:', error);
+    console.error('Lỗi khi phản hồi bình luận:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi phản hồi bình luận',
@@ -807,7 +807,7 @@ const sharePost = async (req, res) => {
       });
     }
 
-    // Check if already shared
+    // Kiểm tra nếu đã chia sẻ
     const alreadyShared = post.shares.some(
       share => share.user.toString() === req.user._id.toString()
     );
@@ -831,7 +831,7 @@ const sharePost = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error sharing post:', error);
+    console.error('Lỗi khi chia sẻ bài viết:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi chia sẻ bài viết',
@@ -866,9 +866,9 @@ const getMyPosts = async (req, res) => {
       .limit(parseInt(limit))
       .lean();
 
-    // Get author profiles and commenter profiles for each post
+    // nhận hồ sơ tác giả và hồ sơ người bình luận cho mỗi bài viết
     for (const post of posts) {
-      // Get post author profile
+      // Lấy hồ sơ tác giả bài viết
       if (post.author && post.author.role) {
         if (post.author.role === 'student') {
           post.authorProfile = await StudentProfile.findOne({ userId: post.author._id })
@@ -881,7 +881,7 @@ const getMyPosts = async (req, res) => {
         }
       }
 
-      // Get commenter profiles
+      // Lấy hồ sơ người bình luận
       if (post.comments && post.comments.length > 0) {
         for (const comment of post.comments) {
           if (comment.user) {
@@ -896,8 +896,8 @@ const getMyPosts = async (req, res) => {
                 .lean();
             }
           }
-          
-          // Get reply user profiles
+
+          // Lấy hồ sơ người trả lời
           if (comment.replies && comment.replies.length > 0) {
             for (const reply of comment.replies) {
               if (reply.user) {
@@ -932,7 +932,7 @@ const getMyPosts = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error getting my posts:', error);
+    console.error('Lỗi khi lấy bài viết của bạn:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy bài viết của bạn',

@@ -56,7 +56,6 @@ const supportTicketSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for faster queries
 supportTicketSchema.index({ user: 1, status: 1 });
 supportTicketSchema.index({ category: 1, status: 1 });
 supportTicketSchema.index({ createdAt: -1 });

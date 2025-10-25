@@ -11,10 +11,10 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Public route - submit contact form
+// public route
 router.post('/submit', submitContactForm);
 
-// Admin routes - require authentication and admin role
+// Admin routes
 router.get('/submissions', authenticateToken, authorizeRoles('admin'), getContactSubmissions);
 router.get('/submissions/:id', authenticateToken, authorizeRoles('admin'), getContactSubmissionById);
 router.put('/submissions/:id', authenticateToken, authorizeRoles('admin'), updateContactSubmission);

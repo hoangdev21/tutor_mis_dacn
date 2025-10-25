@@ -55,7 +55,6 @@ const tutorProfileSchema = new mongoose.Schema({
     startYear: Number,        // Năm bắt đầu
     endYear: Number,          // Năm kết thúc (thay graduationYear)
     description: String,      // Mô tả chi tiết
-    // Keep for backward compatibility
     major: String,
     university: String,
     graduationYear: Number,
@@ -104,19 +103,16 @@ const tutorProfileSchema = new mongoose.Schema({
       min: 0
     }
   }],
-  // Top-level hourly rate (general rate)
   hourlyRate: {
     type: Number,
     default: 0,
     min: 0
   },
-  // Years of experience (top-level)
   yearsOfExperience: {
     type: Number,
     default: 0,
     min: 0
   },
-  // Teaching location (top-level)
   teachingLocation: {
     type: [String],
     enum: ['home', 'student_home', 'online', 'library', 'cafe'],
@@ -142,7 +138,6 @@ const tutorProfileSchema = new mongoose.Schema({
       end: String
     }]
   }],
-  // Top-level rating fields
   averageRating: {
     type: Number,
     default: 0,

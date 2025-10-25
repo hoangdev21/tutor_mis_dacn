@@ -191,7 +191,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    align-items: flex-end;
+    align-items: flex-start;
 }
 
 .ticket-priority, .ticket-status {
@@ -594,9 +594,6 @@
         gap: 12px;
     }
     
-    .ticket-meta {
-        align-items: flex-start;
-    }
     
     .filter-tabs {
         justify-content: center;

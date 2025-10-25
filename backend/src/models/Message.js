@@ -90,7 +90,6 @@ messageSchema.pre('validate', function(next) {
   next();
 });
 
-// Populate thông tin sender và receiver
 messageSchema.pre(/^find/, function(next) {
   this.populate([
     {

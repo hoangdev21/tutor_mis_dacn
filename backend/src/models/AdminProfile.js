@@ -95,7 +95,7 @@ const adminProfileSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Populate user khi query
+// Điền thông tin user khi truy vấn admin profile
 adminProfileSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'userId',

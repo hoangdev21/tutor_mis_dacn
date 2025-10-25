@@ -7,14 +7,14 @@ const createRateLimit = (windowMs, max, message) => {
     max,
     message: {
       success: false,
-      message: message || 'Too many requests, please try again later.'
+      message: message || 'Có quá nhiều yêu cầu, vui lòng thử lại sau'
     },
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {
       res.status(429).json({
         success: false,
-        message: message || 'Too many requests, please try again later.'
+        message: message || 'Có quá nhiều yêu cầu, vui lòng thử lại sau'
       });
     }
   });
@@ -24,56 +24,56 @@ const createRateLimit = (windowMs, max, message) => {
 const loginLimiter = createRateLimit(
   15 * 60 * 1000, // 15 phút
   process.env.NODE_ENV === 'production' ? 5 : 50, // 50 in dev, 5 in prod
-  'Too many login attempts, please try again after 15 minutes.'
+  'Có quá nhiều yêu cầu đăng nhập, vui lòng thử lại sau 15 phút.'
 );
 
 // Rate limit cho đăng ký
 const registerLimiter = createRateLimit(
   60 * 60 * 1000, // 1 giờ
   10, // 10 lần đăng ký (tăng cho development testing)
-  'Too many registration attempts, please try again after 1 hour.'
+  'Có quá nhiều yêu cầu đăng ký, vui lòng thử lại sau 1 giờ.'
 );
 
 // Rate limit cho gửi email
 const emailLimiter = createRateLimit(
   60 * 60 * 1000, // 1 giờ
   5, // 5 email
-  'Too many emails sent, please try again after 1 hour.'
+  'Có quá nhiều email đã được gửi, vui lòng thử lại sau 1 giờ.'
 );
 
 // Rate limit cho API chung (relax for development)
 const apiLimiter = createRateLimit(
   1 * 60 * 1000, // 1 phút
   process.env.NODE_ENV === 'production' ? 100 : 1000, // 1000 requests in dev, 100 in prod
-  'API rate limit exceeded, please try again later.'
+  'Quá nhiều yêu cầu API, vui lòng thử lại sau 1 phút.'
 );
 
 // Rate limit cho upload file
 const uploadLimiter = createRateLimit(
   60 * 60 * 1000, // 1 giờ
   20, // 20 uploads
-  'Too many file uploads, please try again after 1 hour.'
+  'Quá nhiều yêu cầu tải lên, vui lòng thử lại sau 1 giờ.'
 );
 
 // Rate limit cho search
 const searchLimiter = createRateLimit(
   60 * 1000, // 1 phút
   30, // 30 searches
-  'Too many search requests, please slow down.'
+  'Có quá nhiều yêu cầu tìm kiếm, vui lòng chậm lại.'
 );
 
 // Rate limit cho message
 const messageLimiter = createRateLimit(
   60 * 1000, // 1 phút
   20, // 20 messages
-  'Too many messages sent, please slow down.'
+  'Có quá nhiều tin nhắn đã được gửi, vui lòng chậm lại.'
 );
 
-// Rate limit cho admin operations (relax for development)
+// Giới hạn cho admin
 const adminLimiter = createRateLimit(
   60 * 1000, // 1 phút
   process.env.NODE_ENV === 'production' ? 50 : 500, // 500 in dev, 50 in prod
-  'Admin rate limit exceeded, please slow down.'
+  'Quá nhiều yêu cầu từ admin, vui lòng thử lại sau 1 phút.'
 );
 
 module.exports = {

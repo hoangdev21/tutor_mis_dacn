@@ -8,7 +8,7 @@ const getDashboard = async (req, res) => {
     const tutorId = req.user._id;
     const { period = 'month' } = req.query;
     
-    // Calculate date range for income
+    // tính ngày bắt đầu và kết thúc dựa trên period
     const now = new Date();
     let startDate = new Date();
     let futureDate = new Date();
@@ -92,7 +92,7 @@ const getDashboard = async (req, res) => {
           _id: {
             date: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } }
           },
-          amount: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+          amount: { $sum: '$pricing.totalAmount' }  
         }
       },
       { $sort: { '_id.date': 1 } }
@@ -112,13 +112,13 @@ const getDashboard = async (req, res) => {
           _id: {
             date: { $dateToString: { format: '%Y-%m-%d', date: '$schedule.startDate' } }
           },
-          amount: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+          amount: { $sum: '$pricing.totalAmount' }  
         }
       },
       { $sort: { '_id.date': 1 } }
     ]);
     
-    // Format income data for chart
+    // Chuỗi dữ liệu thu nhập theo ngày
     const incomeChartData = {
       actual: actualIncomeData.map(d => ({ date: d._id.date, amount: d.amount })),
       predicted: predictedIncomeData.map(d => ({ date: d._id.date, amount: d.amount }))
@@ -139,7 +139,7 @@ const getDashboard = async (req, res) => {
       {
         $group: {
           _id: null,
-          total: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+          total: { $sum: '$pricing.totalAmount' }  
         }
       }
     ]);
@@ -159,7 +159,7 @@ const getDashboard = async (req, res) => {
       {
         $group: {
           _id: null,
-          total: { $sum: '$pricing.totalAmount' }  // ✅ Sử dụng pricing.totalAmount
+          total: { $sum: '$pricing.totalAmount' }  
         }
       }
     ]);
@@ -299,11 +299,11 @@ const getDashboard = async (req, res) => {
           studentName: booking.studentProfile?.fullName || 'Học sinh',
           studentAvatar: booking.studentProfile?.avatar,
           studentEmail: booking.student?.email,
-          subject: booking.subject?.name || 'N/A',  // ✅ Sử dụng subject.name
+          subject: booking.subject?.name || 'N/A',  
           level: booking.subject?.level || 'N/A',
           status: booking.status,
           startDate: booking.schedule?.startDate,
-          totalAmount: booking.pricing?.totalAmount || 0,  // ✅ Sử dụng pricing.totalAmount
+          totalAmount: booking.pricing?.totalAmount || 0,  
           updatedAt: booking.updatedAt
         })),
         newRequests: newRequestsList.map(req => ({
@@ -325,15 +325,15 @@ const getDashboard = async (req, res) => {
           studentName: booking.studentProfile?.fullName || 'Học sinh',
           studentAvatar: booking.studentProfile?.avatar,
           studentPhone: booking.studentProfile?.phone,
-          subject: booking.subject?.name || 'N/A',  // ✅ Sử dụng subject.name
+          subject: booking.subject?.name || 'N/A',  
           level: booking.subject?.level || 'N/A',
           startDate: booking.schedule?.startDate,
-          preferredTime: booking.schedule?.preferredTime,  // ✅ Thời gian ưa thích
+          preferredTime: booking.schedule?.preferredTime,  
           daysPerWeek: booking.schedule?.daysPerWeek,
           hoursPerSession: booking.schedule?.hoursPerSession,
           duration: booking.schedule?.duration,
           location: booking.location?.type === 'online' ? 'Trực tuyến' : 
-                   (booking.location?.address || 'Chưa xác định')  // ✅ Sử dụng location.address
+                   (booking.location?.address || 'Chưa xác định') 
         })),
         notifications: recentNotifications.map(notif => ({
           _id: notif._id,
@@ -348,10 +348,10 @@ const getDashboard = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Tutor dashboard error:', error);
+    console.error('Lỗi khi tải dashboard tutor:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get dashboard data'
+      message: 'Lỗi khi tải dashboard tutor'
     });
   }
 };
@@ -366,7 +366,7 @@ const getProfile = async (req, res) => {
     if (!profile) {
       return res.status(404).json({
         success: false,
-        message: 'Profile not found'
+        message: 'Không tìm thấy hồ sơ'
       });
     }
     
@@ -379,7 +379,7 @@ const getProfile = async (req, res) => {
       userId: profile.userId,
       fullName: profile.fullName,
       phone: profile.phone,
-      avatar: profile.avatar,  // ✅ Thêm avatar vào root level
+      avatar: profile.avatar,  
       dateOfBirth: profile.dateOfBirth,
       gender: profile.gender,
       idCard: profile.idCard,
@@ -403,10 +403,10 @@ const getProfile = async (req, res) => {
       yearsOfExperience: profile.teachingExperience?.totalYears ? 
         `${profile.teachingExperience.totalYears}-${profile.teachingExperience.totalYears + 1}` : '',
       
-      // Hourly Rate from first subject or default
+      // Hourly Rate 
       hourlyRate: profile.subjects?.[0]?.hourlyRate || 0,
       
-      // Certificates - format to frontend structure
+      // Certificates 
       certifications: (profile.certificates || []).map(cert => ({
         name: cert.name,
         issuer: cert.organization,
@@ -414,7 +414,7 @@ const getProfile = async (req, res) => {
         fileUrl: cert.certificateUrl || ''
       })),
       
-      // Experiences - format to frontend structure
+      // Experiences 
       experiences: (profile.teachingExperience?.previousJobs || []).map(exp => ({
         position: exp.position,
         organization: exp.organization,
@@ -423,7 +423,7 @@ const getProfile = async (req, res) => {
         description: exp.description
       })),
       
-      // Subjects - format to frontend structure
+      // Subjects 
       subjects: (profile.subjects || []).map(sub => ({
         name: sub.subject,
         level: sub.level === 'elementary' ? 'Tiểu học' :
@@ -431,7 +431,7 @@ const getProfile = async (req, res) => {
                sub.level === 'high_school' ? 'THPT' : 'Đại học'
       })),
       
-      // Teaching methods - format to frontend structure
+      // Teaching methods 
       teachingMethods: (profile.teachingOptions?.location || []).map(loc => {
         const map = {
           'student_home': 'Dạy tại nhà học sinh',
@@ -441,7 +441,7 @@ const getProfile = async (req, res) => {
         return map[loc] || loc;
       }),
       
-      // Availability - format to frontend structure
+      // Availability 
       availability: Object.keys(profile.teachingOptions?.availability || {})
         .filter(day => profile.teachingOptions.availability[day]?.available)
         .map(day => ({
@@ -455,10 +455,10 @@ const getProfile = async (req, res) => {
       universityImage: profile.universityImage || '',
       
       user: {
-        fullName: profile.fullName,  // ✅ Lấy từ TutorProfile
+        fullName: profile.fullName, 
         email: user.email,
-        phone: profile.phone,         // ✅ Lấy từ TutorProfile
-        avatar: profile.avatar,       // ✅ Lấy từ TutorProfile
+        phone: profile.phone,        
+        avatar: profile.avatar,      
         approvalStatus: user.approvalStatus
       }
     };
@@ -469,10 +469,10 @@ const getProfile = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get tutor profile error:', error);
+    console.error('Lỗi khi tải hồ sơ:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get profile'
+      message: 'Lỗi khi tải hồ sơ'
     });
   }
 };
@@ -510,7 +510,7 @@ const updateProfile = async (req, res) => {
     if (!profile) {
       return res.status(404).json({
         success: false,
-        message: 'Profile not found'
+        message: 'Không tìm thấy hồ sơ'
       });
     }
 
@@ -564,10 +564,9 @@ const updateProfile = async (req, res) => {
       };
     }
 
-    // Update subjects - handle both formats from frontend
+    // Update subjects 
     if (subjects && subjects.length > 0) {
       profile.subjects = subjects.map(sub => {
-        // If sub already has 'subject' field (new format from frontend)
         if (sub.subject) {
           return {
             subject: sub.subject,
@@ -576,7 +575,6 @@ const updateProfile = async (req, res) => {
             experience: sub.experience || (yearsOfExperience ? parseInt(yearsOfExperience.split('-')[0]) : 0)
           };
         }
-        // If sub has 'name' field (old format from frontend)
         else if (sub.name) {
           return {
             subject: sub.name,
@@ -604,7 +602,7 @@ const updateProfile = async (req, res) => {
         'Dạy online': 'online'
       };
       
-      // Initialize teachingOptions if not exists
+      // khởi tạo teachingOptions nếu chưa có
       if (!profile.teachingOptions) {
         profile.teachingOptions = {};
       }
@@ -621,8 +619,8 @@ const updateProfile = async (req, res) => {
           timeSlots: slot.times.map(time => `${time.from}-${time.to}`)
         };
       });
-      
-      // Initialize teachingOptions if not exists
+
+      // khởi tạo teachingOptions nếu chưa có
       if (!profile.teachingOptions) {
         profile.teachingOptions = {};
       }
@@ -632,7 +630,7 @@ const updateProfile = async (req, res) => {
 
     await profile.save();
 
-    // Check if needs reapproval
+    // kiểm tra nếu có thay đổi quan trọng để đặt lại trạng thái phê duyệt
     const importantFields = ['education', 'certificates', 'subjects'];
     const hasImportantChanges = importantFields.some(field => req.body[field]);
     
@@ -641,13 +639,12 @@ const updateProfile = async (req, res) => {
       await user.save();
     }
 
-    // Format response to match frontend structure (same as getProfile)
     const formattedProfile = {
       _id: profile._id,
       userId: profile.userId,
       fullName: profile.fullName,
       phone: profile.phone,
-      avatar: profile.avatar,  // ✅ Thêm avatar vào root level
+      avatar: profile.avatar, 
       dateOfBirth: profile.dateOfBirth,
       gender: profile.gender,
       idCard: profile.idCard,
@@ -671,10 +668,10 @@ const updateProfile = async (req, res) => {
       yearsOfExperience: profile.teachingExperience?.totalYears ? 
         `${profile.teachingExperience.totalYears}-${profile.teachingExperience.totalYears + 1}` : '',
       
-      // Hourly Rate from first subject or default
+      // Hourly Rate
       hourlyRate: profile.subjects?.[0]?.hourlyRate || 0,
       
-      // Certificates - format to frontend structure
+      // Certificates 
       certifications: (profile.certificates || []).map(cert => ({
         name: cert.name,
         issuer: cert.organization,
@@ -682,7 +679,7 @@ const updateProfile = async (req, res) => {
         fileUrl: cert.certificateUrl || ''
       })),
       
-      // Experiences - format to frontend structure
+      // Experiences 
       experiences: (profile.teachingExperience?.previousJobs || []).map(exp => ({
         position: exp.position,
         organization: exp.organization,
@@ -691,7 +688,7 @@ const updateProfile = async (req, res) => {
         description: exp.description
       })),
       
-      // Subjects - format to frontend structure
+      // Subjects 
       subjects: (profile.subjects || []).map(sub => ({
         name: sub.subject,
         level: sub.level === 'elementary' ? 'Tiểu học' :
@@ -699,7 +696,7 @@ const updateProfile = async (req, res) => {
                sub.level === 'high_school' ? 'THPT' : 'Đại học'
       })),
       
-      // Teaching methods - format to frontend structure
+      // Teaching methods 
       teachingMethods: (profile.teachingOptions?.location || []).map(loc => {
         const map = {
           'student_home': 'Dạy tại nhà học sinh',
@@ -709,7 +706,7 @@ const updateProfile = async (req, res) => {
         return map[loc] || loc;
       }),
       
-      // Availability - format to frontend structure
+      // Availability 
       availability: Object.keys(profile.teachingOptions?.availability || {})
         .filter(day => profile.teachingOptions.availability[day]?.available)
         .map(day => ({
@@ -731,16 +728,16 @@ const updateProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Profile updated successfully',
+      message: 'Update profile thành công',
       data: formattedProfile,
       requiresReapproval: hasImportantChanges
     });
     
   } catch (error) {
-    console.error('Update tutor profile error:', error);
+    console.error('Lỗi khi cập nhật hồ sơ:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update profile',
+      message: 'Lỗi khi cập nhật hồ sơ',
       error: error.message
     });
   }
@@ -797,10 +794,10 @@ const getRequests = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get tutor requests error:', error);
+    console.error('Lỗi khi lấy yêu cầu gia sư:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get requests'
+      message: 'Lỗi khi lấy yêu cầu'
     });
   }
 };
@@ -819,21 +816,21 @@ const applyRequest = async (req, res) => {
     if (!request) {
       return res.status(404).json({
         success: false,
-        message: 'Request not found'
+        message: 'Không tìm thấy yêu cầu'
       });
     }
     
     if (request.status !== 'open') {
       return res.status(400).json({
         success: false,
-        message: 'Request is not open for applications'
+        message: 'Yêu cầu không mở để ứng tuyển'
       });
     }
     
     if (request.expiryDate < new Date()) {
       return res.status(400).json({
         success: false,
-        message: 'Request has expired'
+        message: 'Yêu cầu đã hết hạn'
       });
     }
     
@@ -846,12 +843,12 @@ const applyRequest = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      message: 'Application submitted successfully'
+      message: 'Ứng tuyển thành công'
     });
     
   } catch (error) {
-    console.error('Apply request error:', error);
-    
+    console.error('Lỗi khi ứng tuyển yêu cầu:', error);
+
     if (error.message.includes('đã ứng tuyển')) {
       return res.status(400).json({
         success: false,
@@ -861,7 +858,7 @@ const applyRequest = async (req, res) => {
     
     res.status(500).json({
       success: false,
-      message: 'Failed to apply for request'
+      message: 'Lỗi khi ứng tuyển yêu cầu'
     });
   }
 };
@@ -929,10 +926,10 @@ const getStudents = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get tutor students error:', error);
+    console.error('Lỗi khi lấy học sinh:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get students'
+      message: 'Lỗi khi lấy học sinh'
     });
   }
 };
@@ -948,7 +945,7 @@ const getIncome = async (req, res) => {
     const now = new Date();
     let startDate = new Date();
     
-    // Calculate start date based on period
+    // tính toán startDate dựa trên period
     switch (period) {
       case 'month':
         startDate.setMonth(now.getMonth() - 1);
@@ -1183,10 +1180,10 @@ const getIncome = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get tutor income error:', error);
+    console.error('Lỗi khi lấy dữ liệu thu nhập:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get income data',
+      message: 'Lỗi khi lấy dữ liệu thu nhập',
       error: error.message
     });
   }
@@ -1197,18 +1194,18 @@ const getIncome = async (req, res) => {
 // @access  Private (Tutor only)
 const uploadAvatar = async (req, res) => {
   try {
-    console.log('\n🔵 [Tutor Avatar Upload] Starting...');
-    console.log('📁 File received:', req.file ? 'Yes' : 'No');
+    console.log('\n [Tutor Avatar Upload] starting...');
+    console.log('Đã nhận file:', req.file ? 'Yes' : 'No');
     
     if (!req.file) {
-      console.log('❌ No file in request');
+      console.log('Không có file được tải lên');
       return res.status(400).json({
         success: false,
-        message: 'No file uploaded'
+        message: 'Không có file được tải lên'
       });
     }
 
-    console.log('📂 File details:', {
+    console.log('Chi tiết file:', {
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
       size: `${(req.file.size / 1024).toFixed(2)} KB`,
@@ -1222,91 +1219,91 @@ const uploadAvatar = async (req, res) => {
     // Import cloudinary upload utility
     const { uploadAvatar: uploadToCloudinary, deleteFromCloudinary, extractPublicId } = require('../utils/cloudinaryUpload');
 
-    // Find user and profile
+    // tìm user và profile
     const user = await User.findById(userId);
     const profile = await TutorProfile.findOne({ userId });
 
     if (!user || !profile) {
-      console.log('❌ User or profile not found');
+      console.log('❌ Không tìm thấy user hoặc profile');
       return res.status(404).json({
         success: false,
-        message: 'User or profile not found'
+        message: 'Không tìm thấy user hoặc profile'
       });
     }
 
-    console.log('✅ Profile found:', profile.fullName);
-    console.log('📸 Current avatar:', profile.avatar || 'None');
+    console.log('Profile:', profile.fullName);
+    console.log('Avatar:', profile.avatar || 'None');
 
-    // Delete old avatar from Cloudinary if exists
+    // xóa avatar cũ nếu là Cloudinary
     if (profile.avatar && profile.avatar.includes('cloudinary.com')) {
-      console.log('🗑️  Deleting old Cloudinary avatar...');
+      console.log('Đang xóa avatar cũ từ Cloudinary...');
       const oldPublicId = extractPublicId(profile.avatar);
       if (oldPublicId) {
         try {
           await deleteFromCloudinary(oldPublicId);
-          console.log('✅ Old avatar deleted:', oldPublicId);
+          console.log('Đã xóa avatar cũ:', oldPublicId);
         } catch (deleteError) {
-          console.warn('⚠️  Could not delete old avatar:', deleteError.message);
+          console.warn('Không thể xóa avatar cũ:', deleteError.message);
         }
       }
     }
 
-    console.log('☁️  Uploading to Cloudinary...');
-    console.log('📦 Buffer size:', req.file.buffer.length, 'bytes');
-    
+    console.log('Đang tải lên Cloudinary...');
+    console.log('Kích thước buffer:', req.file.buffer.length, 'bytes');
+
     // Upload new avatar to Cloudinary
     const uploadResult = await uploadToCloudinary(req.file.buffer, userId);
 
-    console.log('📤 Upload result:', JSON.stringify(uploadResult, null, 2));
+    console.log('Kết quả upload:', JSON.stringify(uploadResult, null, 2));
 
     if (!uploadResult.success) {
-      console.log('❌ Upload failed - success=false');
+      console.log('upload thất bại');
       return res.status(500).json({
         success: false,
-        message: 'Failed to upload avatar to cloud storage'
+        message: 'Không thể tải avatar lên cloud storage'
       });
     }
 
     if (!uploadResult.url) {
-      console.log('❌ Upload failed - no URL returned');
+      console.log('upload không trả về URL');
       return res.status(500).json({
         success: false,
-        message: 'Failed to get avatar URL from cloud storage'
+        message: 'Không thể lấy URL avatar từ cloud storage'
       });
     }
 
     if (!uploadResult.url.includes('cloudinary.com')) {
-      console.log('❌ Invalid URL - not Cloudinary:', uploadResult.url);
+      console.log('URL không hợp lệ:', uploadResult.url);
       return res.status(500).json({
         success: false,
-        message: 'Invalid cloud storage URL'
+        message: 'URL không hợp lệ'
       });
     }
 
-    console.log('✅ Upload successful!');
-    console.log('🔗 Cloudinary URL:', uploadResult.url);
+    console.log('Upload successful!');
+    console.log('Cloudinary URL:', uploadResult.url);
 
     // Update avatar URL in profile
     profile.avatar = uploadResult.url;
     await profile.save();
 
-    console.log('💾 Profile updated with new avatar');
-    console.log('✅ [Tutor Avatar Upload] Complete!\n');
+    console.log('Hồ sơ đã được cập nhật với avatar mới');
+    console.log('[Tutor Avatar Upload] Complete!\n');
 
     res.status(200).json({
       success: true,
-      message: 'Avatar uploaded successfully',
+      message: 'Avatar đã được tải lên thành công',
       data: {
         avatarUrl: uploadResult.url
       }
     });
 
   } catch (error) {
-    console.error('❌ [Tutor Avatar Upload] Error:', error.message);
+    console.error('[Tutor Avatar Upload] Error:', error.message);
     console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload avatar',
+      message: 'Không thể tải avatar lên',
       error: error.message
     });
   }
@@ -1317,18 +1314,18 @@ const uploadAvatar = async (req, res) => {
 // @access  Private (Tutor only)
 const uploadUniversityImage = async (req, res) => {
   try {
-    console.log('\n🏛️  [Upload University Image] Starting...');
+    console.log('\n[Upload University Image] Starting...');
     
     if (!req.file) {
-      console.log('❌ No file uploaded');
+      console.log('Không có file được tải lên');
       return res.status(400).json({
         success: false,
-        message: 'No file uploaded'
+        message: 'Không có file được tải lên'
       });
     }
 
-    console.log('📁 File received:', req.file.originalname);
-    console.log('📦 File size:', req.file.size, 'bytes');
+    console.log('File:', req.file.originalname);
+    console.log('Kích thước file:', req.file.size, 'bytes');
 
     const userId = req.user._id;
 
@@ -1344,21 +1341,20 @@ const uploadUniversityImage = async (req, res) => {
     // Import cloudinary upload utility
     const { uploadToCloudinary, deleteFromCloudinary, extractPublicId } = require('../utils/cloudinaryUpload');
 
-    // Delete old university image if exists
     if (profile.universityImage) {
       try {
         const publicId = extractPublicId(profile.universityImage);
         if (publicId) {
           await deleteFromCloudinary(publicId);
-          console.log('🗑️  Deleted old university image');
+          console.log('Xóa hình đại học cũ thành công:', publicId);
         }
       } catch (deleteError) {
-        console.error('Warning: Failed to delete old university image:', deleteError.message);
+        console.error('Lỗi khi xóa hình đại học cũ:', deleteError.message);
       }
     }
 
     // Upload to Cloudinary with university folder
-    console.log('☁️  Uploading to Cloudinary...');
+    console.log('Uploading to Cloudinary...');
     const uploadResult = await uploadToCloudinary(req.file.buffer, {
       folder: `${process.env.CLOUDINARY_FOLDER || 'tutormis'}/university/${userId}`,
       transformation: [
@@ -1367,29 +1363,29 @@ const uploadUniversityImage = async (req, res) => {
       ]
     });
 
-    console.log('✅ Upload successful:', uploadResult.secure_url);
+    console.log('Upload successful:', uploadResult.secure_url);
 
     // Update profile with new university image
     profile.universityImage = uploadResult.secure_url;
     await profile.save();
 
-    console.log('💾 Profile updated with university image');
-    console.log('✅ [Upload University Image] Complete!\n');
+    console.log('Hồ sơ đã được cập nhật với hình đại học mới');
+    console.log('[Upload University Image] Complete!\n');
 
     res.status(200).json({
       success: true,
-      message: 'University image uploaded successfully',
+      message: 'Hình đại học đã được tải lên thành công',
       data: {
         universityImageUrl: uploadResult.secure_url
       }
     });
 
   } catch (error) {
-    console.error('❌ [Upload University Image] Error:', error.message);
+    console.error('[Upload University Image] Error:', error.message);
     console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload university image',
+      message: 'Không thể tải hình đại học lên',
       error: error.message
     });
   }
@@ -1403,7 +1399,7 @@ const uploadCertificate = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'No file uploaded'
+        message: 'Không có file được tải lên'
       });
     }
 
@@ -1418,23 +1414,23 @@ const uploadCertificate = async (req, res) => {
     if (!uploadResult.success) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to upload certificate to cloud storage'
+        message: 'Không thể tải chứng chỉ lên cloud storage'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Certificate uploaded successfully',
+      message: 'Chứng chỉ đã được tải lên thành công',
       data: {
         certificateUrl: uploadResult.url
       }
     });
 
   } catch (error) {
-    console.error('Upload certificate error:', error);
+    console.error('Lỗi khi tải chứng chỉ lên:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload certificate',
+      message: 'Không thể tải chứng chỉ lên',
       error: error.message
     });
   }

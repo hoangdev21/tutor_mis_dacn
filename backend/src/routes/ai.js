@@ -4,7 +4,7 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// All AI routes require authentication
+// tất cả các route bên dưới đều cần xác thực token
 router.use(authenticateToken);
 
 // Chat with AI

@@ -53,7 +53,6 @@ const contactSubmissionSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for efficient querying
 contactSubmissionSchema.index({ status: 1, createdAt: -1 });
 contactSubmissionSchema.index({ email: 1 });
 contactSubmissionSchema.index({ createdAt: -1 });

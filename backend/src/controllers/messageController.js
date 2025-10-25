@@ -9,7 +9,7 @@ const getConversations = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Get all messages where user is sender or recipient
+    // get tất cả các cuộc trò chuyện của người dùng
     const messages = await Message.aggregate([
       {
         $match: {
@@ -115,10 +115,10 @@ const getConversations = async (req, res) => {
       data: messages
     });
   } catch (error) {
-    console.error('Get conversations error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to load conversations',
+      message: 'Không thể tải cuộc trò chuyện',
       error: error.message
     });
   }
@@ -135,21 +135,21 @@ const createConversation = async (req, res) => {
     if (!recipientId) {
       return res.status(400).json({
         success: false,
-        message: 'Recipient ID is required'
+        message: 'Cần thiết ID người nhận'
       });
     }
 
-    // Check if recipient exists
+    // kiểm tra nếu người nhận tồn tại
     const recipient = await User.findById(recipientId).select('name email avatar role');
     
     if (!recipient) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Người dùng không tồn tại'
       });
     }
 
-    // Check if conversation already exists
+    // kiểm tra nếu cuộc trò chuyện đã tồn tại
     const existingMessage = await Message.findOne({
       $or: [
         { sender: userId, recipient: recipientId },
@@ -167,7 +167,7 @@ const createConversation = async (req, res) => {
       });
     }
 
-    // Return recipient info for new conversation
+    // trả về thông tin người nhận nếu không có cuộc trò chuyện nào tồn tại
     res.json({
       success: true,
       data: {
@@ -176,10 +176,10 @@ const createConversation = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Create conversation error:', error);
+    console.error('Lỗi tạo cuộc trò chuyện:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create conversation',
+      message: 'Không thể tạo cuộc trò chuyện',
       error: error.message
     });
   }
@@ -197,7 +197,7 @@ const getMessages = async (req, res) => {
     let query = {};
 
     if (recipientId) {
-      // Get messages between two users
+      // get tin nhắn giữa hai người dùng
       query = {
         $or: [
           { senderId: userId, receiverId: recipientId },
@@ -207,7 +207,7 @@ const getMessages = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: 'Recipient ID is required'
+        message: 'Cần thiết ID người nhận'
       });
     }
 
@@ -215,9 +215,8 @@ const getMessages = async (req, res) => {
       .sort({ createdAt: 1 })
       .limit(parseInt(limit))
       .skip(parseInt(skip));
-    // Note: populate handled by pre-find hook in model
 
-    // Mark unread messages as read
+    // đánh dấu tất cả tin nhắn chưa đọc từ người gửi là đã đọc
     await Message.updateMany(
       {
         receiverId: userId,
@@ -230,7 +229,7 @@ const getMessages = async (req, res) => {
       }
     );
 
-    // Notify sender via socket if online
+    // gửi sự kiện qua Socket.IO để cập nhật trạng thái đã đọc
     const io = req.app.get('io');
     if (io) {
       io.to(`user:${recipientId}`).emit('messages_read', {
@@ -244,10 +243,10 @@ const getMessages = async (req, res) => {
       data: messages
     });
   } catch (error) {
-    console.error('Get messages error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to load messages',
+      message: 'Không thể tải tin nhắn',
       error: error.message
     });
   }
@@ -263,7 +262,7 @@ const uploadAttachment = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'No file uploaded'
+        message: 'Không có file nào được tải lên'
       });
     }
 
@@ -280,11 +279,11 @@ const uploadAttachment = async (req, res) => {
     if (!uploadResult.success) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to upload file'
+        message: 'Không thể tải lên file'
       });
     }
 
-    // Determine message type based on MIME type
+    // xác định loại tin nhắn dựa trên mimetype
     let messageType = 'file';
     if (mimetype.startsWith('image/')) {
       messageType = 'image';
@@ -294,7 +293,7 @@ const uploadAttachment = async (req, res) => {
       messageType = 'audio';
     }
 
-    // Return file information
+    // trả về thông tin file đã tải lên
     res.json({
       success: true,
       data: {
@@ -306,10 +305,10 @@ const uploadAttachment = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Upload attachment error:', error);
+    console.error('Lỗi tải lên tệp đính kèm:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload attachment',
+      message: 'Không thể tải lên tệp đính kèm',
       error: error.message
     });
   }
@@ -323,7 +322,7 @@ const sendMessage = async (req, res) => {
     const { recipientId, content, messageType, attachments } = req.body;
     const userId = req.user._id;
 
-    console.log('📨 Received message data:', {
+    console.log('📨 Dữ liệu tin nhắn:', {
       recipientId,
       content: content ? `"${content}"` : 'EMPTY',
       contentLength: content?.length || 0,
@@ -336,29 +335,29 @@ const sendMessage = async (req, res) => {
     if (!recipientId) {
       return res.status(400).json({
         success: false,
-        message: 'Recipient ID is required'
+        message: 'Cần thiết ID người nhận'
       });
     }
 
-    // Content is required unless there are attachments
+    // Nội dung là bắt buộc trừ khi có tệp đính kèm
     if (!content && (!attachments || attachments.length === 0)) {
-      console.log('❌ Validation failed: No content and no attachments');
+      console.log(' Thiếu nội dung tin nhắn và tệp đính kèm');
       return res.status(400).json({
         success: false,
-        message: 'Message content or attachment is required'
+        message: 'Nội dung tin nhắn hoặc tệp đính kèm là bắt buộc'
       });
     }
 
-    // Check if recipient exists
+    // kiểm tra nếu người nhận tồn tại
     const recipient = await User.findById(recipientId);
     if (!recipient) {
       return res.status(404).json({
         success: false,
-        message: 'Recipient not found'
+        message: 'Không tìm thấy người nhận'
       });
     }
 
-    // Prepare message data
+    // Tạo dữ liệu tin nhắn
     const messageData = {
       senderId: userId,
       receiverId: recipientId,
@@ -367,7 +366,7 @@ const sendMessage = async (req, res) => {
       isRead: false
     };
 
-    // Add attachments if provided
+    // Xử lý tệp đính kèm nếu có
     if (attachments && Array.isArray(attachments) && attachments.length > 0) {
       messageData.attachments = attachments.map(att => ({
         filename: att.fileName,
@@ -376,11 +375,11 @@ const sendMessage = async (req, res) => {
         size: att.fileSize,
         url: att.url
       }));
-      
-      console.log('📎 Attachments mapped:', messageData.attachments);
+
+      console.log('Tệp đính kèm:', messageData.attachments);
     }
 
-    console.log('💾 Creating message with data:', {
+    console.log(' Tạo tin nhắn với dữ liệu:', {
       senderId: messageData.senderId,
       receiverId: messageData.receiverId,
       content: messageData.content ? `"${messageData.content}"` : 'EMPTY',
@@ -391,14 +390,13 @@ const sendMessage = async (req, res) => {
 
     // Create message
     const message = await Message.create(messageData);
-    
-    console.log('✅ Message created successfully:', message._id);
 
-    // Message will be auto-populated by pre-find hook
-    // Reload to get populated data
+    console.log(' Tạo tin nhắn thành công:', message._id);
+
+    // tải lại tin nhắn với populated sender info
     const populatedMessage = await Message.findById(message._id);
 
-    // Send via Socket.IO (handled by socket handler)
+    // gửi sự kiện qua Socket.IO để thông báo người nhận
     const io = req.app.get('io');
     if (io && populatedMessage) {
       const senderProfile = populatedMessage.senderId.profile;
@@ -424,11 +422,11 @@ const sendMessage = async (req, res) => {
       data: populatedMessage || message
     });
   } catch (error) {
-    console.error('Send message error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Gửi tin nhắn lỗi:', error);
+    console.error('Lỗi:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Failed to send message',
+      message: 'Gửi tin nhắn thất bại',
       error: error.message,
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
@@ -459,11 +457,11 @@ const markAsRead = async (req, res) => {
     if (!message) {
       return res.status(404).json({
         success: false,
-        message: 'Message not found or already read'
+        message: 'Tin nhắn không tồn tại hoặc đã được đọc'
       });
     }
 
-    // Notify sender via Socket.IO
+    // Thông báo cho người gửi qua Socket.IO
     const io = req.app.get('io');
     if (io) {
       io.to(`user:${message.senderId}`).emit('message_read', {
@@ -478,10 +476,10 @@ const markAsRead = async (req, res) => {
       data: message
     });
   } catch (error) {
-    console.error('Mark as read error:', error);
+    console.error('Đánh dấu là đã đọc lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to mark message as read',
+      message: 'Đánh dấu là đã đọc thất bại',
       error: error.message
     });
   }
@@ -498,7 +496,7 @@ const searchUsers = async (req, res) => {
     if (!query) {
       return res.status(400).json({
         success: false,
-        message: 'Search query is required'
+        message: 'truy vấn tìm kiếm là bắt buộc'
       });
     }
 
@@ -517,10 +515,10 @@ const searchUsers = async (req, res) => {
       data: users
     });
   } catch (error) {
-    console.error('Search users error:', error);
+    console.error('Tìm kiếm người dùng lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to search users',
+      message: 'Tìm kiếm người dùng thất bại',
       error: error.message
     });
   }
@@ -537,7 +535,7 @@ const getUserStatus = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid user ID'
+        message: 'ID người dùng không hợp lệ'
       });
     }
 
@@ -547,7 +545,7 @@ const getUserStatus = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Người dùng không tồn tại'
       });
     }
 
@@ -566,10 +564,10 @@ const getUserStatus = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get user status error:', error);
+    console.error('Lấy trạng thái người dùng lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get user status',
+      message: 'Lấy trạng thái người dùng thất bại',
       error: error.message
     });
   }
@@ -585,7 +583,7 @@ const getUsersStatus = async (req, res) => {
     if (!Array.isArray(userIds) || userIds.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid user IDs array'
+        message: 'ID người dùng không hợp lệ'
       });
     }
 
@@ -595,18 +593,18 @@ const getUsersStatus = async (req, res) => {
     if (validUserIds.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No valid user IDs provided'
+        message: 'Không có ID người dùng hợp lệ nào được cung cấp'
       });
     }
 
-    // Get users' lastSeen from database
+    // get user lastSeen from database
     const users = await User.find({ _id: { $in: validUserIds } })
       .select('lastSeen name avatar');
 
     // Import isUserOnline from socketHandler
     const { isUserOnline } = require('../socket/socketHandler');
 
-    // Map users with their online status
+    // Map users với trạng thái trực tuyến của họ
     const usersStatus = users.map(user => ({
       userId: user._id,
       name: user.name,
@@ -620,10 +618,10 @@ const getUsersStatus = async (req, res) => {
       data: usersStatus
     });
   } catch (error) {
-    console.error('Get users status error:', error);
+    console.error('Lấy trạng thái người dùng lỗi:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get users status',
+      message: 'Lấy trạng thái người dùng thất bại',
       error: error.message
     });
   }
@@ -639,39 +637,39 @@ const downloadFileProxy = async (req, res) => {
     if (!url) {
       return res.status(400).json({
         success: false,
-        message: 'URL is required'
+        message: 'URL là bắt buộc'
       });
     }
 
-    console.log('📥 Proxying download for:', filename || 'file');
+    console.log('Tải xuống:', filename || 'file');
 
     // Import cloudinary
     const { cloudinary } = require('../config/cloudinary');
     const { extractPublicId } = require('../utils/cloudinaryUpload');
 
-    // Determine resource type from URL
+    // xác định loại tài nguyên từ URL
     let resourceType = 'raw';
-    let keepExtension = true; // Keep extension for raw files
+    let keepExtension = true; 
     
     if (url.includes('/image/')) {
       resourceType = 'image';
-      keepExtension = false; // Images don't need extension in public_id
+      keepExtension = false; 
     } else if (url.includes('/video/')) {
       resourceType = 'video';
-      keepExtension = false; // Videos don't need extension in public_id
+      keepExtension = false;
     }
 
-    // Extract public ID from URL (keep extension for raw files)
+    // trích xuất publicId từ URL
     const publicId = extractPublicId(url, keepExtension);
     
     if (!publicId) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid Cloudinary URL'
+        message: 'Cloudinary URL không hợp lệ'
       });
     }
 
-    console.log('📦 Fetching from Cloudinary:', { publicId, resourceType, keepExtension });
+    console.log('Lấy từ Cloudinary:', { publicId, resourceType, keepExtension });
 
     // Generate authenticated URL using Cloudinary SDK
     const cloudinaryUrl = cloudinary.url(publicId, {
@@ -691,14 +689,14 @@ const downloadFileProxy = async (req, res) => {
 
     protocol.get(cloudinaryUrl, (cloudinaryRes) => {
       if (cloudinaryRes.statusCode !== 200) {
-        console.error('❌ Cloudinary returned status:', cloudinaryRes.statusCode);
+        console.error('Cloudinary trả về trạng thái:', cloudinaryRes.statusCode);
         return res.status(cloudinaryRes.statusCode).json({
           success: false,
-          message: 'Failed to fetch file from Cloudinary'
+          message: 'Không thể lấy tệp từ Cloudinary'
         });
       }
 
-      // Set headers for download
+      // set tiêu đề tải về
       const contentType = cloudinaryRes.headers['content-type'] || 'application/octet-stream';
       const contentLength = cloudinaryRes.headers['content-length'];
       
@@ -712,22 +710,22 @@ const downloadFileProxy = async (req, res) => {
       // Stream file to client
       cloudinaryRes.pipe(res);
 
-      console.log('✅ Streaming file to client:', filename);
+      console.log('Truyền tệp đến khách hàng:', filename);
 
     }).on('error', (error) => {
-      console.error('❌ Error fetching from Cloudinary:', error);
+      console.error('Lỗi khi lấy từ Cloudinary:', error);
       res.status(500).json({
         success: false,
-        message: 'Error downloading file from Cloudinary',
+        message: 'Lỗi khi tải tệp từ Cloudinary',
         error: error.message
       });
     });
 
   } catch (error) {
-    console.error('❌ Error in download proxy:', error);
+    console.error('Lỗi trong tải xuống proxy:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error downloading file',
+      message: 'Lỗi máy chủ khi tải tệp',
       error: error.message
     });
   }

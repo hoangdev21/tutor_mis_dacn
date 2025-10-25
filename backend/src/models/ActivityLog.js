@@ -176,7 +176,6 @@ activityLogSchema.index({ status: 1, createdAt: -1 });
 activityLogSchema.index({ tags: 1 });
 activityLogSchema.index({ 'request.ip': 1 });
 
-// Virtual for time ago
 activityLogSchema.virtual('timeAgo').get(function() {
   const seconds = Math.floor((new Date() - this.createdAt) / 1000);
   

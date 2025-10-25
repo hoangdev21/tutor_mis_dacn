@@ -86,7 +86,6 @@ const userSchema = new mongoose.Schema({
   lockUntil: {
     type: Date
   },
-  // User preferences/settings
   preferences: {
     language: {
       type: String,
@@ -183,7 +182,6 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Virtual cho profile dựa trên role
 userSchema.virtual('profile', {
   ref: function() {
     if (this.role === 'student') return 'StudentProfile';

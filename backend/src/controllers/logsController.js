@@ -18,7 +18,7 @@ exports.getLogs = async (req, res) => {
       search
     } = req.query;
     
-    // Build filters
+    // xây dựng bộ lọc
     const filters = {};
     
     if (type) filters.type = type;
@@ -59,7 +59,7 @@ exports.getLogs = async (req, res) => {
     
     const total = await ActivityLog.countDocuments(countQuery);
     
-    // Mark logs as read
+    // đánh dấu logs đã đọc
     const logIds = logs.filter(log => !log.isRead).map(log => log._id);
     if (logIds.length > 0) {
       await ActivityLog.updateMany(
@@ -83,7 +83,7 @@ exports.getLogs = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get logs error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải logs',
@@ -109,7 +109,7 @@ exports.getLogById = async (req, res) => {
       });
     }
     
-    // Mark as read
+    // Đánh dấu là đã đọc
     if (!log.isRead) {
       log.isRead = true;
       await log.save();
@@ -121,7 +121,7 @@ exports.getLogById = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get log error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải log',
@@ -137,7 +137,7 @@ exports.getLogStatistics = async (req, res) => {
   try {
     const { period = 'week' } = req.query;
     
-    // Calculate date range
+    // tính toán khoảng thời gian
     const now = new Date();
     let startDate, endDate = now;
     
@@ -155,10 +155,10 @@ exports.getLogStatistics = async (req, res) => {
         startDate = new Date(now.setDate(now.getDate() - 7));
     }
     
-    // Get activity stats
+    // Get số liệu hoạt động
     const activityStats = await ActivityLog.getActivityStats(startDate, endDate);
     
-    // Get counts by severity
+    // Get số liệu mức độ nghiêm trọng
     const severityCounts = await ActivityLog.aggregate([
       {
         $match: {
@@ -173,16 +173,16 @@ exports.getLogStatistics = async (req, res) => {
       }
     ]);
     
-    // Get unresolved errors
+    // Get số liệu lỗi chưa giải quyết
     const unresolvedErrors = await ActivityLog.countDocuments({
       severity: { $in: ['error', 'critical'] },
       isResolved: false
     });
     
-    // Get activity by hour for today
+    // Get hoạt động theo giờ
     const activityByHour = await ActivityLog.getActivityByHour(new Date());
     
-    // Get top users by activity
+    // Get top 10 người dùng hoạt động nhiều nhất
     const topUsers = await ActivityLog.aggregate([
       {
         $match: {
@@ -215,7 +215,7 @@ exports.getLogStatistics = async (req, res) => {
       }
     ]);
     
-    // Calculate total activities
+    // tính tổng hoạt động
     const totalActivities = await ActivityLog.countDocuments({
       createdAt: { $gte: startDate, $lte: endDate }
     });
@@ -246,7 +246,7 @@ exports.getLogStatistics = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get log statistics error:', error);
+    console.error('Lỗi thống kê logs:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải thống kê logs',
@@ -268,7 +268,7 @@ exports.getUnresolvedErrors = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get unresolved errors error:', error);
+    console.error('Lỗi tải lỗi chưa giải quyết:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải lỗi chưa giải quyết',
@@ -295,7 +295,7 @@ exports.resolveLog = async (req, res) => {
     
     await log.resolve(req.user._id, note);
     
-    // Create new log for resolution
+    // tạo activity log cho hành động giải quyết
     await ActivityLog.logActivity({
       type: 'admin',
       action: 'resolve_log',
@@ -303,7 +303,7 @@ exports.resolveLog = async (req, res) => {
       userRole: req.user.role,
       resource: 'system',
       resourceId: log._id,
-      description: `Admin resolved log: ${log.action}`,
+      description: `Admin đã giải quyết log: ${log.action}`,
       severity: 'info',
       status: 'success',
       metadata: {
@@ -323,7 +323,7 @@ exports.resolveLog = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Resolve log error:', error);
+    console.error('Lỗi giải quyết log:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể giải quyết log',
@@ -345,7 +345,7 @@ exports.cleanupLogs = async (req, res) => {
       user: req.user._id,
       userRole: req.user.role,
       resource: 'system',
-      description: `Admin cleaned up ${result.deletedCount} old logs`,
+      description: `Admin đã xóa ${result.deletedCount} logs cũ`,
       severity: 'info',
       status: 'success',
       metadata: {
@@ -366,7 +366,7 @@ exports.cleanupLogs = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Cleanup logs error:', error);
+    console.error('Lỗi xóa logs:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể xóa logs',
@@ -426,7 +426,7 @@ exports.exportLogs = async (req, res) => {
       user: req.user._id,
       userRole: req.user.role,
       resource: 'system',
-      description: `Admin exported ${logs.length} logs`,
+      description: `Admin đã xuất ${logs.length} logs`,
       severity: 'info',
       status: 'success',
       metadata: {
@@ -485,7 +485,7 @@ exports.getUserActivityTimeline = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get user timeline error:', error);
+    console.error('Lỗi tải timeline người dùng:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải timeline',

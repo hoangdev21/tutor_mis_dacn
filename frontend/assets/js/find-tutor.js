@@ -212,7 +212,7 @@ function renderTutorCard(tutor) {
                     <i class="fas fa-eye"></i>
                     Xem Hồ Sơ
                 </button>
-                <button class="btn btn-primary" onclick="sendMessage('${tutor._id}')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <button class="btn btn-primary" onclick="sendMessage('${tutor._id}')" style="background: linear-gradient(135deg, #11d8a9ff 0%, #23a32bff 100%);">
                     <i class="fas fa-comment"></i>
                     Nhắn Tin
                 </button>

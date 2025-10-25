@@ -16,7 +16,6 @@
 const hybridChatbotService = require('../services/hybridChatbotService');
 const { TutorProfile, StudentProfile, Course, BookingRequest, BlogPost, User } = require('../models');
 
-// Get dynamic database context for training
 async function getDatabaseContext(userId, userRole) {
   try {
     const context = {
@@ -27,12 +26,11 @@ async function getDatabaseContext(userId, userRole) {
       userStats: {}
     };
 
-    // Get statistics
+    // get số liệu tổng quan
     context.totalTutors = await TutorProfile.countDocuments({ isApproved: true });
     context.totalStudents = await StudentProfile.countDocuments();
     context.totalCourses = await Course.countDocuments();
 
-    // Get user-specific data
     if (userRole === 'student') {
       const studentProfile = await StudentProfile.findOne({ user: userId });
       const bookings = await BookingRequest.find({ student: userId });
@@ -55,7 +53,6 @@ async function getDatabaseContext(userId, userRole) {
       };
     }
 
-    // Get recent blog posts for context
     const recentBlogs = await BlogPost.find({ status: 'approved' })
       .sort({ createdAt: -1 })
       .limit(5)
@@ -98,13 +95,12 @@ const chat = async (req, res) => {
       });
     }
 
-    console.log('[Hybrid AI] New query:', { 
+    console.log('query mới:', { 
       userId, 
       userRole, 
       message: message.substring(0, 100) 
     });
 
-    // 🚀 Use Hybrid AI System (Gemini + Pattern Matching)
     const chatResult = await hybridChatbotService.chat(message, userId, userRole);
 
     if (!chatResult.success) {
@@ -115,8 +111,7 @@ const chat = async (req, res) => {
       });
     }
 
-    // Log for analytics
-    console.log('[Hybrid AI Response]', {
+    console.log('Phản hồi ', {
       userId,
       userRole,
       queryLength: message.length,
@@ -126,7 +121,6 @@ const chat = async (req, res) => {
       timestamp: new Date()
     });
 
-    // Return hybrid AI response
     res.json({
       success: true,
       response: chatResult.response,
@@ -134,7 +128,7 @@ const chat = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in Hybrid AI:', error);
+    console.error('Lỗi trong Hybrid AI:', error);
     res.status(500).json({
       success: false,
       message: 'Có lỗi xảy ra khi xử lý câu hỏi',
@@ -143,13 +137,10 @@ const chat = async (req, res) => {
   }
 };
 
-/**
- * Fallback responses for common questions (không còn cần thiết nhưng giữ lại cho bảo hiểm)
- */
 function getFallbackResponse(message, userRole) {
   const lowerMessage = message.toLowerCase();
 
-  // Find tutor
+  // tìm gia sư
   if (lowerMessage.includes('tìm gia sư') || lowerMessage.includes('tìm kiếm')) {
     return `Để tìm gia sư phù hợp, bạn có thể:
 
@@ -165,7 +156,7 @@ function getFallbackResponse(message, userRole) {
 Gia sư sẽ nhận được yêu cầu và phản hồi trong vòng 24-48 giờ.`;
   }
 
-  // Booking process
+  // quy trình đặt lịch
   if (lowerMessage.includes('đặt lịch') || lowerMessage.includes('booking')) {
     return `Quy trình đặt lịch học:
 
@@ -184,7 +175,7 @@ Gia sư sẽ nhận được yêu cầu và phản hồi trong vòng 24-48 giờ
 Bạn có thể theo dõi trạng thái yêu cầu trong mục "Yêu Cầu Gia Sư".`;
   }
 
-  // Payment
+  // thanh toán
   if (lowerMessage.includes('thanh toán') || lowerMessage.includes('payment')) {
     return `TutorMis hỗ trợ các phương thức thanh toán:
 
@@ -205,7 +196,7 @@ Bạn có thể theo dõi trạng thái yêu cầu trong mục "Yêu Cầu Gia S
 - Thanh toán linh hoạt theo thỏa thuận với gia sư`;
   }
 
-  // Cancel booking
+  // Hủy lịch học
   if (lowerMessage.includes('hủy') || lowerMessage.includes('cancel')) {
     return `Để hủy lịch học:
 
@@ -223,7 +214,7 @@ Bạn có thể theo dõi trạng thái yêu cầu trong mục "Yêu Cầu Gia S
 Lưu ý: Hãy thông báo cho gia sư để đảm bảo quyền lợi cho cả hai bên.`;
   }
 
-  // For tutors
+  // gia sư
   if (userRole === 'tutor') {
     if (lowerMessage.includes('thu nhập') || lowerMessage.includes('income')) {
       return `Theo dõi thu nhập của bạn:
@@ -258,7 +249,7 @@ Lưu ý: Hãy thông báo cho gia sư để đảm bảo quyền lợi cho cả 
     }
   }
 
-  // Default response
+  // chào hỏi chung
   return `Xin chào! Tôi là trợ lý AI của TutorMis. 
 
 Tôi có thể giúp bạn:

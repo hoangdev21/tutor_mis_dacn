@@ -11,8 +11,8 @@ const swaggerOptions = {
       description: 'API documentation cho hệ thống gia sư TutorMis - Nền tảng kết nối gia sư và học sinh',
       contact: {
         name: 'TutorMis Team',
-        email: 'support@tutornis.com',
-        url: 'https://tutornis.com'
+        email: 'hoangdev21@gmail.com',
+        url: 'https://tutoris.com'
       },
       license: {
         name: 'MIT',
@@ -35,7 +35,7 @@ const swaggerOptions = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'JWT token for authentication'
+          description: 'JWT token cho xác thực'
         }
       },
       schemas: {
@@ -59,16 +59,16 @@ const swaggerOptions = {
             },
             isEmailVerified: {
               type: 'boolean',
-              description: 'Email verification status'
+              description: 'Trạng thái xác thực email'
             },
             isActive: {
               type: 'boolean',
-              description: 'Account active status'
+              description: 'Trạng thái hoạt động của tài khoản'
             },
             approvalStatus: {
               type: 'string',
               enum: ['pending', 'approved', 'rejected'],
-              description: 'Approval status for tutors'
+              description: 'Trạng thái phê duyệt cho gia sư'
             },
             createdAt: {
               type: 'string',
@@ -92,7 +92,7 @@ const swaggerOptions = {
             password: {
               type: 'string',
               minLength: 6,
-              description: 'Password (min 6 characters, must contain uppercase, lowercase, and number)'
+              description: 'Password (tối thiểu 6 ký tự)'
             },
             role: {
               type: 'string',
@@ -108,7 +108,7 @@ const swaggerOptions = {
             phone: {
               type: 'string',
               pattern: '^[0-9]{10,11}$',
-              description: 'Phone number (10-11 digits)'
+              description: 'Phone number (10-11 chữ số)'
             }
           }
         },
@@ -325,11 +325,11 @@ const swaggerOptions = {
                 properties: {
                   field: {
                     type: 'string',
-                    description: 'Field name with error'
+                    description: 'Tên trường lỗi'
                   },
                   message: {
                     type: 'string',
-                    description: 'Error message for the field'
+                    description: 'Thông báo lỗi cho trường'
                   }
                 }
               }
@@ -341,19 +341,19 @@ const swaggerOptions = {
     tags: [
       {
         name: 'Authentication',
-        description: 'API endpoints for user authentication and authorization'
+        description: 'API endpoints cho user đăng ký, đăng nhập và quản lý xác thực'
       },
       {
         name: 'Student',
-        description: 'API endpoints for student operations'
+        description: 'API endpoints cho học sinh'
       },
       {
         name: 'Tutor',
-        description: 'API endpoints for tutor operations'
+        description: 'API endpoints cho gia sư'
       },
       {
         name: 'Admin',
-        description: 'API endpoints for admin operations'
+        description: 'API endpoints cho quản trị viên'
       }
     ]
   },

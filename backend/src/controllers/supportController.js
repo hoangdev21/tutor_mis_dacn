@@ -26,7 +26,7 @@ const createTicket = async (req, res) => {
             fileType: file.mimetype
           });
         } catch (error) {
-          console.error('Error uploading file:', error);
+          console.error('Lỗi upload file:', error);
         }
       }
     }
@@ -49,7 +49,7 @@ const createTicket = async (req, res) => {
       data: ticket
     });
   } catch (error) {
-    console.error('Error creating support ticket:', error);
+    console.error('Lỗi khi tạo yêu cầu hỗ trợ:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tạo yêu cầu hỗ trợ'
@@ -80,7 +80,7 @@ const getMyTickets = async (req, res) => {
       data: tickets
     });
   } catch (error) {
-    console.error('Error fetching tickets:', error);
+    console.error('Lỗi khi tải danh sách yêu cầu:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tải danh sách yêu cầu'
@@ -117,7 +117,7 @@ const getTicketById = async (req, res) => {
       data: ticket
     });
   } catch (error) {
-    console.error('Error fetching ticket:', error);
+    console.error('Lỗi khi tải thông tin yêu cầu:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tải thông tin yêu cầu'
@@ -149,7 +149,7 @@ const getAllTickets = async (req, res) => {
       .populate('user', 'email role')
       .populate('assignedTo', 'email');
 
-    // Get user profiles for each ticket
+    // Get user profiles cho each ticket
     const { StudentProfile, TutorProfile } = require('../models');
     
     const ticketsWithProfiles = await Promise.all(tickets.map(async (ticket) => {
@@ -191,7 +191,7 @@ const getAllTickets = async (req, res) => {
       stats: stats
     });
   } catch (error) {
-    console.error('Error fetching all tickets:', error);
+    console.error('Lỗi khi tải tất cả yêu cầu:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tải danh sách yêu cầu'
@@ -244,7 +244,7 @@ const updateTicket = async (req, res) => {
       data: ticket
     });
   } catch (error) {
-    console.error('Error updating ticket:', error);
+    console.error('Lỗi khi cập nhật yêu cầu:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi cập nhật yêu cầu'
@@ -273,7 +273,7 @@ const deleteTicket = async (req, res) => {
       message: 'Xóa yêu cầu thành công'
     });
   } catch (error) {
-    console.error('Error deleting ticket:', error);
+    console.error('Lỗi khi xóa yêu cầu:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa yêu cầu'
@@ -323,7 +323,7 @@ const getTicketStats = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching ticket stats:', error);
+    console.error('Lỗi khi tải thống kê yêu cầu:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tải thống kê'

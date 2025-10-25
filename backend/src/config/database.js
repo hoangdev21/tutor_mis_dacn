@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-// Load environment variables
+// Tải biến môi trường từ file .env
 dotenv.config();
 
 const connectDB = async () => {
@@ -49,12 +49,11 @@ const createIndexes = async () => {
     await db.collection('messages').createIndex({ courseId: 1 });
     
     // BlogPost indexes
-    // Note: slug index removed - not used in current schema
     await db.collection('blogposts').createIndex({ category: 1 });
     
-    console.log('✅ Database indexes created successfully');
+    console.log('✅ Chỉ mục MongoDB đã được tạo thành công');
   } catch (error) {
-    console.error('❌ Index creation error:', error.message);
+    console.error('❌ Lỗi khi tạo chỉ mục:', error.message);
   }
 };
 

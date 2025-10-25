@@ -645,6 +645,19 @@
   transition: all 0.3s ease;
 }
 
+.empty-state .btn.btn-sm {
+  padding: 10px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  gap: 8px;
+}
+
+.empty-state .btn.btn-sm i {
+  font-size: 14px;
+  padding-top: 5px;
+}
+
 .empty-state .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;

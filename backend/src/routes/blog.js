@@ -17,7 +17,7 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
 const multer = require('multer');
 
-// Configure multer for multiple image uploads
+// cấu hình multer để upload nhiều ảnh
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
@@ -40,7 +40,7 @@ const router = express.Router();
 router.get('/posts', getAllPosts); // Public feed
 router.get('/posts/:id', getPost); // Single post
 
-// Protected routes (require authentication)
+// bảo vệ các route bên dưới bằng xác thực token
 router.use(authenticateToken);
 router.use(apiLimiter);
 

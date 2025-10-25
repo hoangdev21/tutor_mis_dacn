@@ -38,7 +38,7 @@
 
 
 .dashboard-sidebar.collapsed {
-  width: 80px;
+  width: 84px;
 }
 
 .dashboard-sidebar.collapsed:hover {
@@ -50,28 +50,28 @@
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   border-bottom: 1px solid #e4e6eb;
   position: relative;
   transition: all 0.3s ease;
 }
 
 .dashboard-sidebar.collapsed .sidebar-header {
-  justify-content: center;
   padding: 25px 10px;
 }
+
+
 
 .sidebar-brand {
   display: flex;
   align-items: center;
-  padding-left: 12px;
+  padding-left: 2px;
   font-size: 24px;
   font-weight: 700;
   color: var(--primary-color);
   white-space: nowrap;
   position: relative;
-  width: 100%;
-  justify-content: flex-start;
+  flex-shrink: 0;
 }
 
 
@@ -116,7 +116,6 @@
   width: 24px;
   height: 18px;
   cursor: pointer;
-  margin-left: 12px;
   transition: all 0.3s ease;
 }
 
@@ -128,39 +127,30 @@
   transition: all 0.3s ease;
 }
 
-.dashboard-sidebar.collapsed .hamburger-icon {
-  margin-left: 12px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.dashboard-sidebar.collapsed:hover .hamburger-icon {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 .dashboard-sidebar.collapsed .hamburger-icon span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
+  transform: translateX(-8px) rotate(0deg);
 }
 
 .dashboard-sidebar.collapsed .hamburger-icon span:nth-child(2) {
-  opacity: 0;
+  transform: translateX(-4px) rotate(0deg);
+  width: 12px;
 }
 
 .dashboard-sidebar.collapsed .hamburger-icon span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
+  transform: translateX(-8px) rotate(0deg);
 }
 
 .dashboard-sidebar.collapsed:hover .hamburger-icon span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
+  transform: translateX(-8px) rotate(0deg);
 }
 
 .dashboard-sidebar.collapsed:hover .hamburger-icon span:nth-child(2) {
-  opacity: 0;
+  transform: translateX(-4px) rotate(0deg);
+  width: 12px;
 }
 
 .dashboard-sidebar.collapsed:hover .hamburger-icon span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
+  transform: translateX(-8px) rotate(0deg);
 }
 
 .sidebar-menu {

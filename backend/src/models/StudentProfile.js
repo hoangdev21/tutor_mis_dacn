@@ -122,7 +122,6 @@ const studentProfileSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Populate user khi query
 studentProfileSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'userId',

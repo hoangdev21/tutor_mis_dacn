@@ -41,7 +41,7 @@ exports.createBookingRequest = async (req, res) => {
       studentNote
     } = req.body;
 
-    // Validate tutor exists and is approved
+    // xác thực gia sư
     const tutor = await User.findById(tutorId);
     if (!tutor || tutor.role !== 'tutor') {
       return res.status(404).json({
@@ -57,13 +57,13 @@ exports.createBookingRequest = async (req, res) => {
       });
     }
 
-    // Get tutor profile to fetch actual hourly rate
+    // Lấy hồ sơ gia sư -> lấy mức giá theo giờ thực tế
     const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
-    
-    // Determine hourly rate - Priority: 1. Subject-specific, 2. General, 3. Provided in request
+
+    // Xác định mức giá theo giờ - Ưu tiên: 1. Theo môn học, 2. Chung, 3. Cung cấp trong yêu cầu
     let hourlyRate = 0;
-    
-    // Try subject-specific rate first
+
+    // Thử mức giá theo môn học trước
     if (tutorProfile && tutorProfile.subjects && tutorProfile.subjects.length > 0) {
       const matchingSubject = tutorProfile.subjects.find(s => s.subject === subject.name);
       if (matchingSubject && matchingSubject.hourlyRate > 0) {
@@ -71,21 +71,21 @@ exports.createBookingRequest = async (req, res) => {
       }
     }
     
-    // Fallback to general tutor rate - calculate from all subjects
+    // Dự phòng mức giá chung - tính từ tất cả các môn học
     if (hourlyRate === 0 && tutorProfile?.subjects && tutorProfile.subjects.length > 0) {
       const rates = tutorProfile.subjects.map(s => s.hourlyRate).filter(r => r > 0);
       if (rates.length > 0) {
         hourlyRate = Math.round(rates.reduce((sum, r) => sum + r, 0) / rates.length);
-        console.log('📌 Using average rate from subjects:', hourlyRate);
+        console.log('📌 Sử dụng mức giá trung bình từ các môn học:', hourlyRate);
       }
     }
     
-    // Last resort: use provided rate in request
+    // sử dụng mức giá từ yêu cầu đặt lịch
     if (hourlyRate === 0 && pricing?.hourlyRate > 0) {
       hourlyRate = pricing.hourlyRate;
     }
 
-    // Validate schedule start date is in the future
+    // Xác thực ngày bắt đầu lịch trình phải ở tương lai
     const startDate = new Date(schedule.startDate);
     if (startDate < new Date()) {
       return res.status(400).json({
@@ -94,7 +94,7 @@ exports.createBookingRequest = async (req, res) => {
       });
     }
 
-    // Create booking request
+    // tạo yêu cầu đặt lịch
     const bookingRequest = new BookingRequest({
       student: studentId,
       tutor: tutorId,
@@ -125,7 +125,7 @@ exports.createBookingRequest = async (req, res) => {
 
     await bookingRequest.save();
 
-    // Populate tutor and student info for response and email
+    // điền thông tin chi tiết gia sư và học sinh
     await bookingRequest.populate([
       {
         path: 'tutor',
@@ -145,7 +145,7 @@ exports.createBookingRequest = async (req, res) => {
       }
     ]);
 
-    // Send email notification to tutor
+    // Gửi thông báo qua email cho gia sư
     try {
       const tutorEmail = bookingRequest.tutor.email;
       const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
@@ -154,34 +154,34 @@ exports.createBookingRequest = async (req, res) => {
       const studentProfile = await StudentProfile.findOne({ user: studentId });
       const studentName = studentProfile?.fullName || bookingRequest.student.email;
 
-      // IMPORTANT: Get actual hourly rate from tutor profile
-      // Priority: 1. Subject-specific rate, 2. General rate, 3. Booking request rate
+      // QUAN TRỌNG: Lấy mức giá theo giờ thực tế từ hồ sơ gia sư
+      // Ưu tiên: 1. Mức giá theo môn học, 2. Mức giá chung, 3. Mức giá trong yêu cầu đặt lịch
       let actualHourlyRate = 0;
-      
-      // Try to find subject-specific rate first
+
+      // Thử tìm mức giá theo môn học trước
       if (tutorProfile && tutorProfile.subjects && tutorProfile.subjects.length > 0) {
         const matchingSubject = tutorProfile.subjects.find(s => 
           s.subject === bookingRequest.subject.name
         );
         if (matchingSubject && matchingSubject.hourlyRate > 0) {
           actualHourlyRate = matchingSubject.hourlyRate;
-          console.log('📌 Using subject-specific rate:', actualHourlyRate, 'for', bookingRequest.subject.name);
+          console.log('📌 Sử dụng mức giá theo môn học:', actualHourlyRate, 'cho', bookingRequest.subject.name);
         }
       }
-      
-      // Fallback to general rate - calculate from all subjects
+
+      // Dự phòng mức giá chung - tính từ tất cả các môn học
       if (actualHourlyRate === 0 && tutorProfile?.subjects && tutorProfile.subjects.length > 0) {
         const rates = tutorProfile.subjects.map(s => s.hourlyRate).filter(r => r > 0);
         if (rates.length > 0) {
           actualHourlyRate = Math.round(rates.reduce((sum, r) => sum + r, 0) / rates.length);
-          console.log('📌 Using average rate from subjects:', actualHourlyRate);
+          console.log('📌 Sử dụng mức giá trung bình từ các môn học:', actualHourlyRate);
         }
       }
-      
-      // Last resort: use booking request rate
+
+      // Dự phòng cuối cùng: sử dụng mức giá từ yêu cầu đặt lịch
       if (actualHourlyRate === 0) {
         actualHourlyRate = bookingRequest.pricing.hourlyRate || 0;
-        console.log('⚠️ Using booking request rate:', actualHourlyRate, '(no tutor profile rate found)');
+        console.log('⚠️ Sử dụng mức giá từ yêu cầu đặt lịch:', actualHourlyRate, '(không tìm thấy mức giá từ hồ sơ gia sư)');
       }
 
       const emailTemplate = newBookingNotificationTemplate(tutorName, studentName, {
@@ -189,27 +189,26 @@ exports.createBookingRequest = async (req, res) => {
         schedule: bookingRequest.schedule,
         location: bookingRequest.location,
         pricing: {
-          hourlyRate: actualHourlyRate  // Use actual rate from tutor profile
+          hourlyRate: actualHourlyRate  // mức giá theo giờ thực tế
         },
         description: bookingRequest.description,
         studentNote: bookingRequest.studentNote
       });
 
       await sendEmail(tutorEmail, emailTemplate);
-      console.log('✅ Booking notification email sent to tutor:', tutorEmail);
-      console.log('📊 Email pricing - Hourly rate:', actualHourlyRate, 'VND/hour (from tutor profile)');
+      console.log('✅ Gửi thông báo qua email cho gia sư:', tutorEmail);
+      console.log('📊 Email pricing - Mức giá theo giờ:', actualHourlyRate, 'VND/giờ (từ hồ sơ gia sư)');
     } catch (emailError) {
-      console.error('❌ Failed to send booking notification email:', emailError);
-      // Don't fail the request if email fails
+      console.error('❌ Gửi thông báo qua email thất bại:', emailError);
     }
 
-    // Create notification for tutor
+    // Tạo thông báo cho gia sư
     try {
       const studentProfile = await StudentProfile.findOne({ user: studentId });
       const studentName = studentProfile?.fullName || bookingRequest.student.email;
       await notifyBookingRequest(bookingRequest, tutorId, studentName);
     } catch (notifError) {
-      console.error('❌ Failed to create notification:', notifError);
+      console.error('❌ Tạo thông báo thất bại:', notifError);
     }
 
     res.status(201).json({
@@ -219,7 +218,7 @@ exports.createBookingRequest = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Create booking error:', error);
+    console.error('lỗi tạo yêu cầu đặt lịch:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tạo yêu cầu đặt lịch',
@@ -275,7 +274,7 @@ exports.getMyBookings = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get bookings error:', error);
+    console.error('lỗi lấy danh sách đặt lịch:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy danh sách đặt lịch',
@@ -317,7 +316,7 @@ exports.getBookingById = async (req, res) => {
       });
     }
 
-    // Check if user is student or tutor of this booking
+    // kiểm tra có phải là học sinh hoặc gia sư liên quan không
     if (booking.student._id.toString() !== userId && 
         booking.tutor._id.toString() !== userId) {
       return res.status(403).json({
@@ -332,7 +331,7 @@ exports.getBookingById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get booking error:', error);
+    console.error('lỗi lấy thông tin đặt lịch:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin đặt lịch',
@@ -359,7 +358,7 @@ exports.acceptBooking = async (req, res) => {
       });
     }
 
-    // Check if user is the tutor
+    // kiểm tra nếu là gia sư
     if (booking.tutor.toString() !== tutorId) {
       return res.status(403).json({
         success: false,
@@ -367,7 +366,7 @@ exports.acceptBooking = async (req, res) => {
       });
     }
 
-    // Check if booking is still pending
+    // kiểm tra trạng thái yêu cầu còn đang chờ xử lý
     if (booking.status !== 'pending') {
       return res.status(400).json({
         success: false,
@@ -377,7 +376,7 @@ exports.acceptBooking = async (req, res) => {
 
     await booking.accept(message || 'Gia sư đã chấp nhận yêu cầu của bạn');
     
-    // Populate student and tutor info
+    // điền thông tin chi tiết học sinh và gia sư
     await booking.populate([
       {
         path: 'student',
@@ -397,7 +396,7 @@ exports.acceptBooking = async (req, res) => {
       }
     ]);
 
-    // Send email notification to student
+    // Gửi thông báo qua email cho học sinh
     try {
       const studentEmail = booking.student.email;
       const studentProfile = await StudentProfile.findOne({ user: booking.student._id });
@@ -406,7 +405,7 @@ exports.acceptBooking = async (req, res) => {
       const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
       const tutorName = tutorProfile?.fullName || booking.tutor.email;
       
-      // Get actual hourly rate - Priority: Subject-specific, General, Booking rate
+      // lấy mức giá theo giờ thực tế từ hồ sơ gia sư
       let actualHourlyRate = 0;
       if (tutorProfile && tutorProfile.subjects && tutorProfile.subjects.length > 0) {
         const matchingSubject = tutorProfile.subjects.find(s => s.subject === booking.subject.name);
@@ -439,20 +438,19 @@ exports.acceptBooking = async (req, res) => {
       );
 
       await sendEmail(studentEmail, emailTemplate);
-      console.log('✅ Booking accepted notification sent to student:', studentEmail);
-      console.log('📊 Acceptance email - Tutor:', tutorName, '| Student:', studentName, '| Rate:', actualHourlyRate, 'VND/hour');
+      console.log('✅ Gửi thông báo chấp nhận yêu cầu đặt lịch cho học sinh:', studentEmail);
+      console.log('📊 Thông tin email chấp nhận - Gia sư:', tutorName, '| Học sinh:', studentName, '| Mức giá:', actualHourlyRate, 'VND/giờ');
     } catch (emailError) {
-      console.error('❌ Failed to send acceptance email:', emailError);
-      // Don't fail the request if email fails
+      console.error('❌ Gửi email chấp nhận thất bại:', emailError);
     }
 
-    // Create notification for student
+    // Tạo thông báo cho học sinh
     try {
       const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
       const tutorName = tutorProfile?.fullName || booking.tutor.email;
       await notifyBookingAccepted(booking, booking.student._id, tutorName);
     } catch (notifError) {
-      console.error('❌ Failed to create notification:', notifError);
+      console.error('❌ Tạo thông báo thất bại:', notifError);
     }
 
     res.json({
@@ -489,7 +487,7 @@ exports.rejectBooking = async (req, res) => {
       });
     }
 
-    // Check if user is the tutor
+    // kiểm tra nếu là gia sư
     if (booking.tutor.toString() !== tutorId) {
       return res.status(403).json({
         success: false,
@@ -497,7 +495,7 @@ exports.rejectBooking = async (req, res) => {
       });
     }
 
-    // Check if booking is still pending
+    // kiểm tra trạng thái yêu cầu còn đang chờ xử lý
     if (booking.status !== 'pending') {
       return res.status(400).json({
         success: false,
@@ -506,8 +504,8 @@ exports.rejectBooking = async (req, res) => {
     }
 
     await booking.reject(message || 'Gia sư đã từ chối yêu cầu của bạn');
-    
-    // Populate student and tutor info
+
+    // điền thông tin chi tiết học sinh và gia sư
     await booking.populate([
       {
         path: 'student',
@@ -527,7 +525,7 @@ exports.rejectBooking = async (req, res) => {
       }
     ]);
 
-    // Send email notification to student
+    // Gửi thông báo qua email cho học sinh
     try {
       const studentEmail = booking.student.email;
       const studentProfile = await StudentProfile.findOne({ user: booking.student._id });
@@ -548,20 +546,19 @@ exports.rejectBooking = async (req, res) => {
       );
 
       await sendEmail(studentEmail, emailTemplate);
-      console.log('✅ Booking rejected notification sent to student:', studentEmail);
-      console.log('📊 Rejection email - Tutor:', tutorName, '| Student:', studentName, '| Reason:', message || 'No reason provided');
+      console.log('✅ Gửi thông báo từ chối yêu cầu đặt lịch cho học sinh:', studentEmail);
+      console.log('📊 Thông tin email từ chối - Gia sư:', tutorName, '| Học sinh:', studentName, '| Lý do:', message || 'Không có lý do');
     } catch (emailError) {
-      console.error('❌ Failed to send rejection email:', emailError);
-      // Don't fail the request if email fails
+      console.error('❌ Gửi email từ chối thất bại:', emailError);
     }
 
-    // Create notification for student
+    // Tạo thông báo cho học sinh
     try {
       const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
       const tutorName = tutorProfile?.fullName || booking.tutor.email;
       await notifyBookingRejected(booking, booking.student._id, tutorName);
     } catch (notifError) {
-      console.error('❌ Failed to create notification:', notifError);
+      console.error('❌ Tạo thông báo thất bại:', notifError);
     }
 
     res.json({
@@ -598,7 +595,7 @@ exports.cancelBooking = async (req, res) => {
       });
     }
 
-    // Check if user is student or tutor
+    // kiểm tra có phải là học sinh hoặc gia sư liên quan không
     if (booking.student.toString() !== userId && 
         booking.tutor.toString() !== userId) {
       return res.status(403).json({
@@ -607,7 +604,7 @@ exports.cancelBooking = async (req, res) => {
       });
     }
 
-    // Check if booking can be cancelled
+    // kiểm tra yêu cầu có thể bị hủy không
     if (booking.status === 'cancelled' || booking.status === 'completed') {
       return res.status(400).json({
         success: false,
@@ -653,7 +650,7 @@ exports.completeBooking = async (req, res) => {
       });
     }
 
-    // Check if user is the tutor
+    // kiểm tra nếu là gia sư
     if (booking.tutor.toString() !== tutorId) {
       return res.status(403).json({
         success: false,
@@ -661,7 +658,7 @@ exports.completeBooking = async (req, res) => {
       });
     }
 
-    // Check if booking is accepted
+    // kiểm tra nếu yêu cầu đã được chấp nhận
     if (booking.status !== 'accepted') {
       return res.status(400).json({
         success: false,
@@ -679,7 +676,7 @@ exports.completeBooking = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Complete booking error:', error);
+    console.error('Lỗi khi hoàn thành lịch học:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi hoàn thành lịch học',
@@ -706,7 +703,6 @@ exports.rateBooking = async (req, res) => {
       });
     }
 
-    // Check if user is the student
     if (booking.student.toString() !== studentId) {
       return res.status(403).json({
         success: false,
@@ -714,7 +710,7 @@ exports.rateBooking = async (req, res) => {
       });
     }
 
-    // Check if booking is completed
+    // kiểm tra nếu lịch học đã hoàn thành
     if (booking.status !== 'completed') {
       return res.status(400).json({
         success: false,
@@ -722,7 +718,7 @@ exports.rateBooking = async (req, res) => {
       });
     }
 
-    // Check if already rated
+    // kiểm tra nếu đã đánh giá
     if (booking.rating && booking.rating.score) {
       return res.status(400).json({
         success: false,
@@ -730,7 +726,7 @@ exports.rateBooking = async (req, res) => {
       });
     }
 
-    // Validate score
+    // xác thực điểm đánh giá
     if (!score || score < 1 || score > 5) {
       return res.status(400).json({
         success: false,
@@ -740,7 +736,7 @@ exports.rateBooking = async (req, res) => {
 
     await booking.addRating(score, comment || '');
     
-    // Update tutor profile rating
+    // cập nhật đánh giá trung bình của gia sư
     const tutorProfile = await TutorProfile.findOne({ userId: booking.tutor });
     if (tutorProfile) {
       const currentTotal = (tutorProfile.averageRating || 0) * (tutorProfile.totalReviews || 0);
@@ -761,7 +757,7 @@ exports.rateBooking = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Rate booking error:', error);
+    console.error('Lỗi khi đánh giá lịch học:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi đánh giá',
@@ -787,7 +783,7 @@ exports.getUpcomingBookings = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get upcoming bookings error:', error);
+    console.error('Lỗi khi lấy lịch sắp tới:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy lịch sắp tới',
@@ -829,7 +825,7 @@ exports.getPendingBookings = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get pending bookings error:', error);
+    console.error('Lỗi khi lấy yêu cầu chờ xử lý:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy yêu cầu chờ xử lý',
@@ -883,7 +879,7 @@ exports.getBookingStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get booking stats error:', error);
+    console.error('Lỗi khi lấy thống kê:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thống kê',

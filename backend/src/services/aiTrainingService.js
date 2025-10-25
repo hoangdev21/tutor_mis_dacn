@@ -100,7 +100,7 @@ async function searchTutors(criteria = {}) {
     }));
 
   } catch (error) {
-    console.error('Error searching tutors:', error);
+    console.error('Lỗi tìm kiếm gia sư:', error);
     return [];
   }
 }
@@ -153,7 +153,7 @@ async function searchCourses(criteria = {}) {
     }));
 
   } catch (error) {
-    console.error('Error searching courses:', error);
+    console.error('Lỗi tìm kiếm khóa học:', error);
     return [];
   }
 }
@@ -218,7 +218,7 @@ async function getSystemStatistics() {
     };
 
   } catch (error) {
-    console.error('Error getting system statistics:', error);
+    console.error('Lỗi lấy thống kê hệ thống:', error);
     return null;
   }
 }
@@ -243,7 +243,7 @@ async function getRecentBlogs(limit = 5) {
     }));
 
   } catch (error) {
-    console.error('Error getting recent blogs:', error);
+    console.error('Lỗi lấy blog gần đây:', error);
     return [];
   }
 }
@@ -290,7 +290,7 @@ async function getTutorDetails(tutorId) {
     };
 
   } catch (error) {
-    console.error('Error getting tutor details:', error);
+    console.error('Lỗi lấy thông tin chi tiết gia sư:', error);
     return null;
   }
 }
@@ -449,7 +449,7 @@ async function generateAIContext(userQuery, userId = null, userRole = null) {
     };
 
   } catch (error) {
-    console.error('Error generating AI context:', error);
+    console.error('Lỗi tạo ngữ cảnh AI:', error);
     return null;
   }
 }

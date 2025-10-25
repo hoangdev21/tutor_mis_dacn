@@ -20,7 +20,7 @@ exports.getPreferences = async (req, res) => {
             preferences: user.preferences || {}
         });
     } catch (error) {
-        console.error('Get preferences error:', error);
+        console.error('lỗi khi lấy sở thích:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -54,7 +54,7 @@ exports.updatePreferences = async (req, res) => {
             preferences: user.preferences
         });
     } catch (error) {
-        console.error('Update preferences error:', error);
+        console.error('Lỗi khi cập nhật sở thích:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -97,7 +97,7 @@ exports.updateAccount = async (req, res) => {
             user
         });
     } catch (error) {
-        console.error('Update account error:', error);
+        console.error('Lỗi khi cập nhật tài khoản:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -161,7 +161,7 @@ exports.changePassword = async (req, res) => {
             message: 'Đổi mật khẩu thành công'
         });
     } catch (error) {
-        console.error('Change password error:', error);
+        console.error('Lỗi khi đổi mật khẩu:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -183,8 +183,6 @@ exports.logoutAllDevices = async (req, res) => {
             });
         }
 
-        // Clear all sessions (implementation depends on your auth strategy)
-        // For JWT, you might want to blacklist all tokens or change a secret
         user.tokenVersion = (user.tokenVersion || 0) + 1;
         await user.save();
 
@@ -193,7 +191,7 @@ exports.logoutAllDevices = async (req, res) => {
             message: 'Đã đăng xuất tất cả thiết bị'
         });
     } catch (error) {
-        console.error('Logout all devices error:', error);
+        console.error('Lỗi khi đăng xuất tất cả thiết bị:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -215,18 +213,12 @@ exports.downloadData = async (req, res) => {
             });
         }
 
-        // In a real implementation, you would:
-        // 1. Gather all user data from various collections
-        // 2. Create a ZIP file or JSON export
-        // 3. Send via email or provide download link
-        
-        // For now, we'll just send a confirmation
         res.json({
             success: true,
             message: 'Yêu cầu tải dữ liệu đã được gửi. Bạn sẽ nhận được email trong vòng 24 giờ.'
         });
     } catch (error) {
-        console.error('Download data error:', error);
+        console.error('Lỗi khi tải dữ liệu:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -248,7 +240,7 @@ exports.clearHistory = async (req, res) => {
             });
         }
 
-        // Clear search history and activity logs
+        // clear search history and activity logs
         user.searchHistory = [];
         user.activityLog = [];
         await user.save();
@@ -258,7 +250,7 @@ exports.clearHistory = async (req, res) => {
             message: 'Đã xóa lịch sử hoạt động'
         });
     } catch (error) {
-        console.error('Clear history error:', error);
+        console.error('Lỗi khi xóa lịch sử:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -289,7 +281,7 @@ exports.deactivateAccount = async (req, res) => {
             message: 'Tài khoản đã được vô hiệu hóa'
         });
     } catch (error) {
-        console.error('Deactivate account error:', error);
+        console.error('Lỗi khi vô hiệu hóa tài khoản:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -311,11 +303,6 @@ exports.deleteAccount = async (req, res) => {
             });
         }
 
-        // In a real implementation, you would:
-        // 1. Delete or anonymize all related data
-        // 2. Remove from all related collections
-        // 3. Cancel subscriptions, etc.
-        
         await User.findByIdAndDelete(req.user._id);
 
         res.json({
@@ -323,7 +310,7 @@ exports.deleteAccount = async (req, res) => {
             message: 'Tài khoản đã được xóa vĩnh viễn'
         });
     } catch (error) {
-        console.error('Delete account error:', error);
+        console.error('Lỗi khi xóa tài khoản:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'
@@ -353,7 +340,7 @@ exports.getSecuritySettings = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Get security settings error:', error);
+        console.error('Lỗi khi lấy cài đặt bảo mật:', error);
         res.status(500).json({
             success: false,
             message: 'Lỗi server'

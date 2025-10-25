@@ -7,7 +7,7 @@ const submitContactForm = async (req, res) => {
   try {
     const { name, email, phone, message } = req.body;
 
-    // Validate required fields
+    // xác thực trường bắt buộc
     if (!name || !email || !phone || !message) {
       return res.status(400).json({
         success: false,
@@ -15,11 +15,11 @@ const submitContactForm = async (req, res) => {
       });
     }
 
-    // Get IP address and user agent
+    // Lấy địa chỉ IP và user agent
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
 
-    // Create contact submission
+    // Tạo yêu cầu liên hệ
     const contactSubmission = await ContactSubmission.create({
       name,
       email,
@@ -39,7 +39,7 @@ const submitContactForm = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Submit contact form error:', error);
+    console.error('Lỗi khi gửi thông tin liên hệ:', error);
     res.status(500).json({
       success: false,
       message: 'Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau.'
@@ -68,7 +68,7 @@ const getContactSubmissions = async (req, res) => {
       ];
     }
 
-    // Get total count
+    // lấy tổng số yêu cầu liên hệ
     const total = await ContactSubmission.countDocuments(query);
 
     // Get submissions with pagination
@@ -78,7 +78,7 @@ const getContactSubmissions = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    // Get stats
+    // Lấy thống kê
     const stats = await ContactSubmission.aggregate([
       {
         $group: {
@@ -112,7 +112,7 @@ const getContactSubmissions = async (req, res) => {
       stats: statsObject
     });
   } catch (error) {
-    console.error('Get contact submissions error:', error);
+    console.error('Lỗi khi lấy danh sách yêu cầu liên hệ:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải danh sách liên hệ'
@@ -140,7 +140,7 @@ const getContactSubmissionById = async (req, res) => {
       data: submission
     });
   } catch (error) {
-    console.error('Get contact submission error:', error);
+    console.error('Lỗi khi lấy thông tin liên hệ:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải thông tin liên hệ'
@@ -164,11 +164,11 @@ const updateContactSubmission = async (req, res) => {
       });
     }
 
-    // Update fields
+    // Cập nhật các trường
     if (status) {
       submission.status = status;
-      
-      // If status is replied, record who replied and when
+
+      // Nếu trạng thái là replied, ghi lại ai đã trả lời và khi nào
       if (status === 'replied' && !submission.repliedBy) {
         submission.repliedBy = req.user._id;
         submission.repliedAt = new Date();
@@ -181,7 +181,7 @@ const updateContactSubmission = async (req, res) => {
 
     await submission.save();
 
-    // Populate repliedBy before sending response
+    // điền thông tin người trả lời
     await submission.populate('repliedBy', 'email role');
 
     res.json({
@@ -190,7 +190,7 @@ const updateContactSubmission = async (req, res) => {
       data: submission
     });
   } catch (error) {
-    console.error('Update contact submission error:', error);
+    console.error('Lỗi khi cập nhật thông tin liên hệ:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể cập nhật thông tin liên hệ'
@@ -219,7 +219,7 @@ const deleteContactSubmission = async (req, res) => {
       message: 'Đã xóa thông tin liên hệ'
     });
   } catch (error) {
-    console.error('Delete contact submission error:', error);
+    console.error('Lỗi khi xóa thông tin liên hệ:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể xóa thông tin liên hệ'
@@ -238,7 +238,7 @@ const getContactStats = async (req, res) => {
     const replied = await ContactSubmission.countDocuments({ status: 'replied' });
     const archived = await ContactSubmission.countDocuments({ status: 'archived' });
 
-    // Get recent submissions (last 7 days)
+    // Yêu cầu trong 7 ngày qua
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const recentCount = await ContactSubmission.countDocuments({
@@ -257,7 +257,7 @@ const getContactStats = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get contact stats error:', error);
+    console.error('Lỗi khi lấy thống kê yêu cầu liên hệ:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải thống kê'

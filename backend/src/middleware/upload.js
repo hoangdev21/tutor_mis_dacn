@@ -1,10 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 
-// Use memory storage for Cloudinary upload
+// Sử dụng bộ nhớ tạm thời cho Cloudinary
 const memoryStorage = multer.memoryStorage();
 
-// File filter for images
+// bộ lóc file cho ảnh
 const imageFileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -17,7 +17,7 @@ const imageFileFilter = (req, file, cb) => {
   }
 };
 
-// File filter for certificates (images and PDFs)
+// bộ lọc file cho chứng chỉ (ảnh và PDF)
 const certificateFileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|pdf/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -30,7 +30,7 @@ const certificateFileFilter = (req, file, cb) => {
   }
 };
 
-// Avatar upload middleware (using memory storage for Cloudinary)
+// avatar upload middleware
 const uploadAvatar = multer({
   storage: memoryStorage,
   limits: {
@@ -39,7 +39,7 @@ const uploadAvatar = multer({
   fileFilter: imageFileFilter
 }).single('avatar');
 
-// Certificate upload middleware (using memory storage for Cloudinary)
+// chứng chỉ upload middleware
 const uploadCertificate = multer({
   storage: memoryStorage,
   limits: {
@@ -48,7 +48,7 @@ const uploadCertificate = multer({
   fileFilter: certificateFileFilter
 }).single('certificate');
 
-// Multiple files upload middleware for support tickets
+// Nhieu file upload middleware (hỗ trợ ảnh, PDF, DOC)
 const uploadMultiple = multer({
   storage: memoryStorage,
   limits: {
@@ -68,18 +68,16 @@ const uploadMultiple = multer({
   }
 }).array('attachments', 5);
 
-// Message attachment upload middleware (supports various file types)
+// Tin nh nhắn upload middleware
 const uploadMessageAttachment = multer({
   storage: memoryStorage,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB per file
   },
   fileFilter: (req, file, cb) => {
-    // Allow images, documents, videos, and audio files
     const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|html|py|cpp|c|java|js|mp4|mp3|wav|avi|mov/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     
-    // Check mimetype patterns
     const isImage = /^image\//i.test(file.mimetype);
     const isDocument = /pdf|msword|vnd\.openxmlformats-officedocument|text\/plain|text\/html/i.test(file.mimetype);
     const isVideo = /^video\//i.test(file.mimetype);
@@ -94,7 +92,6 @@ const uploadMessageAttachment = multer({
   }
 }).single('attachment');
 
-// Error handler for multer
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {

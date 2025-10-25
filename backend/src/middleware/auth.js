@@ -8,81 +8,81 @@ const authenticateToken = async (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
     
     if (!token) {
-      console.log('❌ No token provided');
+      console.log('Không có token trong yêu cầu');
       return res.status(401).json({
         success: false,
-        message: 'Access token is required'
+        message: 'Truy c cập bị từ chối: Không có token'
       });
     }
     
     // Verify token
     const decoded = verifyAccessToken(token);
-    console.log('✅ Token decoded:', { userId: decoded.userId, role: decoded.role });
+    console.log('Mã token:', { userId: decoded.userId, role: decoded.role });
     
     // Lấy thông tin user
     const user = await User.findById(decoded.userId).populate('profile');
     
     if (!user) {
-      console.log('❌ User not found:', decoded.userId);
+      console.log('Không tìm thấy người dùng:', decoded.userId);
       return res.status(401).json({
         success: false,
-        message: 'User not found'
+        message: 'Không tìm thấy người dùng'
       });
     }
     
-    console.log('✅ User found:', { id: user._id, email: user.email, role: user.role });
+    console.log('Tìm thấy người dùng:', { id: user._id, email: user.email, role: user.role });
     
     // Kiểm tra tài khoản có active không
     if (!user.isActive) {
-      console.log('❌ User not active');
+      console.log('❌ Tài khoản không hoạt động');
       return res.status(401).json({
         success: false,
-        message: 'Account is deactivated'
+        message: 'Tài khoản không hoạt động'
       });
     }
     
     // Kiểm tra email đã verify chưa
     if (!user.isEmailVerified) {
-      console.log('❌ Email not verified');
+      console.log('Email chưa được xác minh');
       return res.status(401).json({
         success: false,
-        message: 'Email is not verified'
+        message: 'Email chưa được xác minh'
       });
     }
     
     // Kiểm tra tài khoản có bị khóa không
     if (user.isLocked) {
-      console.log('❌ User is locked');
+      console.log('Tài khoản bị khóa');
       return res.status(423).json({
         success: false,
-        message: 'Account is temporarily locked due to multiple failed login attempts'
+        message: 'Tài khoản bị khóa do nhiều lần đăng nhập không thành công'
       });
     }
     
-    console.log('✅ Authentication successful');
+    console.log('Xác thực thành công');
     req.user = user;
     next();
     
   } catch (error) {
-    console.error('❌ Authentication error:', error.message);
+    console.error('Lỗi xác thực:', error.message);
     
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        message: 'Invalid token'
+        message: 'Token không hợp lệ'
       });
     }
     
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Token expired'
+        message: 'Token đã hết hạn'
       });
     }
     
     return res.status(500).json({
       success: false,
-      message: 'Authentication failed'
+      message: 'Xác thực không thành công'
     });
   }
 };
@@ -93,14 +93,14 @@ const authorizeRoles = (...roles) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: 'Xác thực yêu cầu'
       });
     }
     
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: 'Insufficient permissions'
+        message: 'Quyền truy cập không đủ'
       });
     }
     
@@ -114,7 +114,7 @@ const authorizeResource = (resourceType) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: 'Xác thực yêu cầu'
       });
     }
     
@@ -127,7 +127,7 @@ const authorizeResource = (resourceType) => {
     if (!req.user.canAccess(resourceType)) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied to this resource'
+        message: 'Quyền truy cập không đủ'
       });
     }
     
@@ -141,7 +141,7 @@ const authorizeOwnership = (ownerField = 'userId') => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: 'Xác thực yêu cầu'
       });
     }
     
@@ -156,7 +156,7 @@ const authorizeOwnership = (ownerField = 'userId') => {
     if (resourceUserId && resourceUserId !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied: You can only access your own resources'
+        message: 'Quyền truy cập không đủ: Bạn chỉ có thể truy cập tài nguyên của chính mình'
       });
     }
     
@@ -174,7 +174,7 @@ const guestOnly = (req, res, next) => {
       verifyAccessToken(token);
       return res.status(400).json({
         success: false,
-        message: 'Already authenticated'
+        message: 'Người dùng đã được xác thực'
       });
     } catch (error) {
       // Token không hợp lệ, cho phép tiếp tục
@@ -187,51 +187,51 @@ const guestOnly = (req, res, next) => {
 // Middleware kiểm tra quyền admin cụ thể
 const authorizeAdminPermission = (permission) => {
   return async (req, res, next) => {
-    console.log('🔐 authorizeAdminPermission middleware:', permission);
+    console.log('authorizeAdminPermission middleware:', permission);
     console.log('User:', req.user?._id, req.user?.role);
     
     if (!req.user || req.user.role !== 'admin') {
-      console.log('❌ Not admin');
+      console.log('Không phải admin');
       return res.status(403).json({
         success: false,
-        message: 'Admin access required'
+        message: 'Cần quyền truy cập admin'
       });
     }
     
     try {
-      // Load admin profile with methods intact
+      // Lấy admin profile
       const AdminProfile = require('../models/AdminProfile');
       const adminProfile = await AdminProfile.findOne({ userId: req.user._id });
-      
-      console.log('Admin profile loaded:', adminProfile?._id);
-      
+
+      console.log('Hồ sơ admin:', adminProfile?._id);
+
       if (!adminProfile) {
-        console.log('❌ No admin profile');
+        console.log('Không có hồ sơ admin');
         return res.status(403).json({
           success: false,
-          message: 'Admin profile not found'
+          message: 'Không tìm thấy hồ sơ admin'
         });
       }
       
-      // Check permission using the method
+      // Kiểm tra quyền
       if (!adminProfile.hasPermission(permission)) {
-        console.log('❌ No permission:', permission);
-        console.log('Available permissions:', adminProfile.permissions);
+        console.log('Không có quyền:', permission);
+        console.log('Quyền có sẵn:', adminProfile.permissions);
         return res.status(403).json({
           success: false,
-          message: `Permission '${permission}' required`
+          message: `Cần quyền '${permission}' để thực hiện hành động này`
         });
       }
       
-      console.log('✅ Permission granted');
-      // Attach adminProfile to request for later use
+      console.log('Quyền admin được xác nhận:', permission);
+      // Gắn hồ sơ admin vào req.user để sử dụng sau
       req.user.adminProfile = adminProfile;
       next();
     } catch (error) {
-      console.error('❌ Permission check error:', error);
+      console.error('Lỗi kiểm tra quyền:', error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to verify permissions'
+        message: 'Không thể xác minh quyền'
       });
     }
   };

@@ -10,7 +10,7 @@ exports.getStatistics = async (req, res) => {
   try {
     const { period = 'month' } = req.query;
     
-    // Calculate date range
+    // tính toán khoảng thời gian
     const now = new Date();
     let startDate, endDate = now;
     
@@ -31,11 +31,11 @@ exports.getStatistics = async (req, res) => {
         startDate = new Date(now.setMonth(now.getMonth() - 1));
     }
     
-    // Get revenue data
+    // lấy dữ liệu thống kê
     const revenueData = await Transaction.getRevenueByPeriod(startDate, endDate);
     const revenueByType = await Transaction.getRevenueByType(startDate, endDate);
-    
-    // Get transaction counts by status
+
+    // Lấy số lượng giao dịch theo trạng thái
     const transactionStats = await Transaction.aggregate([
       {
         $match: {
@@ -51,7 +51,7 @@ exports.getStatistics = async (req, res) => {
       }
     ]);
     
-    // Get pending bookings value
+    // lấy số lượng yêu cầu đặt lịch đang chờ xử lý
     const pendingBookings = await BookingRequest.aggregate([
       {
         $match: { status: 'pending' }
@@ -65,10 +65,10 @@ exports.getStatistics = async (req, res) => {
       }
     ]);
     
-    // Get top users by revenue
+    // Lấy top người dùng theo doanh thu
     const topUsers = await Transaction.getTopUsers(startDate, endDate, 10);
     
-    // Calculate growth rate (compare with previous period)
+    // Tính toán tỷ lệ tăng trưởng (so sánh với kỳ trước)
     const previousStartDate = new Date(startDate);
     const periodDiff = endDate - startDate;
     previousStartDate.setTime(startDate.getTime() - periodDiff);
@@ -88,7 +88,7 @@ exports.getStatistics = async (req, res) => {
       user: req.user._id,
       userRole: req.user.role,
       resource: 'system',
-      description: `Admin viewed financial statistics for period: ${period}`,
+      description: `Admin đã xem thống kê tài chính cho khoảng thời gian: ${period}`,
       severity: 'info',
       status: 'success',
       metadata: { period },
@@ -129,7 +129,7 @@ exports.getStatistics = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get statistics error:', error);
+    console.error('Lấy thống kê lỗi:', error);
     
     await ActivityLog.logActivity({
       type: 'error',
@@ -137,7 +137,7 @@ exports.getStatistics = async (req, res) => {
       user: req.user._id,
       userRole: req.user.role,
       resource: 'system',
-      description: 'Failed to fetch financial statistics',
+      description: 'Không thể tải thống kê tài chính',
       severity: 'error',
       status: 'failed',
       metadata: {
@@ -190,7 +190,7 @@ exports.getTransactions = async (req, res) => {
       ];
     }
     
-    // Execute query with pagination
+    // truy vấn với phân trang
     const skip = (page - 1) * limit;
     const transactions = await Transaction.find(query)
       .populate('user', 'email name role')
@@ -219,7 +219,7 @@ exports.getTransactions = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get transactions error:', error);
+    console.error('Lấy danh sách giao dịch lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải danh sách giao dịch',
@@ -254,7 +254,7 @@ exports.getTransactionById = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Get transaction error:', error);
+    console.error('Lấy thông tin giao dịch lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải thông tin giao dịch',
@@ -273,10 +273,10 @@ exports.getRevenueChart = async (req, res) => {
     let chartData;
     
     if (type === 'monthly') {
-      // Get monthly revenue for the year
+      // Lấy doanh thu hàng tháng cho năm
       chartData = await Transaction.getMonthlyRevenue(year);
-      
-      // Fill missing months with 0
+
+      // Điền các tháng thiếu bằng 0
       const monthlyData = Array(12).fill(null).map((_, index) => {
         const monthData = chartData.find(d => d._id === index + 1);
         return {
@@ -297,7 +297,7 @@ exports.getRevenueChart = async (req, res) => {
       });
       
     } else if (type === 'daily') {
-      // Get daily revenue for current month
+      // Lấy doanh thu hàng ngày cho tháng hiện tại
       const startDate = new Date(year, new Date().getMonth(), 1);
       const endDate = new Date(year, new Date().getMonth() + 1, 0);
       
@@ -337,7 +337,7 @@ exports.getRevenueChart = async (req, res) => {
       });
       
     } else if (type === 'category') {
-      // Get revenue by transaction type
+      // Lấy doanh thu theo loại giao dịch
       const startDate = new Date(year, 0, 1);
       const endDate = new Date(year, 11, 31);
       
@@ -359,7 +359,7 @@ exports.getRevenueChart = async (req, res) => {
     }
     
   } catch (error) {
-    console.error('Get revenue chart error:', error);
+    console.error('Lấy dữ liệu biểu đồ doanh thu lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tải dữ liệu biểu đồ',
@@ -382,7 +382,7 @@ exports.createTransaction = async (req, res) => {
       metadata
     } = req.body;
     
-    // Validate user exists
+    // xác thực người dùng
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -408,7 +408,7 @@ exports.createTransaction = async (req, res) => {
     
     await transaction.save();
     
-    // Log activity
+    // hoạt động log
     await ActivityLog.logActivity({
       type: 'transaction',
       action: 'create_transaction',
@@ -416,7 +416,7 @@ exports.createTransaction = async (req, res) => {
       userRole: req.user.role,
       resource: 'transaction',
       resourceId: transaction._id,
-      description: `Admin created manual transaction: ${type} - ${amount} VND`,
+      description: `Admin đã tạo giao dịch thủ công: ${type} - ${amount} VND`,
       severity: 'info',
       status: 'success',
       metadata: {
@@ -437,7 +437,7 @@ exports.createTransaction = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Create transaction error:', error);
+    console.error('Tạo giao dịch lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể tạo giao dịch',
@@ -482,7 +482,7 @@ exports.updateTransaction = async (req, res) => {
       userRole: req.user.role,
       resource: 'transaction',
       resourceId: transaction._id,
-      description: `Admin updated transaction status from ${oldStatus} to ${status}`,
+      description: `Admin cập nhật trạng thái từ ${oldStatus} thành ${status}`,
       severity: 'info',
       status: 'success',
       beforeData: { status: oldStatus },
@@ -500,7 +500,7 @@ exports.updateTransaction = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Update transaction error:', error);
+    console.error('Lỗi:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể cập nhật giao dịch',
@@ -534,7 +534,7 @@ exports.refundTransaction = async (req, res) => {
     
     await transaction.refundTransaction(req.user._id, reason);
     
-    // Create refund transaction
+    // tạo giao dịch hoàn tiền
     const refundTransaction = new Transaction({
       type: 'refund',
       user: transaction.user,
@@ -560,7 +560,7 @@ exports.refundTransaction = async (req, res) => {
       userRole: req.user.role,
       resource: 'transaction',
       resourceId: transaction._id,
-      description: `Admin refunded transaction: ${transaction.invoiceNumber}`,
+      description: `Admin hoàn tiền cho giao dịch: ${transaction.invoiceNumber}`,
       severity: 'warning',
       status: 'success',
       metadata: {
@@ -583,7 +583,7 @@ exports.refundTransaction = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Refund transaction error:', error);
+    console.error('Lỗi hoàn tiền:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể hoàn tiền',
@@ -638,7 +638,7 @@ exports.exportTransactions = async (req, res) => {
       user: req.user._id,
       userRole: req.user.role,
       resource: 'system',
-      description: `Admin exported ${transactions.length} transactions`,
+      description: `Admin đã xuất ${transactions.length} giao dịch`,
       severity: 'info',
       status: 'success',
       request: {
@@ -652,7 +652,7 @@ exports.exportTransactions = async (req, res) => {
     res.send('\uFEFF' + csv); // Add BOM for Excel UTF-8 support
     
   } catch (error) {
-    console.error('Export transactions error:', error);
+    console.error('Lỗi xuất giao dịch:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể xuất dữ liệu',

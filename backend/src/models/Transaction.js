@@ -154,7 +154,6 @@ const transactionSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Indexes for better query performance
 transactionSchema.index({ user: 1, createdAt: -1 });
 transactionSchema.index({ type: 1, status: 1 });
 transactionSchema.index({ createdAt: -1 });
@@ -162,7 +161,6 @@ transactionSchema.index({ 'metadata.tutorId': 1 });
 transactionSchema.index({ 'metadata.studentId': 1 });
 transactionSchema.index({ booking: 1 });
 
-// Virtual for formatted amount
 transactionSchema.virtual('formattedAmount').get(function() {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -170,7 +168,6 @@ transactionSchema.virtual('formattedAmount').get(function() {
   }).format(this.amount);
 });
 
-// Pre-save middleware to calculate net amount
 transactionSchema.pre('save', function(next) {
   if (this.isModified('amount') || this.isModified('commission.rate')) {
     if (this.commission && this.commission.rate > 0) {
@@ -181,14 +178,14 @@ transactionSchema.pre('save', function(next) {
     }
   }
   
-  // Generate invoice number for completed transactions
+  // tạo invoiceNumber duy nhất khi hoàn thành
   if (this.status === 'completed' && !this.invoiceNumber) {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
     this.invoiceNumber = `INV-${timestamp}-${random}`;
   }
   
-  // Set completedAt when status changes to completed
+  // đặt completedAt khi trạng thái là completed
   if (this.isModified('status') && this.status === 'completed' && !this.completedAt) {
     this.completedAt = new Date();
   }

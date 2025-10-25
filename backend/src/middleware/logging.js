@@ -1,6 +1,6 @@
 const ActivityLog = require('../models/ActivityLog');
 
-// Extract device/browser info from user agent
+// Phân tích user agent để lấy thông tin thiết bị, trình duyệt và hệ điều hành
 const parseUserAgent = (userAgent) => {
   if (!userAgent) return { device: 'Unknown', browser: 'Unknown', os: 'Unknown' };
   
@@ -28,9 +28,9 @@ const parseUserAgent = (userAgent) => {
   return { device, browser, os };
 };
 
-// Main logging middleware - logs all API requests
+// Middleware ghi log yêu cầu
 const requestLogger = async (req, res, next) => {
-  // Skip logging for certain paths
+  // Bỏ qua logging cho một số đường dẫn
   const skipPaths = ['/health', '/api-docs', '/uploads', '/favicon.ico'];
   if (skipPaths.some(path => req.path.startsWith(path))) {
     return next();
@@ -38,7 +38,7 @@ const requestLogger = async (req, res, next) => {
   
   const startTime = Date.now();
   
-  // Capture response
+  // Ghi đè res.send để nắm bắt phản hồi
   const originalSend = res.send;
   let responseBody;
   
@@ -54,7 +54,7 @@ const requestLogger = async (req, res, next) => {
       const userAgent = req.get('user-agent') || '';
       const { device, browser, os } = parseUserAgent(userAgent);
       
-      // Determine log type based on endpoint
+      // Xác định loại log và tài nguyên dựa trên đường dẫn
       let logType = 'system';
       let action = `${req.method} ${req.path}`;
       let resource = 'system';
@@ -84,8 +84,8 @@ const requestLogger = async (req, res, next) => {
         logType = 'admin';
         resource = 'system';
       }
-      
-      // Determine severity based on status code
+
+      // Xác định mức độ nghiêm trọng và trạng thái
       let severity = 'info';
       let status = 'success';
       
@@ -128,28 +128,27 @@ const requestLogger = async (req, res, next) => {
         }
       };
       
-      // Only log important requests or errors
+      // Chỉ ghi log cho các yêu cầu quan trọng
       const shouldLog = 
-        res.statusCode >= 400 || // Log all errors
-        req.method !== 'GET' || // Log all non-GET requests
-        req.path.includes('/admin') || // Log all admin requests
-        req.path.includes('/auth'); // Log all auth requests
+        res.statusCode >= 400 || 
+        req.method !== 'GET' || 
+        req.path.includes('/admin') || 
+        req.path.includes('/auth'); 
       
-      // Only log if we have a valid user (avoid guest role issue)
+      // Ghi log nếu cần thiết
       if (shouldLog && req.user && req.user.role) {
         await ActivityLog.logActivity(logData);
       }
       
     } catch (error) {
-      // Silently fail - don't interrupt the request
-      console.error('Request logging error:', error);
+      console.error('Lỗi ghi log:', error);
     }
   });
   
   next();
 };
 
-// Specific action loggers
+// Trình ghi log xác thực
 const logAuth = async (action, userId, userRole, status, metadata = {}) => {
   try {
     await ActivityLog.logActivity({
@@ -164,7 +163,7 @@ const logAuth = async (action, userId, userRole, status, metadata = {}) => {
       metadata
     });
   } catch (error) {
-    console.error('Auth logging error:', error);
+    console.error('Lỗi ghi log xác thực:', error);
   }
 };
 
@@ -186,7 +185,7 @@ const logUserAction = async (action, userId, userRole, targetUserId, description
       }
     });
   } catch (error) {
-    console.error('User action logging error:', error);
+    console.error('Lỗi ghi log hành động người dùng:', error);
   }
 };
 
@@ -205,7 +204,7 @@ const logBookingAction = async (action, userId, userRole, bookingId, description
       metadata
     });
   } catch (error) {
-    console.error('Booking action logging error:', error);
+    console.error('Lỗi ghi log hành động đặt chỗ:', error);
   }
 };
 
@@ -227,7 +226,7 @@ const logTransaction = async (action, userId, userRole, transactionId, amount, d
       }
     });
   } catch (error) {
-    console.error('Transaction logging error:', error);
+    console.error('Lỗi ghi log giao dịch:', error);
   }
 };
 
@@ -245,7 +244,7 @@ const logAdminAction = async (action, adminId, description, metadata = {}, sever
       metadata
     });
   } catch (error) {
-    console.error('Admin action logging error:', error);
+    console.error('Lỗi ghi log hành động admin:', error);
   }
 };
 
@@ -260,7 +259,7 @@ const logError = async (error, req, additionalInfo = {}) => {
       user: req?.user?._id,
       userRole: req?.user?.role || 'guest',
       resource: 'system',
-      description: error.message || 'An error occurred',
+      description: error.message || 'Đã xảy ra lỗi',
       severity: 'error',
       status: 'failed',
       metadata: {
@@ -279,7 +278,7 @@ const logError = async (error, req, additionalInfo = {}) => {
       }
     });
   } catch (err) {
-    console.error('Error logging error:', err);
+    console.error('Lỗi ghi log lỗi:', err);
   }
 };
 
@@ -307,7 +306,7 @@ const logSecurityEvent = async (event, severity, req, metadata = {}) => {
       }
     });
   } catch (error) {
-    console.error('Security logging error:', error);
+    console.error('Lỗi ghi log sự kiện bảo mật:', error);
   }
 };
 

@@ -7,13 +7,13 @@ const getNotifications = async (req, res) => {
     const userId = req.user.id;
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
 
-    // Build query
+    // build query
     const query = { recipient: userId };
     if (unreadOnly === 'true') {
       query.isRead = false;
     }
 
-    // Get notifications with pagination
+    // Get notifications với phân trang
     const notifications = await Notification.find(query)
       .populate('sender', 'email')
       .sort({ createdAt: -1 })
@@ -38,7 +38,7 @@ const getNotifications = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get notifications error:', error);
+    console.error('lỗi khi lấy thông báo:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tải thông báo',
@@ -58,7 +58,7 @@ const getUnreadCount = async (req, res) => {
       data: { count }
     });
   } catch (error) {
-    console.error('Get unread count error:', error);
+    console.error('lỗi khi đếm thông báo chưa đọc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi đếm thông báo chưa đọc',
@@ -67,7 +67,7 @@ const getUnreadCount = async (req, res) => {
   }
 };
 
-// Mark notification as read
+// đánh dấu thông báo đã đọc
 const markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,7 +87,7 @@ const markAsRead = async (req, res) => {
 
     await notification.markAsRead();
 
-    // Get updated unread count
+    // lấy số lượng chưa đọc cập nhật
     const unreadCount = await Notification.getUnreadCount(userId);
 
     res.json({
@@ -99,7 +99,7 @@ const markAsRead = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Mark as read error:', error);
+    console.error('Lỗi khi đánh dấu đã đọc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi đánh dấu đã đọc',
@@ -108,7 +108,7 @@ const markAsRead = async (req, res) => {
   }
 };
 
-// Mark all notifications as read
+// đánh dấu tất cả thông báo đã đọc
 const markAllAsRead = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -123,7 +123,7 @@ const markAllAsRead = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Mark all as read error:', error);
+    console.error('Lỗi khi đánh dấu tất cả đã đọc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi đánh dấu tất cả đã đọc',
@@ -132,7 +132,7 @@ const markAllAsRead = async (req, res) => {
   }
 };
 
-// Delete notification
+// delete notification
 const deleteNotification = async (req, res) => {
   try {
     const { id } = req.params;
@@ -159,7 +159,7 @@ const deleteNotification = async (req, res) => {
       data: { unreadCount }
     });
   } catch (error) {
-    console.error('Delete notification error:', error);
+    console.error('Lỗi khi xóa thông báo:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa thông báo',
@@ -183,7 +183,7 @@ const deleteAllRead = async (req, res) => {
       message: 'Đã xóa tất cả thông báo đã đọc'
     });
   } catch (error) {
-    console.error('Delete all read error:', error);
+    console.error('Lỗi khi xóa tất cả đã đọc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa thông báo',

@@ -112,7 +112,7 @@ const AVAILABLE_TOOLS = [
 ];
 
 /**
- * Tool implementations
+ * Công cụ AI Agent với nhiều chức năng
  */
 class AIAgent {
   constructor() {
@@ -129,7 +129,7 @@ class AIAgent {
   }
 
   /**
-   * Search tutors with criteria
+   * Tìm kiếm gia sư theo tiêu chí
    */
   async searchTutors(params) {
     try {
@@ -151,7 +151,7 @@ class AIAgent {
   }
 
   /**
-   * Get detailed tutor information
+   * Lấy chi tiết gia sư
    */
   async getTutorDetails(params) {
     try {
@@ -177,7 +177,7 @@ class AIAgent {
   }
 
   /**
-   * Check tutor availability
+   * Kiểm tra lịch rảnh của gia sư
    */
   async getTutorAvailability(params) {
     try {
@@ -191,7 +191,6 @@ class AIAgent {
 
       const availability = tutor.availability || [];
       
-      // Get existing bookings
       const existingBookings = await BookingRequest.find({
         tutorId: params.tutorId,
         status: { $in: ['pending', 'confirmed'] }
@@ -216,7 +215,7 @@ class AIAgent {
   }
 
   /**
-   * Compare multiple tutors
+   * So sánh nhiều gia sư
    */
   async compareTutors(params) {
     try {
@@ -234,7 +233,7 @@ class AIAgent {
 
       const validTutors = tutors.filter(t => t !== null);
 
-      // Create comparison matrix
+      // tạo ra bảng so sánh
       const comparison = {
         tutors: validTutors,
         metrics: {
@@ -261,7 +260,7 @@ class AIAgent {
         message: `So sánh ${validTutors.length} gia sư`
       };
     } catch (error) {
-      console.error('Agent tool error - compare_tutors:', error);
+      console.error('AI lỗi so sánh gia sư:', error);
       return {
         success: false,
         error: error.message
@@ -270,7 +269,7 @@ class AIAgent {
   }
 
   /**
-   * Get booking requirements
+   * Lấy yêu cầu và quy trình đặt lịch học
    */
   async getBookingRequirements(params) {
     try {
@@ -301,7 +300,7 @@ class AIAgent {
         }
       };
 
-      // Get tutor-specific requirements if provided
+      // lấy thông tin gia sư cụ thể nếu có
       if (params.tutorId) {
         const tutor = await TutorProfile.findById(params.tutorId).lean();
         if (tutor) {
@@ -321,7 +320,7 @@ class AIAgent {
         message: 'Yêu cầu và quy trình đặt lịch học'
       };
     } catch (error) {
-      console.error('Agent tool error - get_booking_requirements:', error);
+      console.error('AI lỗi lấy yêu cầu đặt lịch:', error);
       return {
         success: false,
         error: error.message
@@ -330,7 +329,7 @@ class AIAgent {
   }
 
   /**
-   * Calculate total learning cost
+   * Tính tổng chi phí học
    */
   async calculateTotalCost(params) {
     try {
@@ -339,7 +338,7 @@ class AIAgent {
       const totalHours = hours * sessions;
       const subtotal = hourlyRate * totalHours;
       
-      // Calculate discounts for long-term bookings
+      // Tính chiết khấu dựa trên số buổi
       let discount = 0;
       if (sessions >= 20) {
         discount = 0.15; // 15% for 20+ sessions
@@ -373,7 +372,7 @@ class AIAgent {
         message: `Tổng chi phí: ${total.toLocaleString('vi-VN')}đ cho ${sessions} buổi học`
       };
     } catch (error) {
-      console.error('Agent tool error - calculate_total_cost:', error);
+      console.error('AI lỗi tính tổng chi phí:', error);
       return {
         success: false,
         error: error.message
@@ -382,7 +381,7 @@ class AIAgent {
   }
 
   /**
-   * Get user booking history
+   * Lấy lịch sử đặt lịch của người dùng
    */
   async getUserBookingHistory(params) {
     try {
@@ -419,7 +418,7 @@ class AIAgent {
         message: `Lịch sử ${bookings.length} yêu cầu đặt lịch`
       };
     } catch (error) {
-      console.error('Agent tool error - get_user_booking_history:', error);
+      console.error('AI lỗi lấy lịch sử đặt lịch:', error);
       return {
         success: false,
         error: error.message
@@ -428,35 +427,35 @@ class AIAgent {
   }
 
   /**
-   * Recommend tutors based on user history and preferences
+   * Gợi ý gia sư phù hợp dựa trên lịch sử và sở thích của người dùng
    */
   async recommendTutors(params) {
     try {
       const { userId, limit = 5 } = params;
 
-      // Get user profile and history
+      // Lấy thông tin người dùng và lịch sử đặt lịch
       const student = await StudentProfile.findOne({ userId }).lean();
       const bookingHistory = await BookingRequest.find({ studentId: userId })
         .populate('tutorId')
         .lean();
 
-      // Extract user preferences
+      // Phân tích sở thích và lịch sử
       const interestedSubjects = student?.interestedSubjects || [];
       const previousTutorIds = bookingHistory.map(b => b.tutorId?._id?.toString()).filter(Boolean);
-      
-      // Get average price from history
+
+      // Lấy giá trung bình từ lịch sử
       const completedBookings = bookingHistory.filter(b => b.status === 'completed');
       const avgPrice = completedBookings.length > 0
         ? completedBookings.reduce((sum, b) => sum + (b.hourlyRate || 0), 0) / completedBookings.length
         : 300000; // Default
 
-      // Build recommendation query
+      // Xây dựng truy vấn gợi ý
       const query = {
         isVerified: true,
-        _id: { $nin: previousTutorIds } // Exclude already booked tutors
+        _id: { $nin: previousTutorIds } 
       };
 
-      // Prefer tutors teaching interested subjects
+      // Chọn gia sư dạy các môn học người dùng quan tâm
       if (interestedSubjects.length > 0) {
         query.subjects = {
           $elemMatch: {
@@ -465,13 +464,13 @@ class AIAgent {
         };
       }
 
-      // Prefer tutors in similar price range (±30%)
+      // Chọn gia sư có mức giá tương tự (±30%)
       query.hourlyRate = {
         $gte: avgPrice * 0.7,
         $lte: avgPrice * 1.3
       };
 
-      // Get recommendations
+      // Lấy danh sách gợi ý
       const recommendations = await TutorProfile.find(query)
         .populate('userId', 'email isActive')
         .sort({ rating: -1, totalStudents: -1 })
@@ -504,7 +503,7 @@ class AIAgent {
         message: `${formattedResults.length} gia sư được gợi ý dựa trên sở thích của bạn`
       };
     } catch (error) {
-      console.error('Agent tool error - recommend_tutors:', error);
+      console.error('AI lỗi gợi ý gia sư:', error);
       return {
         success: false,
         error: error.message
@@ -513,12 +512,12 @@ class AIAgent {
   }
 
   /**
-   * Helper: Get match reason for recommendation
+   * Trợ giúp lý do phù hợp khi gợi ý gia sư
    */
   _getMatchReason(tutor, interestedSubjects, avgPrice) {
     const reasons = [];
     
-    // Check subject match
+    // Kiểm tra môn học phù hợp
     const tutorSubjects = tutor.subjects?.map(s => s.name?.toLowerCase()) || [];
     const matchingSubjects = interestedSubjects.filter(s => 
       tutorSubjects.some(ts => ts?.includes(s.toLowerCase()))
@@ -527,17 +526,17 @@ class AIAgent {
       reasons.push(`Dạy ${matchingSubjects.join(', ')}`);
     }
 
-    // Check price match
+    // Kiểm tra mức giá phù hợp
     if (tutor.hourlyRate >= avgPrice * 0.7 && tutor.hourlyRate <= avgPrice * 1.3) {
       reasons.push('Phù hợp ngân sách');
     }
 
-    // Check rating
+    // Kiểm tra đánh giá
     if (tutor.rating >= 4.5) {
       reasons.push('Đánh giá cao');
     }
 
-    // Check experience
+    // Kiểm tra kinh nghiệm
     if (tutor.totalStudents >= 20) {
       reasons.push('Kinh nghiệm nhiều học sinh');
     }
@@ -546,31 +545,31 @@ class AIAgent {
   }
 
   /**
-   * Execute a tool by name
+   * Thực thi công cụ theo tên
    */
   async executeTool(toolName, params) {
     const tool = this.tools[toolName];
     if (!tool) {
       return {
         success: false,
-        error: `Tool not found: ${toolName}`
+        error: `Không tìm thấy công cụ: ${toolName}`
       };
     }
 
-    console.log(`[AI Agent] Executing tool: ${toolName}`, params);
+    console.log(`Công cụ ${toolName}`, params);
     const result = await tool(params);
-    console.log(`[AI Agent] Tool result:`, { success: result.success, dataKeys: Object.keys(result.data || {}) });
-    
+    console.log(`Kết quả công cụ:`, { success: result.success, dataKeys: Object.keys(result.data || {}) });
+
     return result;
   }
 
   /**
-   * Get all available tools
+   * Lấy danh sách công cụ có sẵn
    */
   getAvailableTools() {
     return AVAILABLE_TOOLS;
   }
 }
 
-// Export singleton instance
+// Xuất instance của AI Agent
 module.exports = new AIAgent();
