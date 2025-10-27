@@ -41,7 +41,7 @@ TutorMis là nền tảng kết nối gia sư và học sinh được xây dựn
 - **Thông Báo Mới Nhất**: Hiển thị thông báo quan trọng
 - **Khóa Học Gần Đây**: Danh sách khóa học với trạng thái
 - **Tin Nhắn Gần Đây**: Các cuộc trò chuyện gần nhất
-- **Menu**: Khóa học, Yêu cầu gia sư, Tìm gia sư, Tin nhắn, Blog, Liên hệ, AI, Hồ sơ, Cài đặt
+- **Menu**: Khóa học, Yêu cầu gia sư, Tìm gia sư, Tin nhắn, Blog, Liên hệ, Trợ lý AI, Hồ sơ, Cài đặt
 
 ### 👨‍🏫 Dashboard Gia Sư
 - **Thống Kê**: Tổng học sinh, thu nhập tháng, yêu cầu có sẵn, đánh giá TB
@@ -50,7 +50,7 @@ TutorMis là nền tảng kết nối gia sư và học sinh được xây dựn
 - **Yêu Cầu Mới**: Các yêu cầu chưa ứng tuyển
 - **Lịch Dạy Sắp Tới**: Các buổi học sắp diễn ra
 - **Thông Báo Mới Nhất**: Cập nhật từ hệ thống
-- **Menu**: Học sinh, Yêu cầu mới, Lịch dạy, Thu nhập, Tin nhắn, Blog, Liên hệ, AI, Hồ sơ, Cài đặt
+- **Menu**: Học sinh, Yêu cầu mới, Lịch dạy, Thu nhập, Tin nhắn, Blog, Liên hệ, Trợ lý AI, Hồ sơ, Cài đặt
 
 ### 👨‍💼 Dashboard Admin
 - **Thống Kê Tổng Quan**: Tổng user, gia sư, khóa học, doanh thu
@@ -60,7 +60,7 @@ TutorMis là nền tảng kết nối gia sư và học sinh được xây dựn
 - **Người Dùng Mới**: 10 user đăng ký gần nhất
 - **Bài Viết Chờ Duyệt**: Blog posts cần kiểm duyệt
 - **Hoạt Động Hệ Thống**: Nhật ký hoạt động gần đây
-- **Menu**: Người dùng, Duyệt gia sư, Khóa học, Blog, Báo cáo, Tài chính, Cài đặt, Logs
+- **Menu**: Người dùng, Duyệt gia sư, Khóa học, Quản lý Blog, Báo cáo, Thống Kê Tài chính, Thông tin, Cài đặt, Logs
 
 ## Công Nghệ Sử Dụng
 
@@ -75,7 +75,7 @@ TutorMis là nền tảng kết nối gia sư và học sinh được xây dựn
 ### Frontend
 - HTML5 - Markup
 - CSS3 - Styling
-- Vanilla JavaScript - Client-side logic
+- JavaScript 
 
 ### Bảo Mật
 - JWT authentication
@@ -180,29 +180,6 @@ Base URL: `http://localhost:5000/api`
   role: ['student', 'tutor', 'admin'],
   isEmailVerified: Boolean,
   approvalStatus: ['pending', 'approved', 'rejected']
-}
-```
-
-### BookingRequest
-```javascript
-{
-  student: ObjectId,
-  tutor: ObjectId,
-  subject: String,
-  schedule: Object,
-  pricing: Object,
-  status: ['pending', 'accepted', 'completed']
-}
-```
-
-### TutorProfile
-```javascript
-{
-  userId: ObjectId,
-  fullName: String,
-  subjects: Array,
-  hourlyRate: Number,
-  stats: Object
 }
 ```
 
