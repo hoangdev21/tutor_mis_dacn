@@ -6,22 +6,22 @@ const notificationSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      'booking_request',      // New booking request received (for tutor)
-      'booking_accepted',     // Booking accepted by tutor (for student)
-      'booking_rejected',     // Booking rejected by tutor (for student)
-      'booking_completed',    // Booking marked as completed (for both)
-      'booking_cancelled',    // Booking cancelled (for both)
-      'blog_approved',        // Blog post approved by admin (for tutor)
-      'blog_rejected',        // Blog post rejected by admin (for tutor)
-      'blog_comment',         // New comment on blog post (for tutor)
-      'message_received',     // New message received (for both)
-      'profile_approved',     // Tutor profile approved (for tutor)
-      'profile_rejected',     // Tutor profile rejected (for tutor)
-      'system'                // System notification
+      'booking_request',      // Yêu cầu đặt lịch (for tutor)
+      'booking_accepted',     // Yêu cầu đặt lịch đã được chấp nhận (for student)
+      'booking_rejected',     // Yêu cầu đặt lịch đã bị từ chối (for student)
+      'booking_completed',    // Yêu cầu đặt lịch đã hoàn thành 
+      'booking_cancelled',    // Yêu cầu đặt lịch đã bị hủy 
+      'blog_approved',        // Bài viết đã được phê duyệt (for tutor)
+      'blog_rejected',        // Bài viết đã bị từ chối (for tutor)
+      'blog_comment',         // Bình luận mới trên bài viết (for tutor)
+      'message_received',     // Tin nhắn mới nhận được 
+      'profile_approved',     // Hồ sơ gia sư đã được phê duyệt (for tutor)
+      'profile_rejected',     // Hồ sơ gia sư đã bị từ chối (for tutor)
+      'system'                // Thông báo hệ thống 
     ]
   },
 
-  // Recipient of notification
+  // Người nhận thông báo
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -29,66 +29,66 @@ const notificationSchema = new mongoose.Schema({
     index: true
   },
 
-  // Sender of notification (optional, for user-generated notifications)
+  // Người gửi thông báo
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
 
-  // Notification title
+  // Tiêu đề thông báo
   title: {
     type: String,
     required: true
   },
 
-  // Notification message
+  // Nội dung thông báo
   message: {
     type: String,
     required: true
   },
 
-  // Link to navigate to when clicked
+  // Đường dẫn liên kết
   link: {
     type: String
   },
 
-  // Related entity ID (booking, blog, message, etc.)
+  // Liên quan đến entity nào (ID)
   relatedId: {
     type: mongoose.Schema.Types.ObjectId
   },
 
-  // Related entity type
+  // Loại entity liên quan
   relatedModel: {
     type: String,
     enum: ['BookingRequest', 'BlogPost', 'Message', 'TutorRequest', 'User']
   },
 
-  // Icon for notification (Font Awesome class)
+  // Icon đại diện cho thông báo
   icon: {
     type: String,
     default: 'fa-bell'
   },
 
-  // Color scheme for notification
+  // Màu sắc cho thông báo
   color: {
     type: String,
     enum: ['blue', 'green', 'red', 'orange', 'purple', 'gray'],
     default: 'blue'
   },
 
-  // Read status
+  // Trạng thái đã đọc
   isRead: {
     type: Boolean,
     default: false,
     index: true
   },
 
-  // Read at timestamp
+  // Thời gian đã đọc
   readAt: {
     type: Date
   },
 
-  // Creation timestamp
+  // Thời gian tạo
   createdAt: {
     type: Date,
     default: Date.now,

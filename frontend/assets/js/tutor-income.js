@@ -102,8 +102,12 @@ function renderIncomeData(data) {
     renderStats(data.summary);
   }
   
-  // Render charts
-  if (data.monthlyIncome && data.monthlyIncome.length > 0) {
+  // Priority: Render dashboard chart (current month - day by day) FIRST
+  // This is the main chart for income.html
+  if (data.incomeChartData) {
+    renderCurrentMonthChart(data.incomeChartData);
+  } else if (data.monthlyIncome && data.monthlyIncome.length > 0) {
+    // Fallback: if no current month chart data, render monthly historical chart
     renderMonthlyIncomeChart(data.monthlyIncome);
   }
   
@@ -122,6 +126,127 @@ function renderIncomeData(data) {
   
   hideLoading();
   console.log('✅ Income data rendered successfully');
+}
+
+// Render current month income chart (day by day)
+function renderCurrentMonthChart(chartData) {
+  console.log('📈 renderCurrentMonthChart called with:', chartData);
+  
+  const canvas = document.getElementById('monthlyIncomeChart');
+  if (!canvas) {
+    console.error('❌ Canvas not found');
+    return;
+  }
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Destroy existing chart
+  if (incomeChart) {
+    incomeChart.destroy();
+  }
+  
+  if (!chartData.actual || chartData.actual.length === 0) {
+    console.log('ℹ️  No chart data for current month');
+    return;
+  }
+  
+  console.log('✅ Rendering chart with', chartData.actual.length, 'actual and', chartData.predicted.length, 'predicted items');
+  
+  // Prepare data - merge actual and predicted by date
+  const allDates = new Set();
+  chartData.actual.forEach(d => allDates.add(d.date));
+  chartData.predicted.forEach(d => allDates.add(d.date));
+  
+  const sortedDates = Array.from(allDates).sort();
+  
+  const actualData = sortedDates.map(date => {
+    const item = chartData.actual.find(d => d.date === date);
+    return item ? item.amount : 0;
+  });
+  
+  const predictedData = sortedDates.map(date => {
+    const item = chartData.predicted.find(d => d.date === date);
+    return item ? item.amount : 0;
+  });
+  
+  // Format labels to show date
+  const labels = sortedDates.map(date => {
+    const d = new Date(date + 'T00:00:00');
+    return d.getDate() + '/' + (d.getMonth() + 1);
+  });
+  
+  incomeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Thu nhập thực tế (VND)',
+          data: actualData,
+          borderColor: '#11998e',
+          backgroundColor: 'rgba(17, 153, 142, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#11998e'
+        },
+        {
+          label: 'Thu nhập dự kiến (VND)',
+          data: predictedData,
+          borderColor: '#f093fb',
+          backgroundColor: 'rgba(240, 147, 251, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#f093fb'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND'
+                }).format(context.parsed.y);
+              }
+              return label;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return new Intl.NumberFormat('vi-VN', {
+                notation: 'compact',
+                compactDisplay: 'short'
+              }).format(value) + 'đ';
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 // Render stats cards

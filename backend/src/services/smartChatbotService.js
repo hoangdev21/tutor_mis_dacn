@@ -23,7 +23,7 @@ const BlogPost = require('../models/BlogPost');
 class SmartChatbotService {
     
     /**
-     * Main chat function - process user query and return response
+     * Chức năng trò chuyện chính - process user query and return response
      * @param {string} query - User's question
      * @param {string} userId - User ID
      * @param {string} userRole - User role (student/tutor)
@@ -31,16 +31,16 @@ class SmartChatbotService {
      */
     async chat(query, userId, userRole) {
         try {
-            // Parse query to extract criteria
+            // Phân tích truy vấn để trích xuất tiêu chí
             const criteria = this.parseQuery(query);
             
-            // Search database based on criteria
+            // Tìm kiếm cơ sở dữ liệu dựa trên tiêu chí
             const searchResults = await this.searchTutors(criteria);
             
-            // Get additional context
+            // Lấy ngữ cảnh hệ thống
             const systemContext = await this.getSystemContext(userId, userRole);
             
-            // Generate response
+            // Tạo response
             const response = this.generateResponse(query, criteria, searchResults, systemContext);
             
             return {
@@ -64,7 +64,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Parse Vietnamese query to extract search criteria
+     * Phân tích truy vấn tiếng Việt để trích xuất tiêu chí tìm kiếm
      */
     parseQuery(query) {
         const normalized = this.normalizeVietnamese(query.toLowerCase());
@@ -82,7 +82,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Normalize Vietnamese text (handle typos, missing diacritics)
+     * Chuẩn hóa văn bản tiếng Việt, sửa lỗi chính tả phổ biến
      */
     normalizeVietnamese(text) {
         text = text.replace(/\s+/g, ' ').trim();
@@ -110,7 +110,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract subjects from query
+     * Trích xuất chủ đề từ truy vấn
      */
     extractSubjects(query) {
         const subjects = [];
@@ -135,7 +135,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract city from query
+     * Trích xuất thành phố từ truy vấn
      */
     extractCity(query) {
         const cityPatterns = {
@@ -154,7 +154,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract price range from query
+     * Trích xuất khoảng giá từ truy vấn
      */
     extractPrices(query) {
         const prices = { minPrice: null, maxPrice: null };
@@ -179,7 +179,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract gender preference
+     * Trích xuất giới tính từ truy vấn
      */
     extractGender(query) {
         if (/\b(nữ|nu|female|cô)\b/.test(query)) return 'Nữ';
@@ -188,7 +188,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract experience requirement
+     * Trích xuất yêu cầu kinh nghiệm từ truy vấn
      */
     extractExperience(query) {
         const expMatch = query.match(/(\d+)\s*(năm|nam|year)/);
@@ -202,7 +202,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract rating requirement
+     * Trích xuất đánh giá tối thiểu từ truy vấn
      */
     extractRating(query) {
         const ratingMatch = query.match(/(\d+\.?\d*)\s*(sao|star)/);
@@ -213,7 +213,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Extract education level
+     * Trích xuất trình độ học vấn từ truy vấn
      */
     extractEducation(query) {
         if (/thạc sĩ|thac si|master/.test(query)) return 'Thạc sĩ';
@@ -223,7 +223,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Detect query type
+     * Xác định loại truy vấn
      */
     detectQueryType(query) {
         if (/so sánh|sosánh|compare/.test(query)) return 'comparison';
@@ -236,45 +236,45 @@ class SmartChatbotService {
     }
 
     /**
-     * Search tutors in database
+     * Tìm kiếm gia sư trong cơ sở dữ liệu dựa trên tiêu chí
      */
     async searchTutors(criteria) {
         try {
             const query = { isApproved: true };
 
-            // Add subject filter
+            // thêm bộ lọc môn học
             if (criteria.subjects.length > 0) {
                 query['subjects.name'] = { $in: criteria.subjects };
             }
 
-            // Add city filter
+            // thêm bộ lọc thành phố
             if (criteria.city) {
                 query.city = criteria.city;
             }
 
-            // Add price filter
+            // thêm bộ lọc khoảng giá
             if (criteria.minPrice || criteria.maxPrice) {
                 query.hourlyRate = {};
                 if (criteria.minPrice) query.hourlyRate.$gte = criteria.minPrice;
                 if (criteria.maxPrice) query.hourlyRate.$lte = criteria.maxPrice;
             }
 
-            // Add gender filter
+            // Thêm bộ lọc giới tính
             if (criteria.gender) {
                 query.gender = criteria.gender;
             }
 
-            // Add experience filter
+            // Thêm bộ lọc kinh nghiệm
             if (criteria.minExperience) {
                 query.yearsOfExperience = { $gte: criteria.minExperience };
             }
 
-            // Add rating filter
+            // Thêm bộ lọc đánh giá
             if (criteria.minRating) {
                 query.rating = { $gte: criteria.minRating };
             }
 
-            // Add education filter
+            // Thêm bộ lọc trình độ học vấn
             if (criteria.educationLevel) {
                 query['education.level'] = criteria.educationLevel;
             }
@@ -287,13 +287,13 @@ class SmartChatbotService {
 
             return tutors;
         } catch (error) {
-            console.error('[searchTutors Error]', error);
+            console.error('[searchTutors Lỗi]', error);
             return [];
         }
     }
 
     /**
-     * Get system context
+     * Lấy ngữ cảnh hệ thống để cung cấp thông tin bổ sung trong phản hồi
      */
     async getSystemContext(userId, userRole) {
         try {
@@ -315,7 +315,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate response based on query type
+     * Tạo phản hồi dựa trên loại truy vấn và kết quả tìm kiếm
      */
     generateResponse(query, criteria, searchResults, systemContext) {
         const queryType = criteria.queryType;
@@ -339,7 +339,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate tutor search response with markdown formatting
+     * Tạo phản hồi tìm kiếm gia sư với định dạng markdown
      */
     generateTutorSearchResponse(results, criteria, systemContext) {
         if (results.length === 0) {
@@ -369,7 +369,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate no results response
+     * Tạo phản hồi khi không tìm thấy gia sư phù hợp
      */
     generateNoResultsResponse(criteria, systemContext) {
         let response = `## 🔍 Không tìm thấy gia sư phù hợp\n\n`;
@@ -394,7 +394,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate booking help
+     * Tạo hướng dẫn đặt lịch học
      */
     generateBookingHelp() {
         let response = `## 📅 Hướng dẫn đặt lịch học\n\n`;
@@ -410,7 +410,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate cancellation help
+     * Tạo hướng dẫn hủy lịch học
      */
     generateCancellationHelp() {
         let response = `## ❌ Hướng dẫn hủy lịch học\n\n`;
@@ -428,7 +428,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate payment help
+     * Tạo hướng dẫn phương thức thanh toán
      */
     generatePaymentHelp() {
         let response = `## 💳 Phương thức thanh toán\n\n`;
@@ -441,7 +441,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate online teaching info
+     * Tạo thông tin dạy học online
      */
     generateOnlineTeachingInfo() {
         let response = `## 💻 Dạy học Online\n\n`;
@@ -455,7 +455,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate comparison
+     * Tạo phản hồi so sánh gia sư
      */
     generateComparison(query, results) {
         if (results.length < 2) {
@@ -485,7 +485,7 @@ class SmartChatbotService {
     }
 
     /**
-     * Generate recommendation
+     * Tạo phản hồi gợi ý gia sư tốt nhất
      */
     generateRecommendation(results, criteria) {
         if (results.length === 0) {
@@ -509,14 +509,14 @@ class SmartChatbotService {
     }
 
     /**
-     * Get error response
+     * Tạo phản hồi lỗi chung
      */
     getErrorResponse() {
         return `## ❌ Có lỗi xảy ra\n\nXin lỗi, tôi gặp sự cố khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.\n\n💡 *Hoặc liên hệ hỗ trợ để được giúp đỡ*`;
     }
 
     /**
-     * Sanitize criteria for metadata
+     * Làm sạch tiêu chí để trả về trong metadata
      */
     sanitizeCriteria(criteria) {
         return {

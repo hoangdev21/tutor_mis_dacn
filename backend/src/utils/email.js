@@ -5,14 +5,14 @@ const createTransporter = () => {
   // Use SendGrid if API key is provided, otherwise fallback to Gmail
   if (process.env.SENDGRID_API_KEY) {
     const sgTransport = require('nodemailer-sendgrid-transport');
-    return nodemailer.createTransporter(sgTransport({
+    return nodemailer.createTransport(sgTransport({
       auth: {
         api_key: process.env.SENDGRID_API_KEY
       }
     }));
   } else {
     // Fallback to Gmail SMTP
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       host: process.env.EMAIL_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.EMAIL_PORT) || 587,
       secure: false,
@@ -798,6 +798,71 @@ const bookingRejectedNotificationTemplate = (studentName, tutorName, bookingDeta
   };
 };
 
+// Template email OTP đặt lại mật khẩu
+const passwordResetOTPVerificationTemplate = (name, otp) => {
+  return {
+    subject: 'Đặt lại mật khẩu - Mã OTP xác thực TutorMis',
+    html: `
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+        <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+          <h1 style="margin: 0; font-size: 28px;">🔐 Đặt lại mật khẩu</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px;">TutorMis</p>
+        </div>
+        
+        <div style="background: #ffffff; padding: 40px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+          <h2 style="color: #333; margin-bottom: 20px;">Xin chào ${name}!</h2>
+          
+          <p style="color: #666; line-height: 1.6; margin-bottom: 30px;">
+            Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản TutorMis. Vui lòng sử dụng mã OTP bên dưới để xác thực và đặt lại mật khẩu mới:
+          </p>
+          
+          <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); 
+                      padding: 30px; 
+                      border-radius: 15px; 
+                      text-align: center; 
+                      margin: 40px 0;
+                      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);">
+            <p style="color: rgba(255,255,255,0.9); margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">
+              Mã OTP đặt lại mật khẩu
+            </p>
+            <div style="font-size: 42px; 
+                        font-weight: bold; 
+                        color: white; 
+                        letter-spacing: 10px; 
+                        font-family: 'Roboto Mono', monospace;
+                        text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+              ${otp}
+            </div>
+            <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0 0; font-size: 13px;">
+              ⏱️ Có hiệu lực trong 10 phút
+            </p>
+          </div>
+          
+          <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 30px 0;">
+            <p style="color: #856404; margin: 0; font-size: 14px;">
+              <strong>⚠️ Lưu ý quan trọng:</strong> Không chia sẻ mã OTP này với bất kỳ ai, kể cả nhân viên TutorMis. 
+              Mã này chỉ sử dụng để đặt lại mật khẩu của bạn.
+            </p>
+          </div>
+          
+          <p style="color: #666; font-size: 14px; line-height: 1.6;">
+            Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này. 
+            Mật khẩu của bạn sẽ không bị thay đổi và tài khoản vẫn an toàn.
+          </p>
+          
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+          
+          <p style="color: #888; font-size: 12px; margin: 0;">
+            Email này được gửi tự động, vui lòng không trả lời.<br>
+            Nếu bạn cần hỗ trợ, hãy liên hệ: support@tutornis.com<br>
+            © 2024 TutorMis. All rights reserved.
+          </p>
+        </div>
+      </div>
+    `
+  };
+};
+
 module.exports = {
   sendEmail,
   emailVerificationTemplate,
@@ -806,5 +871,6 @@ module.exports = {
   otpVerificationTemplate,
   newBookingNotificationTemplate,
   bookingAcceptedNotificationTemplate,
-  bookingRejectedNotificationTemplate
+  bookingRejectedNotificationTemplate,
+  passwordResetOTPVerificationTemplate
 };

@@ -71,7 +71,7 @@ const getDashboard = async (req, res) => {
 
     console.log(`[Student ${studentId}] Found ${activeRequests.length} hoạt động yêu cầu gia sư.`);
 
-    // Learning Progress Data - Tính toán tiến độ học tập
+    // Learning Progress Data - Tính toán tiến độ học tập chi tiết hơn
     const totalHoursPlanned = await BookingRequest.aggregate([
       {
         $match: {
@@ -85,9 +85,9 @@ const getDashboard = async (req, res) => {
           totalHours: {
             $sum: {
               $multiply: [
-                '$schedule.hoursPerSession',
-                '$schedule.daysPerWeek',
-                { $divide: ['$schedule.duration', 7] } // duration in weeks
+                { $ifNull: ['$schedule.hoursPerSession', 0] },
+                { $ifNull: ['$schedule.daysPerWeek', 0] },
+                { $divide: [{ $ifNull: ['$schedule.duration', 0] }, 7] } // duration in weeks
               ]
             }
           }
@@ -108,9 +108,9 @@ const getDashboard = async (req, res) => {
           completedHours: {
             $sum: {
               $multiply: [
-                '$schedule.hoursPerSession',
-                '$schedule.daysPerWeek',
-                { $divide: ['$schedule.duration', 7] }
+                { $ifNull: ['$schedule.hoursPerSession', 0] },
+                { $ifNull: ['$schedule.daysPerWeek', 0] },
+                { $divide: [{ $ifNull: ['$schedule.duration', 0] }, 7] }
               ]
             }
           }
@@ -118,7 +118,7 @@ const getDashboard = async (req, res) => {
       }
     ]);
     
-    // tiến độ theo môn học
+    // tiến độ theo môn học - Lấy top 6 môn học
     const subjectProgress = await BookingRequest.aggregate([
       {
         $match: {
@@ -128,13 +128,37 @@ const getDashboard = async (req, res) => {
       },
       {
         $group: {
-          _id: '$subject.name',
+          _id: { $ifNull: ['$subject.name', '$subject', 'Khác'] },
           total: { $sum: 1 },
           completed: {
             $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
           },
           active: {
             $sum: { $cond: [{ $eq: ['$status', 'accepted'] }, 1, 0] }
+          },
+          totalHours: {
+            $sum: {
+              $multiply: [
+                { $ifNull: ['$schedule.hoursPerSession', 0] },
+                { $ifNull: ['$schedule.daysPerWeek', 0] },
+                { $divide: [{ $ifNull: ['$schedule.duration', 0] }, 7] }
+              ]
+            }
+          },
+          completedHours: {
+            $sum: {
+              $cond: [
+                { $eq: ['$status', 'completed'] },
+                {
+                  $multiply: [
+                    { $ifNull: ['$schedule.hoursPerSession', 0] },
+                    { $ifNull: ['$schedule.daysPerWeek', 0] },
+                    { $divide: [{ $ifNull: ['$schedule.duration', 0] }, 7] }
+                  ]
+                },
+                0
+              ]
+            }
           }
         }
       },
@@ -144,10 +168,13 @@ const getDashboard = async (req, res) => {
           total: 1,
           completed: 1,
           active: 1,
+          totalHours: { $round: ['$totalHours', 1] },
+          completedHours: { $round: ['$completedHours', 1] },
           progress: {
-            $multiply: [
-              { $divide: ['$completed', '$total'] },
-              100
+            $cond: [
+              { $gt: ['$total', 0] },
+              { $round: [{ $multiply: [{ $divide: ['$completed', '$total'] }, 100] }, 0] },
+              0
             ]
           }
         }
@@ -243,8 +270,8 @@ const getDashboard = async (req, res) => {
           unreadMessages
         },
         learningProgress: {
-          totalHours: totalHoursPlanned[0]?.totalHours || 0,
-          completedHours: totalHoursCompleted[0]?.completedHours || 0,
+          totalHours: Math.round((totalHoursPlanned[0]?.totalHours || 0) * 10) / 10,
+          completedHours: Math.round((totalHoursCompleted[0]?.completedHours || 0) * 10) / 10,
           progressPercentage: totalHoursPlanned[0]?.totalHours > 0 
             ? Math.round((totalHoursCompleted[0]?.completedHours || 0) / totalHoursPlanned[0].totalHours * 100)
             : 0,
@@ -253,8 +280,15 @@ const getDashboard = async (req, res) => {
             total: s.total,
             completed: s.completed,
             active: s.active,
+            totalHours: s.totalHours || 0,
+            completedHours: s.completedHours || 0,
             progress: Math.round(s.progress || 0)
-          }))
+          })),
+          // Thêm thống kê tổng quan
+          totalCourses: completedBookings + activeBookings,
+          averageProgress: subjectProgress.length > 0 
+            ? Math.round(subjectProgress.reduce((sum, s) => sum + (s.progress || 0), 0) / subjectProgress.length)
+            : 0
         },
         recentNotifications: recentNotifications.map(notif => ({
           _id: notif._id,

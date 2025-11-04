@@ -55,10 +55,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       // Close modal
       closeModal('loginModal');
       
-      // Redirect to appropriate dashboard
-      setTimeout(() => {
-        window.location.href = `/pages/${response.data.user.role}/dashboard.html`;
-      }, 1000);
+      // Store user role for intro animation
+      localStorage.setItem('userRole', response.data.user.role);
+      
+      // Log for debugging
+      console.log('[Auth] Login successful, starting intro animation...');
+      console.log('[Auth] User role:', response.data.user.role);
+      
+      // Show intro animation before redirecting to dashboard
+      showIntroAnimation(() => {
+        const dashboardUrl = `/pages/${response.data.user.role}/dashboard.html`;
+        console.log('[Auth] Redirecting to:', dashboardUrl);
+        
+        // Sử dụng replace để không lưu trang index vào history
+        // Điều này đảm bảo khi nhấn Back sẽ không quay về trang login
+        window.location.replace(dashboardUrl);
+      }, 4000);
     }
     
   } catch (error) {

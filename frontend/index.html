@@ -4,22 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TutorMis - Nền tảng gia sư hàng đầu</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="assets/images/logo/logo-3.png">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/css/otp.css">
     <link rel="stylesheet" href="assets/css/landing-page.css">
+    <link rel="stylesheet" href="assets/css/intro-animation.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="nav__brand">
-            <button class="sidebar__toggle" id="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="assets/images/logo/logo-3.png" alt="Logo TutorMis" class="nav__logo">
+            <a href="#home">
+                <img src="assets/images/logo/logo-3.png" alt="Logo TutorMis" class="nav__logo">
+            </a>
+        </div>
+        <nav class="nav__menu">
+            <ul class="nav__list">
+                <li class="nav__item">
+                    <a href="#home" class="nav__link"><img src="assets/images/icon-home/home.png" alt="Trang Chủ" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Trang Chủ</a>
+                </li>
+                <li class="nav__item">
+                    <a href="#university-partners" class="nav__link"><img src="assets/images/icon-home/handshake.png" alt="Đối Tác" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Đối Tác</a>
+                </li>
+                <li class="nav__item">
+                    <a href="#how-it-works" class="nav__link"><img src="assets/images/icon-home/settings.png" alt="Cách Hoạt Động" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Cách Hoạt Động</a>
+                </li>
+                <li class="nav__item">
+                    <a href="#featured-tutors" class="nav__link"><img src="assets/images/icon-home/star.png" alt="Gia Sư Tiêu Biểu" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Gia Sư Tiêu Biểu</a>
+                </li>
+                <li class="nav__item">
+                    <a href="#testimonials" class="nav__link"><img src="assets/images/icon-home/chat.png" alt="Nhận Xét" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Nhận Xét</a>
+                </li>
+                <li class="nav__item">
+                    <a href="#contact" class="nav__link"><img src="assets/images/icon-home/mail.png" alt="Liên Hệ" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Liên Hệ</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="nav__language-switcher">
+            <div class="language-dropdown">
+                <button class="language-btn active" onclick="toggleLanguageDropdown()">
+                    <img src="https://flagcdn.com/w20/vn.png" alt="Vietnam Flag" class="flag-icon">
+                    VIE
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </button>
+                <div class="language-options" id="languageOptions">
+                    <button class="language-option" data-lang="vi" onclick="switchLanguage('vi')">
+                        <img src="https://flagcdn.com/w20/vn.png" alt="Vietnam Flag" class="flag-icon">
+                        VIE
+                    </button>
+                    <button class="language-option" data-lang="en" onclick="switchLanguage('en')">
+                        <img src="https://flagcdn.com/w20/us.png" alt="US Flag" class="flag-icon">
+                        EN
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="nav__actions">
             <button class="btn btn--outline" onclick="showLoginModal()">Đăng Nhập</button>
@@ -27,127 +69,29 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar__overlay" id="sidebar-overlay"></div>
-        <div class="sidebar__content">
-            <div class="sidebar__header">
-                <div class="sidebar__brand">
-                    <img src="assets/images/logo/logo-3.png" alt="Logo TutorMis" class="nav__logo">
-                </div>
-                <button class="sidebar__close" id="sidebar-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="sidebar__menu">
-                <ul class="sidebar__list">
-                    <li class="sidebar__item">
-                        <a href="#home" class="sidebar__link">
-                            <i class="fas fa-home"></i>
-                            <span>Trang Chủ</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#university-partners" class="sidebar__link">
-                            <i class="fas fa-university"></i>
-                            <span>Đối Tác Đại Học</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#how-it-works" class="sidebar__link">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Cách Hoạt Động</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#featured-subjects" class="sidebar__link">
-                            <i class="fas fa-book"></i>
-                            <span>Môn Học</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#featured-tutors" class="sidebar__link">
-                            <i class="fas fa-user-graduate"></i>
-                            <span>Gia Sư Tiêu Biểu</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#testimonials" class="sidebar__link">
-                            <i class="fas fa-star"></i>
-                            <span>Nhận Xét</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#tutor-benefits" class="sidebar__link">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            <span>Lợi Ích Gia Sư</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#faq" class="sidebar__link">
-                            <i class="fas fa-question-circle"></i>
-                            <span>FAQ</span>
-                        </a>
-                    </li>
-                    <li class="sidebar__item">
-                        <a href="#contact" class="sidebar__link">
-                            <i class="fas fa-envelope"></i>
-                            <span>Liên Hệ</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="sidebar__footer">
-                <div class="sidebar__actions">
-                    <button class="btn btn--outline btn--full" onclick="showLoginModal()">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Đăng Nhập
-                    </button>
-                    <button class="btn btn--primary btn--full" onclick="showRegisterModal()">
-                        <i class="fas fa-user-plus"></i>
-                        Đăng Ký
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
     <!-- Hero Section -->
     <main>
         <section class="hero" id="home">
-            <video autoplay muted loop class="hero__video">
-                <source src="assets/videos/background-video-1.mp4" type="video/mp4">
-                Trình duyệt của bạn không hỗ trợ video.
-            </video>
             <div class="container">
                 <div class="hero__content">
                     <div class="hero__text">
                         <h1 class="hero__title">
-                            Tìm Kiếm <span class="highlight">Gia Sư Tinh Hoa</span> - 
-                            <span class="highlight">Bứt Phá Điểm Số</span> Ngay Hôm Nay
+                            <span class="highlight">GIA SƯ TINH HOA</span> <br>
+                            <span class="highlight">BỨT PHÁ ĐIỂM SỐ</span>
                         </h1>
                         <p class="hero__description">
-                            Kết nối với 1,000+ gia sư đã xác thực. Học tập cá nhân hóa, tiến bộ nhanh chóng chỉ từ 200k/buổi.
+                            Kết nối với 1,000+ gia sư đã xác thực. Học tập cá nhân hóa, tiến bộ nhanh chóng.
                         </p>
-                        <!-- Search Bar -->
-                        <div class="hero__search">
-                            <div class="search__form">
-                                <input type="text" class="search__input" placeholder="Tìm tên môn học, gia sư..." id="searchInput">
-                                <button class="btn btn--primary search__button" onclick="showRegisterModal('student')">
-                                    <i class="fas fa-search"></i> Tìm kiếm
-                                </button>
-                            </div>
-                        </div>
                         <div class="hero__buttons">
                             <button class="btn btn--primary btn--large" onclick="showRegisterModal('student')" style="display:inline-flex;align-items:center;gap:8px;">
                                 <dotlottie-wc src="https://lottie.host/40f4b784-6ff4-4b20-b065-4e6ca08c7973/Phf0VFiJ0U.lottie" style="width:40px;height:40px;display:inline-block;vertical-align:middle;margin-right:0;" autoplay loop></dotlottie-wc>
                                 <span>Tôi cần gia sư</span>
                                 <span class="right-arrow">
-                                    <img src="assets/images/icon/rotate.png" alt="right-arrow" style="width:20px;height:20px;">
+                                    <i class="fas fa-arrow-right" style="font-size:20px; color: #ffffff;"></i>
                                 </span>
                             </button>
                             <button class="btn btn--outline btn--large" onclick="showRegisterModal('tutor')">
-                                <img src="assets/images/icon/tutor-1.png" alt="Tôi là gia sư" style="width: 40px; height: 40px; display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                <img src="assets/images/icon/coaching.png" alt="Tôi là gia sư" style="width: 40px; height: 40px; display: inline-block; vertical-align: middle; margin-right: 8px;">
                                 Tôi là gia sư
                             </button>
                         </div>
@@ -165,11 +109,6 @@
                                 <i class="fas fa-headset"></i>
                                 <span>Hỗ trợ 24/7</span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="hero__image">
-                        <div class="hero__illustration">
-                            <dotlottie-wc src="https://lottie.host/e5f3c8b8-f9f8-4b6f-8304-412ab6c74a9b/l19Vkn7IBK.lottie" style="width: 400px;height: 400px" autoplay loop></dotlottie-wc>
                         </div>
                     </div>
                 </div>
@@ -190,7 +129,7 @@
                     </div>
                     <div class="trust-badge-item">
                         <i class="fas fa-lock"></i>
-                        <span>Bảo mật dữ liệu ISO 27001</span>
+                        <span>Bảo mật dữ liệu</span>
                     </div>
                     <div class="trust-badge-item">
                         <i class="fas fa-graduation-cap"></i>
@@ -431,42 +370,62 @@
                     <h2 class="section__title">Các Chứng Chỉ Nổi Bật Khi Tham Gia TutorMis</h2>
                     <p class="section__subtitle">Được công nhận và khen thưởng cho những đóng góp và thành tích xuất sắc của bạn</p>
                 </div>
-                <div class="certificates__grid">
-                    <div class="certificate__card">
-                        <h3 class="certificate__title">Gia Sư Xuất Sắc</h3>
-                        <img src="assets/images/certificate/GiaSuXS.png" alt="Chứng chỉ gia sư xuất sắc">
-                        <p class="certificate__description">Chứng chỉ dành cho gia sư có điểm đánh giá cao và đóng góp tích cực cho cộng đồng học tập</p>
-                        <span class="certificate__count">200+ gia sư nhận được</span>
+                <div class="swiper certificates__swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="certificate__card">
+                                <h3 class="certificate__title">Gia Sư Xuất Sắc</h3>
+                                <img src="assets/images/certificate/GiaSuXS.png" alt="Chứng chỉ gia sư xuất sắc">
+                                <p class="certificate__description">Chứng chỉ dành cho gia sư có điểm đánh giá cao và đóng góp tích cực cho cộng đồng học tập</p>
+                                <span class="certificate__count">200+ gia sư nhận được</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="certificate__card">
+                                <h3 class="certificate__title">Học Viên Tiến Bộ</h3>
+                                <img src="assets/images/certificate/HocVienTienBo.png" alt="Chứng chỉ học viên tiến bộ">
+                                <p class="certificate__description">Chứng nhận cho học viên đạt được tiến bộ vượt trội trong quá trình học tập</p>
+                                <span class="certificate__count">500+ học viên đạt được</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="certificate__card">
+                                <h3 class="certificate__title">Người Chiến Thắng Cuộc Thi</h3>
+                                <img src="assets/images/certificate/ChienThangCuocThi.png" alt="Chứng chỉ người chiến thắng các cuộc thi ">
+                                <p class="certificate__description">Chứng chỉ dành cho người thắng cuộc trong các cuộc thi kiến thức do TutorMis tổ chức</p>
+                                <span class="certificate__count">50+ người chiến thắng</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="certificate__card">
+                                <h3 class="certificate__title">Tham Gia Tích Cực</h3>
+                                <img src="assets/images/certificate/ThamGiaTichCuc.png" alt="Chứng chỉ tham gia tích cực">
+                                <p class="certificate__description">Chứng nhận cho những thành viên tích cực tham gia các hoạt động cộng đồng và sự kiện</p>
+                                <span class="certificate__count">1000+ thành viên nhận được</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="certificate__card">
+                                <h3 class="certificate__title">Chuyên Gia Môn Học</h3>
+                                <img src="assets/images/certificate/ChuyenGiaMonHoc.png" alt="Chứng chỉ chuyên gia môn học">
+                                <p class="certificate__description">Chứng chỉ xác nhận chuyên môn sâu về một môn học cụ thể sau khi hoàn thành các khóa đào tạo</p>
+                                <span class="certificate__count">150+ chuyên gia</span>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="certificate__card">
+                                <h3 class="certificate__title">Đóng Góp Cộng Đồng</h3>
+                                <img src="assets/images/certificate/DongGopCongDong.png" alt="Chứng chỉ đóng góp cộng đồng ">
+                                <p class="certificate__description">Chứng nhận cho những đóng góp ý nghĩa cho cộng đồng TutorMis và giáo dục</p>
+                                <span class="certificate__count">300+ đóng góp viên</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="certificate__card">
-                        <h3 class="certificate__title">Học Viên Tiến Bộ</h3>
-                        <img src="assets/images/certificate/HocVienTienBo.png" alt="Chứng chỉ học viên tiến bộ">
-                        <p class="certificate__description">Chứng nhận cho học viên đạt được tiến bộ vượt trội trong quá trình học tập</p>
-                        <span class="certificate__count">500+ học viên đạt được</span>
+                    <div class="custom-swiper-button-prev">
+                        <img src="assets/images/icon/chevron-first.png" alt="Previous">
                     </div>
-                    <div class="certificate__card">
-                        <h3 class="certificate__title">Người Chiến Thắng Cuộc Thi</h3>
-                        <img src="assets/images/certificate/ChienThangCuocThi.png" alt="Chứng chỉ người chiến thắng các cuộc thi ">
-                        <p class="certificate__description">Chứng chỉ dành cho người thắng cuộc trong các cuộc thi kiến thức do TutorMis tổ chức</p>
-                        <span class="certificate__count">50+ người chiến thắng</span>
-                    </div>
-                    <div class="certificate__card">
-                        <h3 class="certificate__title">Tham Gia Tích Cực</h3>
-                        <img src="assets/images/certificate/ThamGiaTichCuc.png" alt="Chứng chỉ tham gia tích cực">
-                        <p class="certificate__description">Chứng nhận cho những thành viên tích cực tham gia các hoạt động cộng đồng và sự kiện</p>
-                        <span class="certificate__count">1000+ thành viên nhận được</span>
-                    </div>
-                    <div class="certificate__card">
-                        <h3 class="certificate__title">Chuyên Gia Môn Học</h3>
-                        <img src="assets/images/certificate/ChuyenGiaMonHoc.png" alt="Chứng chỉ chuyên gia môn học">
-                        <p class="certificate__description">Chứng chỉ xác nhận chuyên môn sâu về một môn học cụ thể sau khi hoàn thành các khóa đào tạo</p>
-                        <span class="certificate__count">150+ chuyên gia</span>
-                    </div>
-                    <div class="certificate__card">
-                        <h3 class="certificate__title">Đóng Góp Cộng Đồng</h3>
-                        <img src="assets/images/certificate/DongGopCongDong.png" alt="Chứng chỉ đóng góp cộng đồng ">
-                        <p class="certificate__description">Chứng nhận cho những đóng góp ý nghĩa cho cộng đồng TutorMis và giáo dục</p>
-                        <span class="certificate__count">300+ đóng góp viên</span>
+                    <div class="custom-swiper-button-next">
+                        <img src="assets/images/icon/chevron-last.png" alt="Next">
                     </div>
                 </div>
             </div>
@@ -478,7 +437,7 @@
                     <h2 class="section__title">Gia Sư Tiêu Biểu - Chất Lượng Đảm Bảo Từ TutorMis</h2>
                     <p class="section__subtitle">Những gia sư xuất sắc nhất đang đồng hành cùng học viên</p>
                 </div>
-                <div class="tutors__carousel">
+                <div class="tutors__row1">
                     <div class="tutor__card">
                         <div class="tutor__avatar">
                             <img src="https://cdn-i.vtcnews.vn/resize/th/upload/2025/09/09/pho-giao-su-10464589.png" alt="Gia sư Hồ Viết Dũng">
@@ -533,8 +492,389 @@
                             <p class="tutor__experience">6 năm kinh nghiệm dạy Olympic</p>
                         </div>
                     </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/11/7/screenshot-2024-11-07-114847-68003.png?width=0&s=UwLy7Wgq5Mx6FzQKlQJOhA" alt="Gia sư Nguyễn Thị Lan">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Nguyễn Thị Lan</h3>
+                            <p class="tutor__subject">Hóa học - Đại học Bách khoa Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (92 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">7 năm kinh nghiệm dạy Hóa</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://danviet.ex-cdn.com/files/f1/296231569849192448/2022/1/12/bach-khoa-1-docx-1612941731952-2481-1641968737592-1641968738905332571471.jpeg" alt="Gia sư Trần Văn Minh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Trần Văn Minh</h3>
+                            <p class="tutor__subject">Lịch sử - Đại học Sư phạm Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (78 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">5 năm kinh nghiệm dạy Lịch sử</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://cafefcdn.com/203337114487263232/2023/8/5/img2509-1691140538916777218478-1691194278981-16911942791821515686834.jpg" alt="Gia sư Lê Thị Mai">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Lê Thị Mai</h3>
+                            <p class="tutor__subject">Địa lý - Đại học Khoa học Xã hội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.6 (65 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">4 năm kinh nghiệm dạy Địa lý</p>
+                        </div>
+                    </div>
+                    <!-- Duplicate for infinite scroll -->
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://cdn-i.vtcnews.vn/resize/th/upload/2025/09/09/pho-giao-su-10464589.png" alt="Gia sư Hồ Viết Dũng">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Hồ Viết Dũng</h3>
+                            <p class="tutor__subject">Toán học - Đại học Bách khoa Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (120 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">5 năm kinh nghiệm dạy Toán</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-chan-dung-co-giao-thay-giao-giao-vien-o-ha-noi-studio-yeu-media-phuc-vu-nha-truong-school-08.jpg?v=1612760881463" alt="Gia sư Trần Thị Bích Thủy">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Trần Thị Bích Thủy</h3>
+                            <p class="tutor__subject">Tiếng Anh - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (95 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">4 năm kinh nghiệm dạy IELTS</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://nguoinoitieng.tv/images/nnt/102/0/bf50.jpg" alt="Gia sư Võ Tuấn Bình">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Võ Tuấn Bình</h3>
+                            <p class="tutor__subject">Vật lý - Đại học Khoa học Tự nhiên</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.7 (85 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">6 năm kinh nghiệm dạy Olympic</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/11/7/screenshot-2024-11-07-114847-68003.png?width=0&s=UwLy7Wgq5Mx6FzQKlQJOhA" alt="Gia sư Nguyễn Thị Lan">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Nguyễn Thị Lan</h3>
+                            <p class="tutor__subject">Hóa học - Đại học Bách khoa Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (92 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">7 năm kinh nghiệm dạy Hóa</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://danviet.ex-cdn.com/files/f1/296231569849192448/2022/1/12/bach-khoa-1-docx-1612941731952-2481-1641968737592-1641968738905332571471.jpeg" alt="Gia sư Trần Văn Minh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Trần Văn Minh</h3>
+                            <p class="tutor__subject">Lịch sử - Đại học Sư phạm Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (78 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">5 năm kinh nghiệm dạy Lịch sử</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://cafefcdn.com/203337114487263232/2023/8/5/img2509-1691140538916777218478-1691194278981-16911942791821515686834.jpg" alt="Gia sư Lê Thị Mai">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Lê Thị Mai</h3>
+                            <p class="tutor__subject">Địa lý - Đại học Khoa học Xã hội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.6 (65 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">4 năm kinh nghiệm dạy Địa lý</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="tutors__row2">
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://ss-images.saostar.vn/wp700/2019/01/24/4500761/3.jpg" alt="Gia sư Phạm Quốc Anh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Phạm Quốc Anh</h3>
+                            <p class="tutor__subject">Tin học - Đại học Công nghệ</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (110 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">8 năm kinh nghiệm lập trình</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://photo.znews.vn/w660/Uploaded/ofh_btgazspf/2020_05_15/29597928_10155165050996949_186901651400465378_n.jpg" alt="Gia sư Hoàng Thị Linh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Hoàng Thị Linh</h3>
+                            <p class="tutor__subject">Ngữ văn - Đại học Sư phạm Hà Nội 2</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (95 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">6 năm kinh nghiệm dạy Văn</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://channel.mediacdn.vn/428462621602512896/2023/7/25/photo-4-16902795974311173597142.jpg" alt="Gia sư Đỗ Minh Tuấn">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Đỗ Minh Tuấn</h3>
+                            <p class="tutor__subject">Sinh học - Đại học Y Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.7 (88 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">5 năm kinh nghiệm dạy Sinh</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-giang-vien-giao-vien-trung-tam-dao-tao-lam-profile-website-quang-cao-03.jpg?v=1599634947027" alt="Gia sư Bùi Thị Hương">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Bùi Thị Hương</h3>
+                            <p class="tutor__subject">Tiếng Pháp - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (72 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">4 năm kinh nghiệm dạy Pháp</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://ht.edu.vn/wp-content/uploads/2023/05/325896371_1172206643413360_2832689520362645936_n-e1683810244954.jpg" alt="Gia sư Vũ Văn Đức">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Vũ Văn Đức</h3>
+                            <p class="tutor__subject">Tiếng Trung - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (105 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">7 năm kinh nghiệm dạy Trung</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://cdn.pixabay.com/photo/2025/02/20/12/48/ai-generated-9419886_640.jpg" alt="Gia sư Nguyễn Minh Anh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Nguyễn Minh Anh</h3>
+                            <p class="tutor__subject">Tiếng Nhật - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.6 (58 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">3 năm kinh nghiệm dạy Nhật</p>
+                        </div>
+                    </div>
+                    <!-- Duplicate for infinite scroll -->
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://ss-images.saostar.vn/wp700/2019/01/24/4500761/3.jpg" alt="Gia sư Phạm Quốc Anh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Phạm Quốc Anh</h3>
+                            <p class="tutor__subject">Tin học - Đại học Công nghệ</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (110 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">8 năm kinh nghiệm lập trình</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://photo.znews.vn/w660/Uploaded/ofh_btgazspf/2020_05_15/29597928_10155165050996949_186901651400465378_n.jpg" alt="Gia sư Hoàng Thị Linh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Hoàng Thị Linh</h3>
+                            <p class="tutor__subject">Ngữ văn - Đại học Sư phạm Hà Nội 2</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (95 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">6 năm kinh nghiệm dạy Văn</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://channel.mediacdn.vn/428462621602512896/2023/7/25/photo-4-16902795974311173597142.jpg" alt="Gia sư Đỗ Minh Tuấn">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Đỗ Minh Tuấn</h3>
+                            <p class="tutor__subject">Sinh học - Đại học Y Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.7 (88 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">5 năm kinh nghiệm dạy Sinh</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-giang-vien-giao-vien-trung-tam-dao-tao-lam-profile-website-quang-cao-03.jpg?v=1599634947027" alt="Gia sư Bùi Thị Hương">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Bùi Thị Hương</h3>
+                            <p class="tutor__subject">Tiếng Pháp - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (72 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">4 năm kinh nghiệm dạy Pháp</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://ht.edu.vn/wp-content/uploads/2023/05/325896371_1172206643413360_2832689520362645936_n-e1683810244954.jpg" alt="Gia sư Vũ Văn Đức">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Thầy Vũ Văn Đức</h3>
+                            <p class="tutor__subject">Tiếng Trung - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (105 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">7 năm kinh nghiệm dạy Trung</p>
+                        </div>
+                    </div>
+                    <div class="tutor__card">
+                        <div class="tutor__avatar">
+                            <img src="https://cdn.pixabay.com/photo/2025/02/20/12/48/ai-generated-9419886_640.jpg" alt="Gia sư Nguyễn Minh Anh">
+                        </div>
+                        <div class="tutor__info">
+                            <h3 class="tutor__name">Cô Nguyễn Minh Anh</h3>
+                            <p class="tutor__subject">Tiếng Nhật - Đại học Ngoại ngữ Hà Nội</p>
+                            <div class="tutor__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.6 (58 đánh giá)</span>
+                            </div>
+                            <p class="tutor__experience">3 năm kinh nghiệm dạy Nhật</p>
+                        </div>
+                    </div>
+                </div>
         </section>
 
         <!-- Testimonials Section -->
@@ -560,7 +900,7 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://media.baoquangninh.vn/dataimages/201410/original/images751403_3.jpg" alt="Chị Lan Anh" class="testimonial__avatar">
+                            <img src="https://vwu.vn/documents/20182/3244000/10_Dec_2021_141142_GMTucmy.jpg/d17e017b-cf4c-4565-8b75-bfa2358fcea9" alt="Chị Lan Anh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chị Lan Anh</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 9</p>
@@ -582,7 +922,7 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://lh6.googleusercontent.com/proxy/eSIs8OEV34wgxoG1s_hWARTHdwCzM1a7KvkGDo6puFOGjeSUb4VYzXLO3seCpalqJ8Q-LjULyUaDKtlE2A6DJies4lVAg_tQloBLcbBcODILZoq9g3B-BW4KtqCCXhhZwXyDP2iR6Ceq" alt="Anh Minh" class="testimonial__avatar">
+                            <img src="https://cdn.tuoitrethudo.vn/stores/news_dataimages/2024/032024/13/22/chang-sinh-vien-120240313220913.jpg?rt=20240313220922" alt="Anh Minh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Anh Minh</h4>
                                 <p class="testimonial__role">Sinh viên năm 3</p>
@@ -611,7 +951,381 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "TutorMis giúp tôi tìm được gia sư Tiếng Pháp xuất sắc. Chỉ sau 3 tháng, tôi đã có thể giao tiếp cơ bản. 
+                                Gia sư rất kiên nhẫn và phương pháp dạy rất thú vị. Khuyến khích mọi người sử dụng!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://giadinh.mediacdn.vn/2017/photo-0-1509607329029.jpg" alt="Cô Mai" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Cô Mai</h4>
+                                <p class="testimonial__role">Nhân viên văn phòng</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Con trai tôi học kém môn Lý, nhưng nhờ gia sư trên TutorMis, điểm số cải thiện đáng kể. 
+                                Gia sư giải thích rất dễ hiểu và tạo động lực học tập cho con. Cảm ơn TutorMis!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://channel.mediacdn.vn/2021/1/14/photo-1-1610602796546963495282.jpg" alt="Chị Linh" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Linh</h4>
+                                <p class="testimonial__role">Phụ huynh học sinh lớp 10</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Tôi là sinh viên IT, cần ôn lại kiến thức cơ bản. Gia sư trên TutorMis rất am hiểu và dạy rất chi tiết. 
+                                Học phí hợp lý và lịch học linh hoạt. Rất hài lòng với trải nghiệm!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://photo.znews.vn/w660/Uploaded/hointt/2024_11_30/z6080162402916_1ca24423e857d4ae3ccc34e68d39d12f_116505.jpg" alt="Anh Khoa" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Anh Khoa</h4>
+                                <p class="testimonial__role">Sinh viên năm 2 CNTT</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Gia sư Ngữ văn trên TutorMis giúp con tôi yêu thích môn học này hơn. 
+                                Gia sư không chỉ dạy kiến thức mà còn truyền cảm hứng. Điểm Văn của con tăng từ 6 lên 8.5!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://giadinh.mediacdn.vn/zoom/740_463/2017/nusinh1-1510734837497-1510798135145.jpg" alt="Chị Hương" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Hương</h4>
+                                <p class="testimonial__role">Phụ huynh học sinh lớp 12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Tôi học gia sư Toán cao cấp để chuẩn bị thi đại học. Gia sư rất giỏi và dạy rất có hệ thống. 
+                                Nhờ vậy mà tôi tự tin hơn với môn thi. TutorMis là lựa chọn tuyệt vời!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://icdn.dantri.com.vn/thumb_w/960/2018/10/6/minh-tuyen-top18-miss-teen-1-1538763544844454673946.jpg" alt="Em Lan" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Em Lan</h4>
+                                <p class="testimonial__role">Học sinh lớp 12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Gia sư Sinh học trên TutorMis giúp tôi hiểu rõ hơn về các quá trình sống. 
+                                Gia sư có cách giảng dạy rất sinh động và dễ nhớ. Điểm Sinh của tôi cải thiện đáng kể!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://images2.thanhnien.vn/528068263637045248/2024/5/7/1-17150696746752126116094.jpg" alt="Anh Tùng" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Anh Tùng</h4>
+                                <p class="testimonial__role">Sinh viên năm 1 Y khoa</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "TutorMis giúp tôi tìm gia sư Tiếng Trung nhanh chóng. Gia sư là người bản xứ và dạy rất chuyên nghiệp. 
+                                Tôi đã có thể nói chuyện cơ bản sau 2 tháng. Dịch vụ rất tốt!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://studiochupanhdep.com/Upload/Images/Album/chan-dung-beauty-05.jpg" alt="Chị Nga" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Nga</h4>
+                                <p class="testimonial__role">Nhân viên kinh doanh</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Duplicate for infinite scroll -->
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Con tôi đã tiến bộ vượt bậc môn Toán chỉ sau 1 tháng học cùng gia sư trên TutorMis. 
+                                Gia sư rất tận tâm và phương pháp dạy rất hiệu quả. Nền tảng rất dễ sử dụng và đáng tin cậy."
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://vwu.vn/documents/20182/3244000/10_Dec_2021_141142_GMTucmy.jpg/d17e017b-cf4c-4565-8b75-bfa2358fcea9" alt="Chị Lan Anh" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Lan Anh</h4>
+                                <p class="testimonial__role">Phụ huynh học sinh lớp 9</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Tôi đã cải thiện điểm Tiếng Anh từ 6.0 lên 7.5 IELTS chỉ trong 2 tháng nhờ gia sư trên TutorMis. 
+                                Gia sư rất chuyên nghiệp và lịch học linh hoạt. Rất hài lòng với dịch vụ!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://cdn.tuoitrethudo.vn/stores/news_dataimages/2024/032024/13/22/chang-sinh-vien-120240313220913.jpg?rt=20240313220922" alt="Anh Minh" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Anh Minh</h4>
+                                <p class="testimonial__role">Sinh viên năm 3</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Gia sư Hóa học trên TutorMis giúp con tôi đạt giải trong kỳ thi học sinh giỏi. 
+                                Gia sư có kinh nghiệm và phương pháp dạy rất khoa học. Cảm ơn TutorMis đã kết nối chúng tôi!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://pepsilan.com/wp-content/uploads/2022/12/full-bo-anh-dan-ong-trung-nien-viet-nam-dep-nhat-vn-1.jpg" alt="Chú Thành" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chú Thành</h4>
+                                <p class="testimonial__role">Phụ huynh học sinh lớp 11</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "TutorMis giúp tôi tìm được gia sư Tiếng Pháp xuất sắc. Chỉ sau 3 tháng, tôi đã có thể giao tiếp cơ bản. 
+                                Gia sư rất kiên nhẫn và phương pháp dạy rất thú vị. Khuyến khích mọi người sử dụng!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar4.jpg" alt="Cô Mai" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Cô Mai</h4>
+                                <p class="testimonial__role">Nhân viên văn phòng</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Con trai tôi học kém môn Lý, nhưng nhờ gia sư trên TutorMis, điểm số cải thiện đáng kể. 
+                                Gia sư giải thích rất dễ hiểu và tạo động lực học tập cho con. Cảm ơn TutorMis!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar5.jpg" alt="Chị Linh" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Linh</h4>
+                                <p class="testimonial__role">Phụ huynh học sinh lớp 10</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Tôi là sinh viên IT, cần ôn lại kiến thức cơ bản. Gia sư trên TutorMis rất am hiểu và dạy rất chi tiết. 
+                                Học phí hợp lý và lịch học linh hoạt. Rất hài lòng với trải nghiệm!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar6.jpg" alt="Anh Khoa" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Anh Khoa</h4>
+                                <p class="testimonial__role">Sinh viên năm 2 CNTT</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Gia sư Ngữ văn trên TutorMis giúp con tôi yêu thích môn học này hơn. 
+                                Gia sư không chỉ dạy kiến thức mà còn truyền cảm hứng. Điểm Văn của con tăng từ 6 lên 8.5!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar7.jpg" alt="Chị Hương" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Hương</h4>
+                                <p class="testimonial__role">Phụ huynh học sinh lớp 12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Tôi học gia sư Toán cao cấp để chuẩn bị thi đại học. Gia sư rất giỏi và dạy rất có hệ thống. 
+                                Nhờ vậy mà tôi tự tin hơn với môn thi. TutorMis là lựa chọn tuyệt vời!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar8.jpg" alt="Em Lan" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Em Lan</h4>
+                                <p class="testimonial__role">Học sinh lớp 12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "Gia sư Sinh học trên TutorMis giúp tôi hiểu rõ hơn về các quá trình sống. 
+                                Gia sư có cách giảng dạy rất sinh động và dễ nhớ. Điểm Sinh của tôi cải thiện đáng kể!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar9.jpg" alt="Anh Tùng" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Anh Tùng</h4>
+                                <p class="testimonial__role">Sinh viên năm 1 Y khoa</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial__card">
+                        <div class="testimonial__content">
+                            <p class="testimonial__text">
+                                "TutorMis giúp tôi tìm gia sư Tiếng Trung nhanh chóng. Gia sư là người bản xứ và dạy rất chuyên nghiệp. 
+                                Tôi đã có thể nói chuyện cơ bản sau 2 tháng. Dịch vụ rất tốt!"
+                            </p>
+                            <div class="testimonial__rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial__author">
+                            <img src="https://example.com/avatar10.jpg" alt="Chị Nga" class="testimonial__avatar">
+                            <div class="testimonial__info">
+                                <h4 class="testimonial__name">Chị Nga</h4>
+                                <p class="testimonial__role">Nhân viên kinh doanh</p>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </section>
 
@@ -620,7 +1334,7 @@
             <div class="container">
                 <div class="section__header">
                     <h2 class="section__title">Liên hệ với chúng tôi</h2>
-                    <p class="section__subtitle">Gửi thông tin của bạn, chúng tôi sẽ phản hồi trong thời gian sớm nhất</p>
+                    <p class="section__subtitle">Gửi thông tin của bạn, chúng tôi sẽ phản hồi trong thời gian sớm nhất!</p>
                 </div>
                 
                 <div class="contact__layout">
@@ -729,7 +1443,7 @@
                         <span class="checkbox__checkmark"></span>
                         Ghi nhớ đăng nhập
                     </label>
-                    <a href="#" class="form__link">Quên mật khẩu?</a>
+                    <a href="#" class="form__link" onclick="showForgotPasswordModal()">Quên mật khẩu?</a>
                 </div>
                 <button type="submit" class="btn btn--primary btn--full">
                     <span class="btn__text">Đăng nhập</span>
@@ -833,6 +1547,158 @@
         </div>
     </div>
 
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal__overlay" onclick="closeModal('forgotPasswordModal')"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">Quên mật khẩu</h2>
+                <button class="modal__close" onclick="closeModal('forgotPasswordModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Step 1: Enter Email -->
+            <div class="forgot-password__step" id="forgotStep1">
+                <form class="auth__form" id="forgotPasswordForm">
+                    <div class="form__group">
+                        <label class="form__label">Email</label>
+                        <input type="email" class="form__input" name="email" placeholder="Nhập email của bạn" required>
+                        <small class="form__help">Chúng tôi sẽ gửi mã OTP đến email này</small>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full">
+                        <span class="btn__text">Gửi mã OTP</span>
+                        <span class="btn__loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Step 2: Enter OTP and New Password -->
+            <div class="forgot-password__step" id="forgotStep2" style="display: none;">
+                <form class="auth__form" id="resetPasswordForm">
+                    <div class="form__group">
+                        <label class="form__label">Mã OTP</label>
+                        <input type="text" class="form__input" name="otp" placeholder="Nhập mã OTP 6 chữ số" maxlength="6" pattern="[0-9]{6}" required>
+                        <small class="form__help">Mã OTP đã được gửi đến email của bạn</small>
+                    </div>
+                    <div class="form__group">
+                        <label class="form__label">Mật khẩu mới</label>
+                        <div class="form__input-group">
+                            <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu mới" required>
+                            <button type="button" class="form__input-button" onclick="togglePassword(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password__strength" id="resetPasswordStrength"></div>
+                    </div>
+                    <div class="form__group">
+                        <label class="form__label">Xác nhận mật khẩu mới</label>
+                        <div class="form__input-group">
+                            <input type="password" class="form__input" name="confirmPassword" placeholder="Nhập lại mật khẩu mới" required>
+                            <button type="button" class="form__input-button" onclick="togglePassword(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full">
+                        <span class="btn__text">Đặt lại mật khẩu</span>
+                        <span class="btn__loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="form__divider">
+                <span>Hoặc</span>
+            </div>
+            <p class="form__switch" style="margin-bottom: 12px;">
+                Quay lại 
+                <a href="#" onclick="switchModal('forgotPasswordModal', 'loginModal')">Đăng nhập</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Terms & Privacy Modals -->
+    <div class="modal" id="termsModal">
+        <div class="modal__overlay" onclick="closeModal('termsModal')"></div>
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h2 class="modal__title">ĐIỀU KHOẢN VÀ ĐIỀU KIỆN SỬ DỤNG DỊCH VỤ TUTORMIS</h2>
+                <button class="modal__close" onclick="closeModal('termsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal__body" style="max-height:60vh;overflow:auto;padding:16px;">
+                <p>Chào mừng đến với <span style="font-weight: 700; color: var(--primary-color)">TutorMis</span>. Trước khi sử dụng dịch vụ, vui lòng đọc kỹ các điều khoản dưới đây. Bằng việc đăng ký hoặc sử dụng dịch vụ, bạn đồng ý với các điều khoản này. Nếu bạn không đồng ý với bất kỳ phần nào của Điều khoản, vui lòng ngưng sử dụng Dịch vụ ngay lập tức.</p>
+
+                <h3>1. Giới thiệu và Phạm vi Dịch vụ</h3>
+                <p>TutorMis cung cấp nền tảng kết nối học viên và gia sư. Chúng tôi không trực tiếp cung cấp dịch vụ dạy học mà đóng vai trò trung gian kết nối và hỗ trợ thanh toán, đánh giá.
+                    Chúng tôi không phải là một tổ chức giáo dục hay nhà cung cấp dịch vụ gia sư. Vai trò của TutorMis được giới hạn trong việc:
+                    <p>(a) Cung cấp Nền tảng như một nơi trung gian để kết nối Học viên và Gia sư.</p>
+                    <p></p>(b) Hỗ trợ các công cụ quản lý lịch học, lớp học và đánh giá.</p>
+                    <p>(c) Đóng vai trò là đại lý thu hộ và xử lý thanh toán cho các Dịch vụ do Gia sư cung cấp.</p>
+                </p>
+                <h3>2. Tài khoản người dùng</h3>
+                <p>Người dùng chịu trách nhiệm về tính chính xác thông tin cung cấp. Bạn cam kết không sử dụng tài khoản cho các hành vi lừa đảo, xâm phạm bản quyền hoặc vi phạm pháp luật.</p>
+
+                <h3>3. Quy định nội dung</h3>
+                <p>Mọi nội dung tải lên nền tảng (hồ sơ, ảnh, video, mô tả) phải là của bạn hoặc bạn có quyền chia sẻ. Nền tảng có quyền xóa nội dung vi phạm.</p>
+
+                <h3>4. Thanh toán và hoàn tiền</h3>
+                <p>Chính sách thanh toán sẽ được áp dụng theo từng gói dịch vụ. Trong trường hợp không hài lòng, chính sách hoàn tiền sẽ được xử lý theo quy định của TutorMis.</p>
+
+                <h3>5. Giới hạn trách nhiệm</h3>
+                <p>TutorMis không chịu trách nhiệm cho hành vi, nội dung hoặc kết quả học tập của gia sư/học viên; chúng tôi cung cấp công cụ kết nối và phản hồi.</p>
+
+                <h3>6. Cập nhật điều khoản</h3>
+                <p>Chúng tôi có thể thay đổi điều khoản tại bất kỳ thời điểm nào. Mọi thay đổi sẽ được thông báo trên trang web; việc tiếp tục sử dụng dịch vụ sau thông báo đồng nghĩa bạn chấp nhận các thay đổi.</p>
+
+                <p style="margin-top:12px;"><strong>Phiên bản: </strong>1.0 — Cập nhật: 2025</p>
+            </div>
+            <div class="modal__footer" style="padding:12px 16px;text-align:right;">
+                <button class="btn btn--outline" onclick="closeModal('termsModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="policyModal">
+        <div class="modal__overlay" onclick="closeModal('policyModal')"></div>
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h2 class="modal__title">Chính sách bảo mật</h2>
+                <button class="modal__close" onclick="closeModal('policyModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal__body" style="max-height:60vh;overflow:auto;padding:16px;">
+                <p>Tại TutorMis, chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu.</p>
+
+                <h3>1. Dữ liệu thu thập</h3>
+                <p>Chúng tôi thu thập thông tin bạn cung cấp khi đăng ký (tên, email, số điện thoại), thông tin giao dịch và các dữ liệu do bạn nhập trên hồ sơ.</p>
+
+                <h3>2. Mục đích sử dụng</h3>
+                <p>Dữ liệu được sử dụng để liên hệ, xác thực tài khoản, xử lý thanh toán, cải thiện dịch vụ và tuân thủ pháp luật.</p>
+
+                <h3>3. Lưu trữ và bảo mật</h3>
+                <p>Chúng tôi lưu trữ dữ liệu trên máy chủ an toàn và sử dụng biện pháp mã hóa cho thông tin nhạy cảm. Chỉ nhân viên/đối tác được ủy quyền mới truy cập dữ liệu khi cần thiết.</p>
+
+                <h3>4. Chia sẻ dữ liệu</h3>
+                <p>Chúng tôi có thể chia sẻ thông tin với dịch vụ thanh toán, đối tác cung cấp chức năng (ví dụ: hệ thống email), hoặc khi được yêu cầu theo pháp luật.</p>
+
+                <h3>5. Quyền của bạn</h3>
+                <p>Bạn có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân. Để thực hiện, vui lòng liên hệ: <a href="mailto:hoangdev21@gmail.com">hoangdev21@gmail.com</a>.</p>
+
+                <p style="margin-top:12px;"><strong>Phiên bản: </strong>1.0 — Cập nhật: 2025</p>
+            </div>
+            <div class="modal__footer" style="padding:12px 16px;text-align:right;">
+                <button class="btn btn--outline" onclick="closeModal('policyModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal__overlay" onclick="closeModal('successModal')"></div>
@@ -846,6 +1712,24 @@
                 <button class="btn btn--primary" onclick="closeModal('successModal')">
                     Đóng
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intro Overlay -->
+    <div class="intro-overlay" id="introOverlay">
+        <div class="intro-background"></div>
+        <div class="intro-content">
+            <div class="logo-container">
+                <img src="assets/images/logo/logo-3.png" alt="TutorMis Logo" class="intro-logo">
+            </div>
+            <div class="intro-text">
+                <h1 class="intro-title">Chào mừng đến với TutorMis</h1>
+                <p class="intro-subtitle">Nền tảng gia sư hàng đầu Việt Nam</p>
+                <p class="intro-description">Kết nối tri thức và tương lai</p>
+            </div>
+            <div class="loading-indicator">
+                <div class="loading-bar"></div>
             </div>
         </div>
     </div>
@@ -876,7 +1760,7 @@
                     <h4 class="footer__heading">Hỗ trợ</h4>
                     <ul class="footer__links">
                         <li><a href="#">Trung tâm trợ giúp</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
+                            <li><a href="#">Điều khoản sử dụng</a></li>
                         <li><a href="#">Chính sách bảo mật</a></li>
                     </ul>
                 </div>
@@ -892,8 +1776,8 @@
                             <a href="https://www.instagram.com/_hoanggmis_/" target="_blank"><i class="fab fa-instagram"></i></a>
                             <a href="https://www.tiktok.com/@cobietbuondau_" target="_blank"><i class="fab fa-tiktok"></i></a>
                             <a href="https://hoangdev21.github.io/Portfolio/" target="_blank"><i class="fas fa-briefcase"></i></a>
-                            
                         </div>
+                        <p class="footer__note">Make by 🧡 <i>HoangDev21</i></p>
                     </div>
                 </div>
             </div>
@@ -902,14 +1786,28 @@
             </div>
         </div>
     </footer>
-
-    <!-- Scripts -->
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/otp.js"></script>
+    <script src="assets/js/intro-animation-config.js"></script>
+    <script src="assets/js/intro-animation.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/home-contact.js"></script>
     <script src="assets/js/landing-page.js"></script>
+    <script src="assets/js/language.js"></script>
     <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.1/dist/dotlottie-wc.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Hotline Icons -->
+    <div class="hotline-icons">
+        <a href="tel:0337982569" class="hotline-icon phone" title="Gọi hotline">
+            <img src="assets/images/icon/phone-call.png" alt="Gọi hotline">
+        </a>
+        <a href="https://zalo.me/0337982569" class="hotline-icon zalo" title="Chat Zalo" target="_blank">
+            <img src="assets/images/icon/chat-zalo.png" alt="Chat Zalo">
+        </a>
+        <a href="https://t.me/hoangdev21" class="hotline-icon telegram" title="Chat Telegram" target="_blank">
+            <img src="assets/images/icon/telegram.png" alt="Chat Telegram">
+        </a>
+    </div>
 </body>
 </html>

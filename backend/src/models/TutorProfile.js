@@ -148,6 +148,11 @@ const tutorProfileSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // Danh sách đánh giá từ học sinh
+  reviews: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
+  }],
   totalStudents: {
     type: Number,
     default: 0

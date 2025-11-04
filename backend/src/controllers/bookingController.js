@@ -667,7 +667,98 @@ exports.completeBooking = async (req, res) => {
     }
 
     await booking.complete();
-    await booking.populate('student', 'email profile');
+    
+    // Populate lại dữ liệu đầy đủ (including student.profile) trước khi gửi response
+    await booking.populate([
+      {
+        path: 'student',
+        select: 'email role',
+        populate: {
+          path: 'profile',
+          select: 'fullName avatar phone'
+        }
+      },
+      {
+        path: 'tutor',
+        select: 'email role',
+        populate: {
+          path: 'profile',
+          select: 'fullName avatar phone bio'
+        }
+      }
+    ]);
+
+    // Gửi email thông báo hoàn thành cho học sinh
+    try {
+      const studentEmail = booking.student.email;
+      const studentProfile = await StudentProfile.findOne({ user: booking.student._id });
+      const studentName = studentProfile?.fullName || booking.student.email;
+      
+      const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
+      const tutorName = tutorProfile?.fullName || booking.tutor.email;
+
+      const emailTemplate = {
+        subject: 'Khóa Học Đã Hoàn Thành',
+        html: `
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+              <h1 style="margin: 0; font-size: 28px;">TutorMis</h1>
+              <p style="margin: 10px 0 0 0; font-size: 16px;">Nền tảng gia sư hàng đầu</p>
+            </div>
+            
+            <div style="background: #ffffff; padding: 40px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+              <h2 style="color: #333; margin-bottom: 20px;">Xin chào ${studentName}!</h2>
+              
+              <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+                Gia sư <strong>${tutorName}</strong> vừa đánh dấu khóa học của bạn là đã hoàn thành.
+              </p>
+              
+              <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 30px 0;">
+                <h3 style="color: #333; margin-top: 0;">Chi tiết khóa học:</h3>
+                <p style="margin: 10px 0;"><strong>Môn học:</strong> ${booking.subject?.name || 'N/A'}</p>
+                <p style="margin: 10px 0;"><strong>Cấp học:</strong> ${booking.subject?.level || 'N/A'}</p>
+                <p style="margin: 10px 0;"><strong>Ngày bắt đầu:</strong> ${booking.schedule?.startDate ? new Date(booking.schedule.startDate).toLocaleDateString('vi-VN') : 'N/A'}</p>
+                <p style="margin: 10px 0;"><strong>Gia sư:</strong> ${tutorName}</p>
+              </div>
+              
+              <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+                Bạn có thể <strong>đánh giá khóa học và gia sư</strong> của bạn trên nền tảng để giúp cải thiện dịch vụ.
+              </p>
+              
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/pages/student/courses.html" 
+                   style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                           color: white; padding: 12px 30px; text-decoration: none; 
+                           border-radius: 5px; display: inline-block; font-weight: bold;">
+                  Xem Khóa Học Của Bạn
+                </a>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
+              
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                Cảm ơn bạn đã sử dụng Tutornis!<br>
+                © 2024 Tutornis. All rights reserved.
+              </p>
+            </div>
+          </div>
+        `
+      };
+
+      await sendEmail(studentEmail, emailTemplate);
+      console.log('✅ Gửi thông báo hoàn thành khóa học cho học sinh:', studentEmail);
+    } catch (emailError) {
+      console.error('⚠️ Gửi email hoàn thành thất bại:', emailError);
+    }
+
+    // Tạo thông báo cho học sinh
+    try {
+      const tutorProfile = await TutorProfile.findOne({ userId: tutorId });
+      const tutorName = tutorProfile?.fullName || booking.tutor.email;
+      await notifyBookingCompleted(booking, booking.student._id, tutorName);
+    } catch (notifError) {
+      console.error('⚠️ Tạo thông báo hoàn thành thất bại:', notifError);
+    }
 
     res.json({
       success: true,
@@ -688,6 +779,8 @@ exports.completeBooking = async (req, res) => {
 // @desc    Add rating to completed booking
 // @route   POST /api/bookings/:id/rating
 // @access  Private (Student)
+// NOTE: Chức năng này hiện tại được thay thế bằng /api/reviews
+// Nhưng vẫn giữ lại để tương thích ngược
 exports.rateBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
@@ -752,7 +845,7 @@ exports.rateBooking = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Đã đánh giá lịch học',
+      message: 'Đã đánh giá lịch học (sử dụng hệ thống Review cũ - vui lòng sử dụng /api/reviews)',
       data: booking
     });
 

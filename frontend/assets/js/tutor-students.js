@@ -220,6 +220,7 @@ function renderStudentCard(booking) {
                      booking.status === 'cancelled' ? 'Đã hủy' : 'Từ chối';
   
   const startDate = booking.schedule?.startDate ? new Date(booking.schedule.startDate).toLocaleDateString('vi-VN') : 'N/A';
+  const endDate = calculateEndDate(booking.schedule?.startDate, booking.schedule?.duration);
   const preferredTime = booking.schedule?.preferredTime || 'Chưa xác định';
   const scheduleInfo = `${booking.schedule?.daysPerWeek || 0} buổi/tuần • ${booking.schedule?.hoursPerSession || 0}h/buổi`;
   
@@ -262,17 +263,34 @@ function renderStudentCard(booking) {
         
         <div class="info-row">
           <div class="info-item">
+            <i class="fas fa-calendar-check"></i>
+            <div>
+              <span class="info-label">Kết thúc</span>
+              <span class="info-value">${endDate}</span>
+            </div>
+          </div>
+          <div class="info-item">
             <i class="fas fa-clock"></i>
             <div>
               <span class="info-label">Thời gian</span>
               <span class="info-value">${preferredTime}</span>
             </div>
           </div>
+        </div>
+        
+        <div class="info-row">
           <div class="info-item">
             <i class="fas fa-calendar-week"></i>
             <div>
               <span class="info-label">Lịch học</span>
-              <span class="info-value">${scheduleInfo}</span>
+              <span class="info-value">${booking.schedule?.daysPerWeek || 0} buổi/tuần</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-hourglass-end"></i>
+            <div>
+              <span class="info-label">Thời lượng buổi</span>
+              <span class="info-value">${booking.schedule?.hoursPerSession || 0}h/buổi</span>
             </div>
           </div>
         </div>
@@ -289,12 +307,16 @@ function renderStudentCard(booking) {
         
         <div class="pricing-info">
           <div class="pricing-item">
-            <span class="pricing-label">Học phí</span>
-            <span class="pricing-value">${formatCurrency(hourlyRate)}/giờ</span>
+            <span class="pricing-label">Học phí/giờ</span>
+            <span class="pricing-value">${formatCurrency(hourlyRate)}</span>
+          </div>
+          <div class="pricing-item">
+            <span class="pricing-label">Học phí/tháng</span>
+            <span class="pricing-value">${formatCurrency(calculateMonthlyPrice(booking))}</span>
           </div>
           <div class="pricing-item">
             <span class="pricing-label">Tổng học phí</span>
-            <span class="pricing-value total">${formatCurrency(totalAmount)}</span>
+            <span class="pricing-value total">${formatCurrency(calculateTotalPriceTutor(booking))}</span>
           </div>
         </div>
       </div>
@@ -468,8 +490,12 @@ function renderStudentDetailContent(booking) {
             <strong>${booking.schedule?.startDate ? new Date(booking.schedule.startDate).toLocaleDateString('vi-VN') : 'N/A'}</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
+            <span style="color: #64748b;">Ngày kết thúc:</span>
+            <strong>${calculateEndDate(booking.schedule?.startDate, booking.schedule?.duration)}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
             <span style="color: #64748b;">Thời lượng:</span>
-            <strong>${booking.schedule?.duration || 0} tuần</strong>
+            <strong>${booking.schedule?.duration || 0} tháng</strong>
           </div>
         </div>
       </div>
@@ -493,7 +519,7 @@ function renderStudentDetailContent(booking) {
           </div>
           <div style="display: flex; justify-content: space-between;">
             <span style="color: #64748b;">Tổng số giờ:</span>
-            <strong>${booking.pricing?.totalHours || 0} giờ</strong>
+            <strong>${calculateTotalHoursTutor(booking)} giờ</strong>
           </div>
         </div>
       </div>
@@ -524,8 +550,8 @@ function renderStudentDetailContent(booking) {
             <strong style="color: #059669;">${formatCurrency(booking.pricing?.hourlyRate || 0)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 2px dashed #e2e8f0;">
-            <span style="color: #64748b; font-size: 16px;">Tổng học phí:</span>
-            <strong style="color: #059669; font-size: 18px;">${formatCurrency(booking.pricing?.totalAmount || 0)}</strong>
+            <span style="color: #64748b; font-size: 16px;">Tổng thu nhập dự kiến:</span>
+            <strong style="color: #059669; font-size: 18px;">${formatCurrency(calculateTotalPriceTutor(booking))}</strong>
           </div>
         </div>
       </div>
@@ -618,5 +644,78 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Calculate total hours based on course duration for tutor
+function calculateTotalHoursTutor(booking) {
+  const schedule = booking.schedule || {};
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Get duration in months
+  const duration = schedule.duration || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (duration in months)
+  const totalHours = daysPerWeek * 4 * hoursPerSession * duration;
+  
+  return totalHours;
+}
+
+// Calculate total price based on actual course duration for tutor
+function calculateTotalPriceTutor(booking) {
+  const pricing = booking.pricing || {};
+  const schedule = booking.schedule || {};
+  
+  // Get hourly rate
+  const hourlyRate = pricing.hourlyRate || 0;
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Get duration in months
+  const duration = schedule.duration || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (hourly rate) × (duration in months)
+  const totalPrice = daysPerWeek * 4 * hoursPerSession * hourlyRate * duration;
+  
+  return totalPrice;
+}
+
+// Calculate end date based on start date and duration (in months)
+function calculateEndDate(startDateStr, durationMonths) {
+  if (!startDateStr || !durationMonths) return 'N/A';
+  
+  try {
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + parseInt(durationMonths));
+    
+    return endDate.toLocaleDateString('vi-VN');
+  } catch (error) {
+    console.error('Calculate end date error:', error);
+    return 'N/A';
+  }
+}
+
+// Calculate monthly price (hourly rate × hours per session × days per week × 4 weeks per month)
+function calculateMonthlyPrice(booking) {
+  const pricing = booking.pricing || {};
+  const schedule = booking.schedule || {};
+  
+  const hourlyRate = pricing.hourlyRate || 0;
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Calculate: hourly rate × hours per session × days per week × 4 weeks per month
+  const monthlyPrice = hourlyRate * hoursPerSession * daysPerWeek * 4;
+  
+  return monthlyPrice;
+}
 
 console.log('Tutor students management initialized');

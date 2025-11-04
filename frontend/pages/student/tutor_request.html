@@ -40,7 +40,7 @@
                     </div>
                     <div class="menu-item active" data-page="requests">
                         <img src="../../assets/images/dashboard-student/requests.png" alt="requests">
-                        <span>Yêu Cầu Gia Sư </span>
+                        <span>Đặt lịch</span>
                     </div>
                     <div class="menu-item" data-page="find-tutor">
                         <img src="../../assets/images/dashboard-student/find-tutor.png" alt="find-tutor">
@@ -145,8 +145,34 @@
                                     <i class="fas fa-user-tie"></i>
                                     Thông Tin Gia Sư
                                 </h3>
+                                
+                                <!-- Tutor Search -->
+                                <div class="form-group">
+                                    <label for="tutorSearch">Tìm kiếm gia sư <span class="required">*</span></label>
+                                    <div class="search-input-container">
+                                        <input type="text" id="tutorSearch" placeholder="Nhập tên gia sư, môn học hoặc từ khóa...">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <div class="search-loading" id="searchLoading" style="display: none;">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div id="tutorInfoDisplay" class="tutor-preview">
                                     <!-- Will be populated by JS -->
+                                </div>
+
+                                <!-- Search Results -->
+                                <div class="search-results" id="searchResults" style="display: none;">
+                                    <div class="search-results-header">
+                                        <span>Kết quả tìm kiếm</span>
+                                        <button type="button" class="close-search" onclick="closeTutorSearch()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="search-results-list" id="searchResultsList">
+                                        <!-- Search results will be populated here -->
+                                    </div>
                                 </div>
                             </div>
 

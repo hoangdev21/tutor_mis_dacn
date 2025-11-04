@@ -13,6 +13,7 @@ const Notification = require('./Notification');
 const ContactSubmission = require('./ContactSubmission');
 const Transaction = require('./Transaction');
 const ActivityLog = require('./ActivityLog');
+const Review = require('./Review');
 
 module.exports = {
   User,
@@ -28,5 +29,6 @@ module.exports = {
   SupportTicket,
   ContactSubmission,
   Transaction,
-  ActivityLog
+  ActivityLog,
+  Review
 };

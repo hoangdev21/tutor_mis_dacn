@@ -185,12 +185,18 @@ function renderTutorCard(tutor) {
                 
                 <div class="tutor-info">
                     <div class="info-item">
-                        <i class="fas fa-briefcase"></i>
-                        <span><strong>${profile.yearsOfExperience || 0}</strong> năm kinh nghiệm</span>
+                        <i class="fas fa-star-half-alt"></i>
+                        <div>
+                            <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${profile.yearsOfExperience || 0} năm</strong>
+                            <span style="display: block; font-size: 11px; color: #94a3b8; margin-top: 3px;">Kinh nghiệm giảng dạy</span>
+                        </div>
                     </div>
                     <div class="info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${address}</span>
+                        <i class="fas fa-location-dot"></i>
+                        <div>
+                            <strong style="display: block;">${address.split(',')[0] || 'Chưa cập nhật'}</strong>
+                            <span style="display: block; font-size: 11px; color: #94a3b8; margin-top: 3px;">${address.split(',').length > 1 ? address.split(',')[1].trim() : 'Địa điểm'}</span>
+                        </div>
                     </div>
                 </div>
                 

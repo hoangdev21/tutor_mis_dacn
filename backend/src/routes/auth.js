@@ -12,13 +12,16 @@ const {
   getMe,
   getTutors,
   getTutorById,
-  testEmail
+  testEmail,
+  forgotPasswordOTP,
+  verifyForgotPasswordOTP
 } = require('../controllers/authController');
 const {
   validateRegistration,
   validateLogin,
   validatePasswordReset,
-  validateNewPassword
+  validateNewPassword,
+  validateVerifyForgotPasswordOTP
 } = require('../middleware/validation');
 const {
   loginLimiter,
@@ -266,17 +269,10 @@ router.post('/forgot-password', emailLimiter, validatePasswordReset, forgotPassw
 
 /**
  * @swagger
- * /auth/reset-password/{token}:
+ * /auth/forgot-password-otp:
  *   post:
- *     summary: Reset mật khẩu mới
+ *     summary: Gửi mã OTP đặt lại mật khẩu
  *     tags: [Authentication]
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         description: Token reset mật khẩu
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -284,19 +280,15 @@ router.post('/forgot-password', emailLimiter, validatePasswordReset, forgotPassw
  *           schema:
  *             type: object
  *             required:
- *               - password
- *               - confirmPassword
+ *               - email
  *             properties:
- *               password:
+ *               email:
  *                 type: string
- *                 minLength: 6
- *                 description: Mật khẩu mới
- *               confirmPassword:
- *                 type: string
- *                 description: Xác nhận mật khẩu mới
+ *                 format: email
+ *                 description: Email cần đặt lại mật khẩu
  *     responses:
  *       200:
- *         description: Reset mật khẩu thành công
+ *         description: OTP đã được gửi thành công
  *         content:
  *           application/json:
  *             schema:
@@ -307,15 +299,91 @@ router.post('/forgot-password', emailLimiter, validatePasswordReset, forgotPassw
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: "Password reset successfully"
- *       400:
- *         description: Token không hợp lệ hoặc mật khẩu không khớp
+ *                   example: "Mã OTP đã được gửi đến email của bạn"
+ *       404:
+ *         description: Email không tồn tại
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       429:
+ *         description: Quá nhiều yêu cầu gửi OTP
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/reset-password/:token', validateNewPassword, resetPassword);
+router.post('/forgot-password-otp', emailLimiter, validatePasswordReset, forgotPasswordOTP);
+
+/**
+ * @swagger
+ * /auth/verify-forgot-password-otp:
+ *   post:
+ *     summary: Xác nhận OTP và đặt lại mật khẩu
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email của tài khoản
+ *               otp:
+ *                 type: string
+ *                 minLength: 6
+ *                 maxLength: 6
+ *                 pattern: '^[0-9]{6}$'
+ *                 description: Mã OTP
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *                 description: Mật khẩu mới
+ *               confirmPassword:
+ *                 type: string
+ *                 description: Xác nhận mật khẩu mới
+ *     responses:
+ *       200:
+ *         description: Mật khẩu đã được đặt lại thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Mật khẩu đã được đặt lại thành công"
+ *       400:
+ *         description: OTP không hợp lệ hoặc mật khẩu không khớp
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Email không tồn tại
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       429:
+ *         description: Quá nhiều lần thử OTP sai
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/verify-forgot-password-otp', emailLimiter, validateVerifyForgotPasswordOTP, verifyForgotPasswordOTP);
 
 /**
  * @swagger
@@ -542,5 +610,7 @@ router.get('/tutor/:id', getTutorById);
  *               $ref: '#/components/schemas/Error'
  */
 router.post('/test-email', emailLimiter, testEmail);
+
+module.exports = router;
 
 module.exports = router;

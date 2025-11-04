@@ -3,6 +3,14 @@
 // API_BASE_URL is already defined in main.js
 let incomeChart = null;
 
+// Debug mode
+const DEBUG = true;
+function debug(message, data = null) {
+  if (DEBUG) {
+    console.log(`[DASHBOARD] ${message}`, data || '');
+  }
+}
+
 // Load dashboard data
 async function loadDashboard() {
   try {
@@ -14,7 +22,23 @@ async function loadDashboard() {
     const period = document.getElementById('incomeChartPeriod')?.value || 'month';
     const token = localStorage.getItem('token');
     
-    const response = await fetch(`${API_BASE_URL}/tutor/dashboard?period=${period}`, {
+    console.log('🔄 Loading dashboard...');
+    console.log('📍 API URL:', API_BASE_URL);
+    console.log('🔑 Token exists:', !!token);
+    
+    if (!token) {
+      console.error('❌ No token found');
+      showErrorState('studentsContainer', 'Vui lòng đăng nhập lại');
+      showErrorState('requestsContainer', 'Vui lòng đăng nhập lại');
+      showErrorState('scheduleContainer', 'Vui lòng đăng nhập lại');
+      showErrorState('notificationsContainer', 'Vui lòng đăng nhập lại');
+      return;
+    }
+    
+    const url = `${API_BASE_URL}/tutor/dashboard?period=${period}`;
+    console.log('🌐 Request URL:', url);
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -22,16 +46,33 @@ async function loadDashboard() {
       }
     });
     
+    console.log('📨 Response status:', response.status);
+    
+    // Check if response is ok
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+    }
+    
     const data = await response.json();
     
-    if (data.success) {
+    console.log('📊 Dashboard data received:', data);
+    
+    if (data.success && data.data) {
       const { stats, incomeChartData, recentStudents, newRequests, upcomingSchedule, notifications } = data.data;
       
+      console.log('✅ Data structure valid');
+      console.log('📈 Stats:', stats);
+      
+      // Validate stats
+      if (!stats) {
+        console.warn('⚠️ Stats data is missing');
+      }
+      
       // Update stats
-      updateStats(stats);
+      updateStats(stats || {});
       
       // Render sections
-      renderIncomeChart(incomeChartData, period);
+      renderIncomeChart(incomeChartData || {}, period);
       renderRecentStudents(recentStudents || []);
       renderNewRequests(newRequests || []);
       renderUpcomingSchedule(upcomingSchedule || []);
@@ -42,13 +83,23 @@ async function loadDashboard() {
       document.getElementById('newRequestsCount').textContent = newRequests?.length || 0;
       document.getElementById('upcomingScheduleCount').textContent = upcomingSchedule?.length || 0;
       document.getElementById('notificationsCount').textContent = notifications?.length || 0;
+      
+      console.log('✅ Dashboard loaded successfully');
+    } else {
+      const errorMsg = data.message || 'Lỗi tải dữ liệu';
+      console.error('❌ API returned error:', errorMsg);
+      showErrorState('studentsContainer', errorMsg);
+      showErrorState('requestsContainer', errorMsg);
+      showErrorState('scheduleContainer', errorMsg);
+      showErrorState('notificationsContainer', errorMsg);
     }
   } catch (error) {
-    console.error('Load dashboard error:', error);
-    showErrorState('studentsContainer', 'Không thể tải dữ liệu');
-    showErrorState('requestsContainer', 'Không thể tải dữ liệu');
-    showErrorState('scheduleContainer', 'Không thể tải dữ liệu');
-    showErrorState('notificationsContainer', 'Không thể tải dữ liệu');
+    console.error('❌ Load dashboard error:', error);
+    const errorMsg = error.message || 'Không thể tải dữ liệu. Vui lòng thử lại.';
+    showErrorState('studentsContainer', errorMsg);
+    showErrorState('requestsContainer', errorMsg);
+    showErrorState('scheduleContainer', errorMsg);
+    showErrorState('notificationsContainer', errorMsg);
   }
 }
 
@@ -69,16 +120,27 @@ function updateStats(stats) {
   // Monthly Income - hiển thị thu nhập tháng này
   const monthlyIncomeEl = document.getElementById('monthlyIncome');
   if (monthlyIncomeEl) {
-    const income = stats.monthlyIncome || 0;
-    monthlyIncomeEl.textContent = formatCurrency(income);
-    // Add animation when value changes
-    monthlyIncomeEl.style.transition = 'all 0.3s ease';
+    try {
+      const income = Number(stats.monthlyIncome) || 0;
+      monthlyIncomeEl.textContent = formatCurrency(income);
+      monthlyIncomeEl.style.transition = 'all 0.3s ease';
+      console.log('✅ Monthly income updated:', income);
+    } catch (e) {
+      console.error('Error formatting monthly income:', e);
+      monthlyIncomeEl.textContent = '0đ';
+    }
   }
   
   const predictedIncomeEl = document.getElementById('predictedIncome');
   if (predictedIncomeEl) {
-    const predicted = stats.predictedIncome || 0;
-    predictedIncomeEl.textContent = formatCurrency(predicted);
+    try {
+      const predicted = Number(stats.predictedIncome) || 0;
+      predictedIncomeEl.textContent = formatCurrency(predicted);
+      console.log('✅ Predicted income updated:', predicted);
+    } catch (e) {
+      console.error('Error formatting predicted income:', e);
+      predictedIncomeEl.textContent = '0đ';
+    }
   }
 
   // Available Requests
@@ -90,7 +152,7 @@ function updateStats(stats) {
   // Average Rating - hiển thị đánh giá trung bình
   const averageRatingEl = document.getElementById('averageRating');
   if (averageRatingEl) {
-    const rating = stats.averageRating || 0;
+    const rating = Number(stats.averageRating) || 0;
     averageRatingEl.textContent = rating.toFixed(1);
     
     // Add star color based on rating
@@ -124,84 +186,165 @@ function renderIncomeChart(incomeChartData, period) {
     incomeChart.destroy();
   }
 
-  // Prepare data
-  const actualData = incomeChartData?.actual || [];
-  const predictedData = incomeChartData?.predicted || [];
+  // Handle empty or invalid data
+  if (!incomeChartData || typeof incomeChartData !== 'object') {
+    ctx.parentElement.innerHTML = '<div class="chart-empty-state"><p>Không có dữ liệu biểu đồ</p></div>';
+    return;
+  }
+
+  // Prepare data with validation
+  const actualData = Array.isArray(incomeChartData.actual) ? incomeChartData.actual : [];
+  const predictedData = Array.isArray(incomeChartData.predicted) ? incomeChartData.predicted : [];
+  
+  // If no data at all, show empty state
+  if (actualData.length === 0 && predictedData.length === 0) {
+    ctx.parentElement.innerHTML = '<div class="chart-empty-state"><p>Chưa có dữ liệu thu nhập</p></div>';
+    return;
+  }
   
   // Merge and sort dates
   const allDates = [...new Set([...actualData.map(d => d.date), ...predictedData.map(d => d.date)])].sort();
   
+  if (allDates.length === 0) {
+    ctx.parentElement.innerHTML = '<div class="chart-empty-state"><p>Không có dữ liệu biểu đồ</p></div>';
+    return;
+  }
+  
   // Create data arrays
   const actualAmounts = allDates.map(date => {
     const item = actualData.find(d => d.date === date);
-    return item ? item.amount : 0;
+    return item ? Math.max(0, Number(item.amount) || 0) : 0;
   });
   
   const predictedAmounts = allDates.map(date => {
     const item = predictedData.find(d => d.date === date);
-    return item ? item.amount : 0;
+    return item ? Math.max(0, Number(item.amount) || 0) : 0;
   });
 
-  incomeChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: allDates.map(date => formatChartDate(date, period)),
-      datasets: [
-        {
-          label: 'Thu nhập thực tế',
-          data: actualAmounts,
-          borderColor: 'rgb(34, 197, 94)',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          tension: 0.4,
-          fill: true,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        },
-        {
-          label: 'Dự kiến',
-          data: predictedAmounts,
-          borderColor: 'rgb(249, 115, 22)',
-          backgroundColor: 'rgba(249, 115, 22, 0.1)',
-          tension: 0.4,
-          fill: true,
-          borderDash: [5, 5],
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            usePointStyle: true,
-            padding: 15
+  // Create canvas context wrapper if needed
+  try {
+    incomeChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: allDates.map(date => formatChartDate(date, period)),
+        datasets: [
+          {
+            label: 'Thu nhập thực tế',
+            data: actualAmounts,
+            borderColor: 'rgb(34, 197, 94)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgb(34, 197, 94)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 7,
+            segment: {
+              borderColor: (ctx) => ctx.p0DataIndex === ctx.p1DataIndex ? 'transparent' : undefined,
+            }
+          },
+          {
+            label: 'Dự kiến',
+            data: predictedAmounts,
+            borderColor: 'rgb(249, 115, 22)',
+            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+            tension: 0.4,
+            fill: true,
+            borderDash: [5, 5],
+            pointRadius: 5,
+            pointBackgroundColor: 'rgb(249, 115, 22)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 7
           }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 15,
+              font: {
+                size: 13,
+                weight: '500'
+              }
+            }
+          },
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            titleFont: { size: 13, weight: 'bold' },
+            bodyFont: { size: 12 },
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+              },
+              afterLabel: function(context) {
+                try {
+                  // Get chart instance safely
+                  if (context.datasetIndex === 0 && context.chart && context.chart.data) {
+                    const predictedDataset = context.chart.data.datasets[1];
+                    if (predictedDataset && predictedDataset.data && context.dataIndex < predictedDataset.data.length) {
+                      const predicted = predictedDataset.data[context.dataIndex];
+                      if (predicted) {
+                        const diff = context.parsed.y - predicted;
+                        const sign = diff > 0 ? '+' : '';
+                        return 'So với dự kiến: ' + sign + formatCurrency(diff);
+                      }
+                    }
+                  }
+                  return '';
+                } catch (e) {
+                  console.error('Error in tooltip afterLabel:', e);
+                  return '';
+                }
+              }
             }
           }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return formatCurrency(value);
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)',
+              drawBorder: false
+            },
+            ticks: {
+              callback: function(value) {
+                return formatCurrency(value);
+              },
+              font: { size: 12 }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: { size: 12 }
             }
           }
         }
       }
-    }
-  });
+    });
+    
+    console.log('✅ Income chart rendered successfully');
+  } catch (error) {
+    console.error('❌ Error rendering income chart:', error);
+    ctx.parentElement.innerHTML = '<div class="chart-empty-state"><p>Lỗi hiển thị biểu đồ</p></div>';
+  }
 }
 
 // Format date for chart labels
@@ -222,17 +365,17 @@ function renderRecentStudents(students) {
   
   if (!students || students.length === 0) {
     container.innerHTML = `
-      <div class="empty-state" style="padding: 30px; text-align: center;">
-        <i class="fas fa-users" style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;"></i>
-        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Chưa có học sinh</h3>
-        <p style="font-size: 14px; color: #94a3b8;">Bạn chưa có học sinh nào</p>
+      <div class="empty-state-box">
+        <i class="fas fa-users empty-state-icon"></i>
+        <h3 class="empty-state-title">Chưa có học sinh</h3>
+        <p class="empty-state-text">Bạn chưa có học sinh nào</p>
       </div>
     `;
     return;
   }
   
   container.innerHTML = `
-    <div class="students-list" style="display: grid; gap: 12px;">
+    <div class="students-list">
       ${students.map(student => {
         const avatar = student.studentAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(student.studentName)}&background=667eea&color=fff`;
         const statusClass = student.status === 'accepted' ? 'success' : student.status === 'completed' ? 'info' : 'warning';
@@ -240,25 +383,23 @@ function renderRecentStudents(students) {
         const subjectDisplay = student.level ? `${student.subject} - ${student.level}` : student.subject;
         
         return `
-          <div class="student-card" style="display: flex; align-items: center; padding: 14px; background: #f8fafc; border-radius: 8px; gap: 12px; border: 1px solid #e2e8f0;">
-            <img src="${avatar}" alt="${student.studentName}" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="flex: 1; min-width: 0;">
-              <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 4px; color: #1e293b;">${student.studentName}</h4>
-              <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">
-                <i class="fas fa-book" style="margin-right: 5px;"></i>${subjectDisplay}
+          <div class="student-card">
+            <img src="${avatar}" alt="${student.studentName}">
+            <div class="student-card-info">
+              <h4>${student.studentName}</h4>
+              <p>
+                <i class="fas fa-book"></i>${subjectDisplay}
               </p>
-              <span class="status-badge ${statusClass}" style="font-size: 11px; padding: 3px 10px; border-radius: 12px;">${statusText}</span>
+              <span class="status-badge ${statusClass}">${statusText}</span>
             </div>
-            <div style="text-align: right;">
-              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">
-                <i class="fas fa-calendar" style="margin-right: 4px;"></i>${formatDate(student.startDate)}
-              </p>
-              <p style="font-size: 14px; font-weight: 700; color: #059669; margin-bottom: 6px;">${formatCurrency(student.totalAmount)}</p>
-              <div style="display: flex; gap: 4px;">
-                <button onclick="contactStudent('${student.studentId}')" style="padding: 4px 10px; font-size: 11px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" title="Nhắn tin">
+            <div class="student-card-amount">
+              <p><i class="fas fa-calendar"></i>${formatDate(student.startDate)}</p>
+              <strong>${formatCurrency(student.totalAmount)}</strong>
+              <div class="student-card-actions">
+                <button class="btn-sm primary" onclick="contactStudent('${student.studentId}')" title="Nhắn tin">
                   <i class="fas fa-comment"></i>
                 </button>
-                <button onclick="callStudent('${student.studentId}', 'video')" style="padding: 4px 10px; font-size: 11px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" title="Gọi video">
+                <button class="btn-sm success" onclick="callStudent('${student.studentId}', 'video')" title="Gọi video">
                   <i class="fas fa-video"></i>
                 </button>
               </div>
@@ -276,51 +417,53 @@ function renderNewRequests(requests) {
   
   if (!requests || requests.length === 0) {
     container.innerHTML = `
-      <div class="empty-state" style="padding: 30px; text-align: center;">
-        <i class="fas fa-clipboard-list" style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;"></i>
-        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Chưa có yêu cầu mới</h3>
-        <p style="font-size: 14px; color: #94a3b8;">Hiện không có yêu cầu mới phù hợp. Hãy kiểm tra lại sau!</p>
+      <div class="empty-state-box">
+        <i class="fas fa-clipboard-list empty-state-icon"></i>
+        <h3 class="empty-state-title">Chưa có yêu cầu mới</h3>
+        <p class="empty-state-text">Hiện không có yêu cầu mới phù hợp. Hãy kiểm tra lại sau!</p>
       </div>
     `;
     return;
   }
   
   container.innerHTML = `
-    <div class="requests-list" style="display: grid; gap: 14px;">
+    <div class="requests-list">
       ${requests.map(req => {
         const avatar = req.studentAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(req.studentName)}&background=667eea&color=fff`;
         const methodIcon = req.teachingMethod === 'online' ? 'fa-laptop' : 'fa-home';
         const methodText = req.teachingMethod === 'online' ? 'Trực tuyến' : 'Tại nhà';
         
         return `
-          <div class="request-card" style="padding: 16px; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-radius: 10px; border-left: 4px solid #f59e0b; border: 1px solid #fde68a; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);">
-            <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 12px;">
-              <img src="${avatar}" alt="${req.studentName}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-              <div style="flex: 1; min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                  <h4 style="font-size: 15px; font-weight: 600; color: #1e293b;">${req.studentName}</h4>
-                  <span style="background: #fbbf24; color: #78350f; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;">MỚI</span>
-                </div>
-                <p style="font-size: 13px; color: #475569; margin-bottom: 5px;">
-                  <i class="fas fa-book" style="margin-right: 5px; color: #f59e0b;"></i><strong>${req.subject} - ${req.level}</strong>
+          <div class="request-card">
+            <div class="request-card-header">
+              <div class="request-card-avatar">
+                <img src="${avatar}" alt="${req.studentName}">
+              </div>
+              <div class="request-card-title">
+                <h4>
+                  ${req.studentName}
+                  <span class="request-card-badge">MỚI</span>
+                </h4>
+                <p class="request-card-subject">
+                  <i class="fas fa-book"></i><strong>${req.subject} - ${req.level}</strong>
                 </p>
-                <p style="font-size: 12px; color: #64748b;">
-                  <i class="fas ${methodIcon}" style="margin-right: 5px; color: #3b82f6;"></i>${methodText}
+                <p class="request-card-method">
+                  <i class="fas ${methodIcon}"></i>${methodText}
                   ${req.address ? ' • ' + req.address : ''}
                 </p>
               </div>
-              <div style="text-align: right;">
-                <p style="font-size: 16px; font-weight: 700; color: #059669; margin-bottom: 3px;">${formatCurrency(req.budget)}</p>
-                <p style="font-size: 11px; color: #059669; font-weight: 500;">/giờ</p>
-                <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">${formatRelativeTime(req.createdAt)}</p>
+              <div class="request-card-price">
+                <strong>${formatCurrency(req.budget)}</strong>
+                <small>/giờ</small>
+                <time>${formatRelativeTime(req.createdAt)}</time>
               </div>
             </div>
-            ${req.description ? `<p style="font-size: 13px; color: #475569; margin-bottom: 12px; line-height: 1.5; background: #fff; padding: 10px; border-radius: 6px;">${req.description.substring(0, 120)}${req.description.length > 120 ? '...' : ''}</p>` : ''}
-            <div style="display: flex; gap: 8px;">
-              <button onclick="viewRequestDetail('${req._id}')" style="flex: 1; padding: 10px 14px; font-size: 13px; background: #fff; color: #1e293b; border: 2px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+            ${req.description ? `<p class="request-card-description">${req.description.substring(0, 120)}${req.description.length > 120 ? '...' : ''}</p>` : ''}
+            <div class="request-card-actions">
+              <button class="btn-outline" onclick="viewRequestDetail('${req._id}')">
                 <i class="fas fa-eye"></i> Xem chi tiết
               </button>
-              <button onclick="applyToRequest('${req._id}')" style="flex: 1; padding: 10px 14px; font-size: 13px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);">
+              <button class="btn-apply" onclick="applyToRequest('${req._id}')">
                 <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
               </button>
             </div>
@@ -337,57 +480,55 @@ function renderUpcomingSchedule(schedule) {
   
   if (!schedule || schedule.length === 0) {
     container.innerHTML = `
-      <div class="empty-state" style="padding: 30px; text-align: center;">
-        <i class="fas fa-calendar-alt" style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;"></i>
-        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Không có lịch sắp tới</h3>
-        <p style="font-size: 14px; color: #94a3b8;">Bạn chưa có lịch dạy nào sắp tới</p>
+      <div class="empty-state-box">
+        <i class="fas fa-calendar-alt empty-state-icon"></i>
+        <h3 class="empty-state-title">Không có lịch sắp tới</h3>
+        <p class="empty-state-text">Bạn chưa có lịch dạy nào sắp tới</p>
       </div>
     `;
     return;
   }
   
   container.innerHTML = `
-    <div class="schedule-list" style="display: grid; gap: 12px;">
+    <div class="schedule-list">
       ${schedule.map(item => {
         const avatar = item.studentAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.studentName)}&background=667eea&color=fff`;
         const startDate = new Date(item.startDate);
         const dayName = startDate.toLocaleDateString('vi-VN', { weekday: 'short' });
         const subjectDisplay = item.level ? `${item.subject} - ${item.level}` : item.subject;
-        
-        // Format time display
         const preferredTime = item.preferredTime || 'Chưa xác định';
         const scheduleInfo = `${item.daysPerWeek || 0} buổi/tuần • ${item.hoursPerSession || 0}h/buổi`;
         
         return `
-          <div class="schedule-card" style="display: flex; padding: 14px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #8b5cf6; gap: 12px; border: 1px solid #e2e8f0;">
-            <div style="text-align: center; padding: 10px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border-radius: 10px; min-width: 65px; height: fit-content;">
-              <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; opacity: 0.9;">${dayName}</div>
-              <div style="font-size: 24px; font-weight: 700; margin: 4px 0;">${startDate.getDate()}</div>
-              <div style="font-size: 11px; opacity: 0.9;">Th ${startDate.getMonth() + 1}</div>
+          <div class="schedule-card">
+            <div class="schedule-date-badge">
+              <div class="day">${dayName}</div>
+              <div class="date">${startDate.getDate()}</div>
+              <div class="month">Th ${startDate.getMonth() + 1}</div>
             </div>
-            <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <img src="${avatar}" alt="${item.studentName}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h4 style="font-size: 15px; font-weight: 600; color: #1e293b;">${item.studentName}</h4>
+            <div class="schedule-info">
+              <div class="schedule-student">
+                <img src="${avatar}" alt="${item.studentName}">
+                <h4>${item.studentName}</h4>
               </div>
-              <p style="font-size: 13px; color: #475569; margin-bottom: 5px;">
-                <i class="fas fa-book" style="margin-right: 6px; color: #8b5cf6;"></i><strong>${subjectDisplay}</strong>
+              <p class="schedule-detail">
+                <i class="fas fa-book"></i><strong>${subjectDisplay}</strong>
               </p>
-              <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
-                <i class="fas fa-clock" style="margin-right: 6px; color: #f59e0b;"></i>${preferredTime}
+              <p class="schedule-meta">
+                <i class="fas fa-clock"></i>${preferredTime}
               </p>
-              <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
-                <i class="fas fa-calendar-week" style="margin-right: 6px; color: #06b6d4;"></i>${scheduleInfo}
+              <p class="schedule-meta">
+                <i class="fas fa-calendar-week"></i>${scheduleInfo}
               </p>
-              <p style="font-size: 12px; color: #64748b;">
-                <i class="fas fa-map-marker-alt" style="margin-right: 6px; color: #ef4444;"></i>${item.location}
+              <p class="schedule-meta">
+                <i class="fas fa-map-marker-alt"></i>${item.location}
               </p>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-              <button onclick="contactStudent('${item.studentId}')" style="padding: 8px 14px; font-size: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+            <div class="schedule-actions">
+              <button class="btn-sm primary" onclick="contactStudent('${item.studentId}')">
                 <i class="fas fa-comment"></i> Nhắn tin
               </button>
-              <button onclick="callStudent('${item.studentId}', 'video')" style="padding: 8px 14px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+              <button class="btn-sm success" onclick="callStudent('${item.studentId}', 'video')">
                 <i class="fas fa-video"></i> Gọi video
               </button>
             </div>
@@ -404,31 +545,31 @@ function renderNotifications(notifications) {
   
   if (!notifications || notifications.length === 0) {
     container.innerHTML = `
-      <div class="empty-state" style="padding: 30px; text-align: center;">
-        <i class="fas fa-bell" style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;"></i>
-        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Không có thông báo</h3>
-        <p style="font-size: 14px; color: #94a3b8;">Bạn chưa có thông báo mới</p>
+      <div class="empty-state-box">
+        <i class="fas fa-bell empty-state-icon"></i>
+        <h3 class="empty-state-title">Không có thông báo</h3>
+        <p class="empty-state-text">Bạn chưa có thông báo mới</p>
       </div>
     `;
     return;
   }
   
   container.innerHTML = `
-    <div class="notifications-list" style="display: grid; gap: 10px;">
+    <div class="notifications-list">
       ${notifications.map(notif => {
         const avatar = notif.senderAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(notif.senderName)}&background=667eea&color=fff`;
         const isUnread = !notif.isRead;
         
         return `
-          <div class="notification-card" style="display: flex; align-items: start; padding: 12px; background: ${isUnread ? '#eff6ff' : '#f8fafc'}; border-radius: 8px; gap: 12px; border-left: 3px solid ${isUnread ? '#3b82f6' : 'transparent'};">
-            <img src="${avatar}" alt="${notif.senderName}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-            <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                <h4 style="font-size: 13px; font-weight: 600; color: #1e293b;">${notif.senderName}</h4>
-                ${isUnread ? '<span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; display: inline-block;"></span>' : ''}
+          <div class="notification-card ${isUnread ? 'unread' : ''}">
+            <img src="${avatar}" alt="${notif.senderName}">
+            <div class="notification-content">
+              <div class="notification-header">
+                <h4>${notif.senderName}</h4>
+                ${isUnread ? '<span class="notification-dot"></span>' : ''}
               </div>
-              <p style="font-size: 13px; color: #475569; margin-bottom: 4px; line-height: 1.5;">${notif.content}</p>
-              <p style="font-size: 11px; color: #94a3b8;">${formatRelativeTime(notif.createdAt)}</p>
+              <p class="notification-message">${notif.content}</p>
+              <p class="notification-time">${formatRelativeTime(notif.createdAt)}</p>
             </div>
           </div>
         `;
@@ -439,7 +580,18 @@ function renderNotifications(notifications) {
 
 // Helper functions
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+  try {
+    const num = Number(amount) || 0;
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(num);
+  } catch (error) {
+    console.error('Error formatting currency:', error);
+    return '0đ';
+  }
 }
 
 function formatDate(dateStr) {
@@ -465,26 +617,35 @@ function formatRelativeTime(dateStr) {
 
 function showLoading(containerId) {
   const container = document.getElementById(containerId);
-  if (container) {
-    container.innerHTML = `
-      <div style="padding: 40px; text-align: center;">
-        <div class="spinner" style="border: 3px solid #f3f4f6; border-top: 3px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-      </div>
-    `;
+  if (!container) {
+    console.error(`❌ Container ${containerId} not found!`);
+    return;
   }
+  container.innerHTML = `
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+  `;
+  debug(`Loading shown in ${containerId}`);
 }
 
 function showErrorState(containerId, message) {
   const container = document.getElementById(containerId);
-  if (container) {
-    container.innerHTML = `
-      <div class="error-state" style="padding: 30px; text-align: center;">
-        <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #ef4444; margin-bottom: 15px;"></i>
-        <h3 style="font-size: 16px; color: #64748b; margin-bottom: 8px;">Lỗi tải dữ liệu</h3>
-        <p style="font-size: 14px; color: #94a3b8;">${message}</p>
-      </div>
-    `;
+  if (!container) {
+    console.error(`❌ Container ${containerId} not found!`);
+    return;
   }
+  container.innerHTML = `
+    <div class="error-state">
+      <i class="fas fa-exclamation-circle empty-state-icon"></i>
+      <h3 class="empty-state-title">Lỗi tải dữ liệu</h3>
+      <p class="empty-state-text">${message}</p>
+      <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Thử lại
+      </button>
+    </div>
+  `;
+  debug(`Error shown in ${containerId}: ${message}`);
 }
 
 // View request detail
@@ -533,24 +694,39 @@ function callStudent(studentId, callType = 'video') {
   window.location.href = `messages.html?userId=${studentId}&autoCall=${callType}`;
 }
 
-// Change income chart period
-document.getElementById('incomeChartPeriod')?.addEventListener('change', (e) => {
-  loadDashboard();
-});
-
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  loadDashboard();
-  
-  // Update current date
-  const currentDateEl = document.getElementById('currentDate');
-  if (currentDateEl) {
-    currentDateEl.textContent = new Date().toLocaleDateString('vi-VN', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+  try {
+    debug('🚀 DOM Ready, initializing dashboard...');
+    
+    // Update current date
+    const currentDateEl = document.getElementById('currentDate');
+    if (currentDateEl) {
+      currentDateEl.textContent = new Date().toLocaleDateString('vi-VN', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      debug('✅ Current date updated');
+    }
+    
+    // Change income chart period
+    const periodSelector = document.getElementById('incomeChartPeriod');
+    if (periodSelector) {
+      periodSelector.addEventListener('change', (e) => {
+        debug('📊 Period changed to:', e.target.value);
+        loadDashboard();
+      });
+      debug('✅ Period selector event listener added');
+    }
+    
+    // Load dashboard data
+    debug('📍 Calling loadDashboard()...');
+    loadDashboard();
+    
+  } catch (error) {
+    console.error('❌ Initialization error:', error);
   }
 });
 
@@ -564,4 +740,5 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-console.log('Tutor dashboard initialized');
+console.log('✅ Tutor dashboard script loaded successfully');
+console.log('📍 API_BASE_URL:', typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'NOT DEFINED');

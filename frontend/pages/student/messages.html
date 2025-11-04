@@ -40,7 +40,7 @@
                     </div>
                     <div class="menu-item" data-page="requests">
                         <img src="../../assets/images/dashboard-student/requests.png" alt="requests">
-                        <span>Yêu Cầu Gia Sư</span>
+                        <span>Đặt lịch</span>
                     </div>
                     <div class="menu-item" data-page="find-tutor">
                         <img src="../../assets/images/dashboard-student/find-tutor.png" alt="find-tutor">
@@ -201,6 +201,9 @@
                             <button class="icon-btn" title="Đính kèm" onclick="document.getElementById('fileInput').click()">
                                 <i class="fas fa-paperclip"></i>
                             </button>
+                            <button class="icon-btn" title="Emoji" onclick="openEmojiPicker()">
+                                <i class="fas fa-smile"></i>
+                            </button>
                             <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." autocomplete="off" onkeypress="if(event.key==='Enter') sendMessage()">
                             <button class="send-btn" onclick="sendMessage()">
                                 <i class="fas fa-paper-plane"></i>
@@ -323,6 +326,56 @@
         <span class="lightbox-close">&times;</span>
         <img class="lightbox-content" id="lightboxImage">
         <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+
+    <!-- Emoji Picker Modal -->
+    <div class="emoji-modal" id="emojiModal">
+        <div class="emoji-modal-overlay" onclick="closeEmojiPicker()"></div>
+        <div class="emoji-modal-content">
+            <div class="emoji-modal-header">
+                <h3>Chọn emoji</h3>
+                <button class="emoji-modal-close" onclick="closeEmojiPicker()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="emoji-modal-body">
+                <div class="emoji-categories">
+                    <button class="emoji-category-btn active" data-category="recent" title="Gần đây">
+                        <i class="fas fa-clock"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="smileys" title="Mặt cười">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="people" title="Người">
+                        <i class="fas fa-users"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="animals" title="Động vật">
+                        <i class="fas fa-paw"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="food" title="Đồ ăn">
+                        <i class="fas fa-utensils"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="activities" title="Hoạt động">
+                        <i class="fas fa-futbol"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="travel" title="Du lịch">
+                        <i class="fas fa-plane"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="objects" title="Đồ vật">
+                        <i class="fas fa-lightbulb"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="symbols" title="Biểu tượng">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button class="emoji-category-btn" data-category="flags" title="Cờ">
+                        <i class="fas fa-flag"></i>
+                    </button>
+                </div>
+                <div class="emoji-grid" id="emojiGrid">
+                    <!-- Emojis will be loaded here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->

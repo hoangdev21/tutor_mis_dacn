@@ -63,16 +63,17 @@ function setupTabs() {
   });
 }
 
-// Load courses (from accepted booking requests)
+// Load courses (from accepted and completed booking requests)
 async function loadCourses() {
   try {
     console.log('📤 Loading courses from booking requests...');
     
-    // Get accepted booking requests
-    const response = await tokenManager.apiRequest('/bookings?status=accepted');
+    // Get all booking requests (we'll filter on frontend for accepted and completed)
+    const response = await tokenManager.apiRequest('/bookings');
     
     if (response.success) {
-      allCourses = response.data || [];
+      // Only show accepted and completed bookings
+      allCourses = (response.data || []).filter(b => b.status === 'accepted' || b.status === 'completed');
       console.log('📚 Loaded courses:', allCourses.length);
       
       // Categorize courses
@@ -92,11 +93,13 @@ function categorizeCourses(courses) {
   const now = new Date();
   
   const upcoming = courses.filter(course => {
+    if (course.status === 'completed') return false;
     const startDate = new Date(course.schedule?.startDate);
     return startDate > now;
   });
   
   const ongoing = courses.filter(course => {
+    if (course.status === 'completed') return false;
     const startDate = new Date(course.schedule?.startDate);
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + (course.schedule?.duration || 0));
@@ -104,10 +107,14 @@ function categorizeCourses(courses) {
   });
   
   const completed = courses.filter(course => {
+    // Check if status is completed first
+    if (course.status === 'completed') return true;
+    
+    // Otherwise check if date has passed
     const startDate = new Date(course.schedule?.startDate);
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + (course.schedule?.duration || 0));
-    return endDate < now || course.status === 'completed';
+    return endDate < now;
   });
   
   // Update counts
@@ -445,8 +452,12 @@ function createCourseCard(course, type) {
             <strong>${formatCurrency(course.pricing.hourlyRate)}</strong>
           </div>
           <div class="pricing-item">
+            <small>Học phí/tháng</small>
+            <strong>${formatCurrency(calculateMonthlyPrice(course))}</strong>
+          </div>
+          <div class="pricing-item">
             <small>Tổng học phí</small>
-            <strong class="total-price">${formatCurrency(course.pricing.totalAmount || 0)}</strong>
+            <strong class="total-price">${formatCurrency(calculateTotalPrice(course))}</strong>
           </div>
         </div>
         ` : ''}
@@ -625,8 +636,8 @@ window.viewCourseDetail = function viewCourseDetail(courseId) {
         <div class="detail-section">
           <h4><i class="fas fa-money-bill-wave"></i> Học Phí</h4>
           <p><strong>Học phí/giờ:</strong> ${formatCurrency(course.pricing.hourlyRate)}</p>
-          <p><strong>Tổng số giờ:</strong> ${course.pricing.totalHours || 0} giờ</p>
-          <p><strong>Tổng học phí:</strong> ${formatCurrency(course.pricing.totalAmount || 0)}</p>
+          <p><strong>Tổng số giờ:</strong> ${calculateTotalHours(course)} giờ</p>
+          <p><strong>Tổng học phí:</strong> ${formatCurrency(calculateTotalPrice(course))}</p>
         </div>
         ` : ''}
       </div>
@@ -669,8 +680,427 @@ window.contactTutor = function contactTutor(tutorId) {
 
 // Rate course
 window.rateCourse = function rateCourse(courseId) {
-  alert('Chức năng đánh giá đang được phát triển');
-  // TODO: Implement rating system
+  const course = allCourses.find(c => c._id === courseId);
+  if (!course) {
+    console.error('Course not found:', courseId);
+    return;
+  }
+  
+  // Check if already rated
+if (course.rating?.score) {
+  showModal('Bạn đã đánh giá khóa học này rồi');
+  return;
+}
+
+function showModal(message) {
+  // Tạo overlay
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+  `;
+
+  // Tạo modal
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 420px;
+    width: 90%;
+    animation: slideIn 0.3s ease;
+    overflow: hidden;
+  `;
+
+  modal.innerHTML = `
+    <div style="background: white; padding: 40px 30px;">
+      <div style="
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+      ">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 style="
+        margin: 0 0 12px;
+        font-size: 22px;
+        font-weight: 600;
+        color: #2d3748;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      ">Thông báo</h3>
+      <p style="
+        margin: 0 0 30px;
+        font-size: 16px;
+        color: #4a5568;
+        text-align: center;
+        line-height: 1.6;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      ">${message}</p>
+      <button id="closeModalBtn" style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        width: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      ">Đã hiểu</button>
+    </div>
+  `;
+
+  // Thêm CSS animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    #closeModalBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    #closeModalBtn:active {
+      transform: translateY(0);
+    }
+  `;
+  document.head.appendChild(style);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Đóng modal
+  const closeModal = () => {
+    overlay.style.animation = 'fadeOut 0.3s ease';
+    setTimeout(() => {
+      document.body.removeChild(overlay);
+      document.head.removeChild(style);
+    }, 300);
+  };
+
+  document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+
+  // Thêm animation fadeOut
+  style.textContent += `
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  `;
+}
+  
+  console.log('⭐ Opening rating modal for course:', courseId);
+  
+  // Remove existing modal if any
+  const existingModal = document.getElementById('ratingModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal show';
+  modal.id = 'ratingModal';
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-star"></i> Đánh Giá Gia Sư</h3>
+        <button class="modal-close" onclick="closeRatingModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Course Info -->
+        <div class="detail-section" style="margin-bottom: 20px;">
+          <h4>${course.subject?.name || 'N/A'}</h4>
+          <p style="color: #666; font-size: 14px;">
+            Gia sư: <strong>${course.tutor?.profile?.fullName || 'Gia sư'}</strong>
+          </p>
+        </div>
+        
+        <!-- Star Rating -->
+        <div class="detail-section" style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 10px;"><strong>Đánh giá chung (bắt buộc)</strong></label>
+          <div id="ratingStars" class="rating-stars" style="font-size: 40px; margin-bottom: 10px;">
+            ${[1, 2, 3, 4, 5].map(i => `
+              <i class="fas fa-star" data-rating="${i}" onclick="selectRating(${i})" 
+                 style="cursor: pointer; color: #ddd; margin-right: 10px; transition: color 0.2s;">
+              </i>
+            `).join('')}
+          </div>
+          <p style="color: #666; font-size: 14px;" id="ratingValue">Chọn số sao để đánh giá</p>
+        </div>
+        
+        <!-- Criteria Ratings -->
+        <div class="detail-section" style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 10px;"><strong>Đánh giá chi tiết (tùy chọn)</strong></label>
+          <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <label>Chuyên nghiệp</label>
+                <span id="profValue" style="color: #667eea; font-weight: bold;">0/5</span>
+              </div>
+              <input type="range" id="professionalism" min="0" max="5" value="0" 
+                     onchange="updateCriteriaDisplay()" style="width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <label>Giao tiếp</label>
+                <span id="commValue" style="color: #667eea; font-weight: bold;">0/5</span>
+              </div>
+              <input type="range" id="communication" min="0" max="5" value="0" 
+                     onchange="updateCriteriaDisplay()" style="width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <label>Kiến thức</label>
+                <span id="knwValue" style="color: #667eea; font-weight: bold;">0/5</span>
+              </div>
+              <input type="range" id="knowledgeLevel" min="0" max="5" value="0" 
+                     onchange="updateCriteriaDisplay()" style="width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <label>Kiên nhẫn</label>
+                <span id="patValue" style="color: #667eea; font-weight: bold;">0/5</span>
+              </div>
+              <input type="range" id="patience" min="0" max="5" value="0" 
+                     onchange="updateCriteriaDisplay()" style="width: 100%;">
+            </div>
+            
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <label>Hiệu quả</label>
+                <span id="effValue" style="color: #667eea; font-weight: bold;">0/5</span>
+              </div>
+              <input type="range" id="effectiveness" min="0" max="5" value="0" 
+                     onchange="updateCriteriaDisplay()" style="width: 100%;">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Comment -->
+        <div class="detail-section" style="margin-bottom: 20px;">
+          <label for="reviewComment"><strong>Bình luận (tùy chọn)</strong></label>
+          <textarea id="reviewComment" placeholder="Chia sẻ trải nghiệm học tập của bạn..." 
+                    style="width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: Arial, sans-serif;"
+                    maxlength="1000"></textarea>
+          <small style="color: #999; display: block; margin-top: 5px;">
+            <span id="commentCount">0</span>/1000 ký tự
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeRatingModal()">Hủy</button>
+        <button class="btn btn-primary" id="submitRatingBtn" onclick="submitRating('${courseId}')" disabled>
+          <i class="fas fa-paper-plane"></i> Gửi Đánh Giá
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Add event listeners
+  document.getElementById('reviewComment').addEventListener('input', (e) => {
+    document.getElementById('commentCount').textContent = e.target.value.length;
+  });
+  
+  // Add click outside to close
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeRatingModal();
+    }
+  });
+  
+  console.log('✅ Rating modal displayed');
+}
+
+// Select rating
+window.selectRating = function selectRating(rating) {
+  const stars = document.querySelectorAll('#ratingStars .fa-star');
+  stars.forEach((star, index) => {
+    if (index < rating) {
+      star.style.color = '#ff9800';
+    } else {
+      star.style.color = '#ddd';
+    }
+  });
+  
+  document.getElementById('ratingValue').textContent = `Bạn đã chọn ${rating}/5 sao`;
+  document.getElementById('ratingValue').style.color = '#333';
+  
+  // Enable submit button
+  document.getElementById('submitRatingBtn').disabled = false;
+  document.getElementById('submitRatingBtn').style.opacity = '1';
+  
+  // Store rating value for submission
+  document.getElementById('ratingModal').dataset.rating = rating;
+}
+
+// Update criteria display
+window.updateCriteriaDisplay = function updateCriteriaDisplay() {
+  const prof = document.getElementById('professionalism').value;
+  const comm = document.getElementById('communication').value;
+  const know = document.getElementById('knowledgeLevel').value;
+  const pat = document.getElementById('patience').value;
+  const eff = document.getElementById('effectiveness').value;
+  
+  document.getElementById('profValue').textContent = prof + '/5';
+  document.getElementById('commValue').textContent = comm + '/5';
+  document.getElementById('knwValue').textContent = know + '/5';
+  document.getElementById('patValue').textContent = pat + '/5';
+  document.getElementById('effValue').textContent = eff + '/5';
+}
+
+// Submit rating
+window.submitRating = async function submitRating(courseId) {
+  try {
+    const rating = document.getElementById('ratingModal').dataset.rating;
+    const comment = document.getElementById('reviewComment').value;
+    const prof = parseInt(document.getElementById('professionalism').value) || undefined;
+    const comm = parseInt(document.getElementById('communication').value) || undefined;
+    const know = parseInt(document.getElementById('knowledgeLevel').value) || undefined;
+    const pat = parseInt(document.getElementById('patience').value) || undefined;
+    const eff = parseInt(document.getElementById('effectiveness').value) || undefined;
+    
+    if (!rating) {
+      alert('Vui lòng chọn số sao để đánh giá');
+      return;
+    }
+    
+    const submitBtn = document.getElementById('submitRatingBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Đang gửi...';
+    
+    console.log('📤 Submitting review for course:', courseId);
+    
+    const response = await tokenManager.apiRequest('/reviews', {
+      method: 'POST',
+      body: JSON.stringify({
+        bookingId: courseId,
+        rating: parseInt(rating),
+        comment: comment || '',
+        criteria: {
+          professionalism: prof,
+          communication: comm,
+          knowledgeLevel: know,
+          patience: pat,
+          effectiveness: eff
+        }
+      })
+    });
+    
+    if (response.success) {
+      console.log('✅ Review submitted successfully:', response.data);
+      
+      // Close modal
+      closeRatingModal();
+      
+      // Show success message
+      showSuccessNotification('Đánh giá của bạn đã được gửi thành công!', 'Đánh giá sẽ được hiển thị sau khi quản trị viên phê duyệt.');
+      
+      // Reload courses to update status
+      setTimeout(() => {
+        loadCourses();
+      }, 1500);
+    } else {
+      throw new Error(response.message || 'Failed to submit review');
+    }
+  } catch (error) {
+    console.error('❌ Error submitting review:', error);
+    alert('Lỗi khi gửi đánh giá: ' + error.message);
+    
+    const submitBtn = document.getElementById('submitRatingBtn');
+    submitBtn.disabled = false;
+    submitBtn.textContent = '📤 Gửi Đánh Giá';
+  }
+}
+
+// Close rating modal
+window.closeRatingModal = function closeRatingModal() {
+  const modal = document.getElementById('ratingModal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
+  }
+}
+
+// Show success notification
+function showSuccessNotification(title, message) {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+    max-width: 400px;
+  `;
+  
+  notification.innerHTML = `
+    <div style="display: flex; align-items: flex-start; gap: 15px;">
+      <i class="fas fa-check-circle" style="font-size: 24px; margin-top: 2px;"></i>
+      <div>
+        <h4 style="margin: 0 0 5px 0; font-size: 16px;">${title}</h4>
+        <p style="margin: 0; font-size: 14px; opacity: 0.95;">${message}</p>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOutRight 0.3s ease';
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 4000);
 }
 
 // Utility functions
@@ -721,4 +1151,66 @@ function formatDateTime(dateString) {
   if (!dateString) return 'N/A';
   const date = new Date(dateString);
   return date.toLocaleString('vi-VN');
+}
+
+// Calculate monthly price based on course schedule
+function calculateMonthlyPrice(course) {
+  const pricing = course.pricing || {};
+  const schedule = course.schedule || {};
+  
+  // Get hourly rate
+  const hourlyRate = pricing.hourlyRate || 0;
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (hourly rate)
+  const monthlyPrice = daysPerWeek * 4 * hoursPerSession * hourlyRate;
+  
+  return monthlyPrice;
+}
+
+// Calculate total price based on actual course duration
+function calculateTotalPrice(course) {
+  const pricing = course.pricing || {};
+  const schedule = course.schedule || {};
+  
+  // Get hourly rate
+  const hourlyRate = pricing.hourlyRate || 0;
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Get duration in months
+  const duration = schedule.duration || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (hourly rate) × (duration in months)
+  const totalPrice = daysPerWeek * 4 * hoursPerSession * hourlyRate * duration;
+  
+  return totalPrice;
+}
+
+// Calculate total hours based on actual course duration
+function calculateTotalHours(course) {
+  const schedule = course.schedule || {};
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Get duration in months
+  const duration = schedule.duration || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (duration in months)
+  const totalHours = daysPerWeek * 4 * hoursPerSession * duration;
+  
+  return totalHours;
 }

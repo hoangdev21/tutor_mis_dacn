@@ -3,8 +3,9 @@
 // API_BASE_URL is already defined in main.js
 // const API_BASE_URL = 'http://localhost:5000/api';
 
-// Global variable for chart instance
+// Global variable for chart instances
 let learningProgressChartInstance = null;
+let progressDoughnutChartInstance = null;
 
 // Load dashboard data
 async function loadDashboard() {
@@ -36,6 +37,7 @@ async function loadDashboard() {
       
       // Render new sections
       renderLearningProgressChart(learningProgress);
+      renderProgressDoughnutChart(learningProgress);
       renderRecentNotifications(recentNotifications || []);
       
       // Render existing sections
@@ -165,7 +167,13 @@ function renderLearningProgressChart(progressData) {
   const completedData = subjectProgress.map(s => s.completed);
   const activeData = subjectProgress.map(s => s.active);
   
-// Create chart
+  // Professional color palette
+  const completedColor = '#10b981';  // Emerald Green
+  const activeColor = '#3b82f6';     // Sky Blue
+  const completedHover = '#059669';
+  const activeHover = '#1d4ed8';
+
+  // Create chart with enhanced styling
   learningProgressChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -174,20 +182,34 @@ function renderLearningProgressChart(progressData) {
         {
           label: 'Hoàn thành',
           data: completedData.length > 0 ? completedData : [0],
-          backgroundColor: '#10B981',
-          borderColor: '#059669',
-          borderWidth: 1.5,
-          borderRadius: 8,
-          hoverBackgroundColor: '#059669'
+          backgroundColor: completedColor,
+          borderColor: completedHover,
+          borderWidth: 0,
+          borderRadius: {
+            topLeft: 6,
+            topRight: 6
+          },
+          hoverBackgroundColor: completedHover,
+          hoverBorderColor: completedHover,
+          borderSkipped: false,
+          barPercentage: 0.7,
+          categoryPercentage: 0.8
         },
         {
           label: 'Đang học',
           data: activeData.length > 0 ? activeData : [0],
-          backgroundColor: '#cf597fff',
-          borderColor: '#1D4ED8',
-          borderWidth: 1.5,
-          borderRadius: 8,
-          hoverBackgroundColor: '#7182b1ff'
+          backgroundColor: activeColor,
+          borderColor: activeHover,
+          borderWidth: 0,
+          borderRadius: {
+            topLeft: 6,
+            topRight: 6
+          },
+          hoverBackgroundColor: activeHover,
+          hoverBorderColor: activeHover,
+          borderSkipped: false,
+          barPercentage: 0.7,
+          categoryPercentage: 0.8
         }
       ]
     },
@@ -195,7 +217,7 @@ function renderLearningProgressChart(progressData) {
       responsive: true,
       maintainAspectRatio: true,
       animation: {
-        duration: 800,
+        duration: 1000,
         easing: 'easeInOutQuart'
       },
       plugins: {
@@ -208,14 +230,16 @@ function renderLearningProgressChart(progressData) {
               weight: '600',
               family: 'Inter, -apple-system, sans-serif'
             },
-            padding: 20,
+            padding: 16,
             usePointStyle: true,
             pointStyle: 'circle',
-            color: '#374151'
+            color: '#374151',
+            boxWidth: 12,
+            boxHeight: 12
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
           padding: 14,
           titleFont: {
             size: 14,
@@ -224,13 +248,15 @@ function renderLearningProgressChart(progressData) {
           },
           bodyFont: {
             size: 13,
-            family: 'Inter, sans-serif'
+            family: 'Inter, sans-serif',
+            weight: '500'
           },
           titleColor: '#FFFFFF',
           bodyColor: '#E5E7EB',
-          borderColor: 'rgba(255, 255, 255, 0.2)',
+          borderColor: 'rgba(255, 255, 255, 0.15)',
           borderWidth: 1,
           displayColors: true,
+          cornerRadius: 8,
           padding: 12,
           callbacks: {
             label: function(context) {
@@ -256,7 +282,7 @@ function renderLearningProgressChart(progressData) {
             padding: 10
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.08)',
+            color: 'rgba(0, 0, 0, 0.06)',
             drawBorder: false,
             lineWidth: 1
           }
@@ -280,25 +306,123 @@ function renderLearningProgressChart(progressData) {
     }
   });
   
-  // Render progress stats
+  // Render progress stats with improved colors
   const statsContainer = document.getElementById('progressStats');
   if (statsContainer) {
     const totalHours = progressData.totalHours || 0;
     const completedHours = progressData.completedHours || 0;
     const progressPercentage = progressData.progressPercentage || 0;
+    const remainingHours = totalHours - completedHours;
     
     statsContainer.innerHTML = `
-      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #73b2bbff 0%, #b52976ff 100%); border-radius: 8px; color: white;">
-        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${Math.round(totalHours)}h</div>
-        <div style="font-size: 12px; opacity: 0.9;">Tổng giờ học</div>
+      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+        <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">${Math.round(totalHours)}h</div>
+        <div style="font-size: 11px; opacity: 0.9; font-weight: 500;">Tổng giờ học</div>
       </div>
-      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #8cd2baff 0%, #0f4131ff 100%); border-radius: 8px; color: white;">
-        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${Math.round(completedHours)}h</div>
-        <div style="font-size: 12px; opacity: 0.9;">Đã hoàn thành</div>
+      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+        <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">${Math.round(completedHours)}h</div>
+        <div style="font-size: 11px; opacity: 0.9; font-weight: 500;">Đã hoàn thành</div>
       </div>
-      <div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #b1c1dbff 0%, #646e83ff 100%); border-radius: 8px; color: white;">
-        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${progressPercentage}%</div>
-        <div style="font-size: 12px; opacity: 0.9;">Tiến độ</div>
+      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+        <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">${progressPercentage}%</div>
+        <div style="font-size: 11px; opacity: 0.9; font-weight: 500;">Tiến độ</div>
+      </div>
+    `;
+  }
+}
+
+// Render Progress Doughnut Chart - Overview Summary
+function renderProgressDoughnutChart(progressData) {
+  console.log('📊 Rendering progress doughnut chart:', progressData);
+  
+  const ctx = document.getElementById('progressDoughnutChart');
+  if (!ctx) {
+    console.error('Doughnut chart canvas not found');
+    return;
+  }
+  
+  // Destroy existing chart if exists
+  if (progressDoughnutChartInstance) {
+    progressDoughnutChartInstance.destroy();
+  }
+  
+  const totalHours = progressData.totalHours || 0;
+  const completedHours = progressData.completedHours || 0;
+  const activeHours = totalHours - completedHours;
+  const progressPercentage = progressData.progressPercentage || 0;
+  
+  // Create doughnut chart
+  progressDoughnutChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Hoàn thành', 'Đang học'],
+      datasets: [
+        {
+          data: [completedHours > 0 ? completedHours : 0.1, activeHours > 0 ? activeHours : 0.1],
+          backgroundColor: [
+            '#10b981',  // Emerald Green - Completed
+            '#3b82f6'   // Sky Blue - Active
+          ],
+          borderColor: [
+            '#059669',  // Darker Green
+            '#1d4ed8'   // Darker Blue
+          ],
+          borderWidth: 2,
+          hoverBorderWidth: 3,
+          hoverOffset: 5
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '68%',
+      animation: {
+        duration: 1000,
+        easing: 'easeInOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
+          padding: 12,
+          titleFont: {
+            size: 13,
+            weight: 'bold',
+            family: 'Inter, sans-serif'
+          },
+          bodyFont: {
+            size: 12,
+            family: 'Inter, sans-serif'
+          },
+          titleColor: '#FFFFFF',
+          bodyColor: '#E5E7EB',
+          borderColor: 'rgba(255, 255, 255, 0.15)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+              return label + ': ' + Math.round(value) + 'h (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Update center text
+  const centerTextContainer = document.getElementById('progressCenterText');
+  if (centerTextContainer) {
+    centerTextContainer.innerHTML = `
+      <div class="doughnut-center-text">
+        <div class="doughnut-percentage">${progressPercentage}%</div>
+        <div class="doughnut-label">Tiến độ</div>
       </div>
     `;
   }

@@ -12,7 +12,8 @@ const {
   emailVerificationTemplate, 
   welcomeEmailTemplate,
   tutorApprovalTemplate,
-  otpVerificationTemplate
+  otpVerificationTemplate,
+  passwordResetOTPVerificationTemplate
 } = require('../utils/email');
 const { 
   generateOTP, 
@@ -28,7 +29,7 @@ const register = async (req, res) => {
   try {
     const { email, password, role, fullName, phone, ...otherData } = req.body;
 
-    console.log('📝 Đăng ký mới:', { email, role, fullName, phone });
+    console.log('Đăng ký mới:', { email, role, fullName, phone });
 
     // Kiểm tra email đã tồn tại chưa
     const existingUser = await User.findOne({ email });
@@ -87,13 +88,13 @@ const register = async (req, res) => {
     // Gửi email trong background - không chờ kết quả
     sendEmail(email, emailTemplate).then(emailResult => {
       if (!emailResult.success) {
-        console.warn('⚠️ Gửi email thất bại trong background:', emailResult.error);
+        console.warn('Gửi email thất bại trong background:', emailResult.error);
         // Có thể lưu trạng thái email failed để user có thể resend sau
       } else {
-        console.log('✅ Gửi email OTP thành công đến:', email);
+        console.log('Gửi email OTP thành công đến:', email);
       }
     }).catch(error => {
-      console.error('❌ Lỗi gửi email trong background:', error);
+      console.error('Lỗi gửi email trong background:', error);
     });
     
     // Trả về response ngay lập tức - không chờ email
@@ -219,12 +220,12 @@ const verifyEmailOTP = async (req, res) => {
     const welcomeTemplate = welcomeEmailTemplate(profile.profile.fullName, user.role);
     sendEmail(user.email, welcomeTemplate).then(emailResult => {
       if (!emailResult.success) {
-        console.warn('⚠️ Gửi email chào mừng thất bại:', emailResult.error);
+        console.warn('Gửi email chào mừng thất bại:', emailResult.error);
       } else {
-        console.log('✅ Gửi email chào mừng thành công đến:', user.email);
+        console.log('Gửi email chào mừng thành công đến:', user.email);
       }
     }).catch(error => {
-      console.error('❌ Lỗi gửi email chào mừng:', error);
+      console.error('Lỗi gửi email chào mừng:', error);
     });
     
     res.status(200).json({
@@ -295,12 +296,12 @@ const resendOTP = async (req, res) => {
     const emailTemplate = otpVerificationTemplate(user.profile.fullName, otp);
     sendEmail(email, emailTemplate).then(emailResult => {
       if (!emailResult.success) {
-        console.warn('⚠️ Gửi email OTP thất bại:', emailResult.error);
+        console.warn('Gửi email OTP thất bại:', emailResult.error);
       } else {
-        console.log('✅ Gửi email OTP thành công đến:', email);
+        console.log('Gửi email OTP thành công đến:', email);
       }
     }).catch(error => {
-      console.error('❌ Lỗi gửi email OTP:', error);
+      console.error('Lỗi gửi email OTP:', error);
     });
     
     // Trả về response ngay lập tức
@@ -380,26 +381,39 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    // Tìm user và check password
-    const user = await User.findOne({ email }).populate('profile');
+    // Tìm user theo email
+    const user = await User.findOne({ email });
     
-    if (!user || !(await user.comparePassword(password))) {
-      // Tăng số lần đăng nhập sai nếu user tồn tại
-      if (user) {
-        await user.incLoginAttempts();
-      }
+    // Nếu không tìm thấy user
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Tài khoản không tồn tại',
+        errorType: 'user_not_found'
+      });
+    }
+    
+    // Kiểm tra mật khẩu
+    if (!(await user.comparePassword(password))) {
+      // Tăng số lần đăng nhập sai
+      await user.incLoginAttempts();
       
       return res.status(401).json({
         success: false,
-        message: 'Email hoặc mật khẩu không hợp lệ'
+        message: 'Mật khẩu không đúng',
+        errorType: 'invalid_password'
       });
     }
+    
+    // Populate profile sau khi xác thực
+    await user.populate('profile');
     
     // Kiểm tra tài khoản có bị khóa không
     if (user.isLocked) {
       return res.status(423).json({
         success: false,
-        message: 'Tài khoản tạm thời bị khóa do nhiều lần đăng nhập không thành công'
+        message: 'Tài khoản tạm thời bị khóa do nhiều lần đăng nhập không thành công',
+        errorType: 'account_locked'
       });
     }
     
@@ -407,7 +421,8 @@ const login = async (req, res) => {
     if (!user.isEmailVerified) {
       return res.status(401).json({
         success: false,
-        message: 'Vui lòng xác thực email của bạn trước khi đăng nhập'
+        message: 'Vui lòng xác thực email của bạn trước khi đăng nhập',
+        errorType: 'email_not_verified'
       });
     }
     
@@ -415,7 +430,8 @@ const login = async (req, res) => {
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
-        message: 'Tài khoản đã bị vô hiệu hóa'
+        message: 'Tài khoản đã bị vô hiệu hóa',
+        errorType: 'account_inactive'
       });
     }
     
@@ -428,7 +444,8 @@ const login = async (req, res) => {
       
       return res.status(401).json({
         success: false,
-        message: statusMessages[user.approvalStatus] || 'Hồ sơ gia sư không được phê duyệt'
+        message: statusMessages[user.approvalStatus] || 'Hồ sơ gia sư không được phê duyệt',
+        errorType: 'tutor_not_approved'
       });
     }
     
@@ -694,9 +711,9 @@ const getTutors = async (req, res) => {
       .sort(sort)
       .lean()
       .exec();
-    
-    console.log('📊 Found', tutors.length, 'tutors');
-    
+
+    console.log('Tìm thấy', tutors.length, 'gia sư');
+
     // lấy hồ sơ thủ công
     const TutorProfile = require('../models/TutorProfile');
     for (let tutor of tutors) {
@@ -704,8 +721,8 @@ const getTutors = async (req, res) => {
         .select('fullName phone address bio subjects education yearsOfExperience hourlyRate teachingLocation availability averageRating totalReviews universityImage idCard avatar')
         .lean()
         .exec();
-      
-      console.log(`✅ Tutor ${tutor.email}: Profile ${tutor.profile ? 'found' : 'not found'}${tutor.profile?.avatar ? ', avatar: YES' : ', avatar: NO'}`);
+
+      console.log(`Gia sư ${tutor.email}: Profile ${tutor.profile ? 'tìm thấy' : 'không tìm thấy'}${tutor.profile?.avatar ? ', avatar: YES' : ', avatar: NO'}`);
     }
     
     // lọc theo từ khóa tìm kiếm
@@ -758,7 +775,7 @@ const getTutors = async (req, res) => {
     // Định dạng kết quả
     const formattedTutors = filteredTutors.map(tutor => {
       const tutorObj = tutor.toObject ? tutor.toObject() : tutor;
-      console.log('🔍 Gia sư :', tutorObj);
+      console.log('Gia sư :', tutorObj);
       console.log('Có hồ sơ không?', !!tutorObj.profile);
       
       return {
@@ -793,7 +810,7 @@ const getTutorById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('🔍 Lấy gia sư theo ID:', id);
+    console.log('Lấy gia sư theo ID:', id);
 
     // Tìm gia sư
     const tutor = await User.findOne({
@@ -815,14 +832,29 @@ const getTutorById = async (req, res) => {
     
     // lấy hồ sơ gia sư
     const TutorProfile = require('../models/TutorProfile');
+    const Review = require('../models/Review');
+    
     tutor.profile = await TutorProfile.findOne({ userId: tutor._id })
       .select('fullName phone address bio subjects education workExperience certificates yearsOfExperience hourlyRate teachingLocation availability averageRating totalReviews totalStudents totalLessons universityImage idCard avatar')
       .lean()
       .exec();
 
-    console.log('✅ Gia sư :', tutor.profile?.fullName);
-    console.log('📸 Avatar:', tutor.profile?.avatar);
-    console.log('🏫 Ảnh trường đại học:', tutor.profile?.universityImage);
+    // Tính toán averageRating từ review thực tế để đảm bảo là dữ liệu mới nhất
+    const reviewStats = await Review.getTutorReviewStats(tutor._id);
+    
+    if (reviewStats && reviewStats.length > 0) {
+      const stats = reviewStats[0];
+      if (tutor.profile) {
+        tutor.profile.averageRating = stats.averageRating || 0;
+        tutor.profile.totalReviews = stats.totalReviews || 0;
+      }
+    }
+
+    console.log('Gia sư :', tutor.profile?.fullName);
+    console.log('Avatar:', tutor.profile?.avatar);
+    console.log('Rating:', tutor.profile?.averageRating);
+    console.log('Total Reviews:', tutor.profile?.totalReviews);
+    console.log('Ảnh trường đại học:', tutor.profile?.universityImage);
     
     res.status(200).json({
       success: true,
@@ -837,7 +869,7 @@ const getTutorById = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Lỗi lấy thông tin gia sư:', error);
+    console.error('Lỗi lấy thông tin gia sư:', error);
     res.status(500).json({
       success: false,
       message: 'Lấy thông tin gia sư không thành công'
@@ -894,11 +926,11 @@ const testEmail = async (req, res) => {
       `
     };
     
-    console.log('🧪 Kiểm tra email đến:', email);
+    console.log('Kiểm tra email đến:', email);
     const emailResult = await sendEmail(email, testTemplate);
     
     if (emailResult.success) {
-      console.log('✅ test email thành công:', emailResult.messageId);
+      console.log('test email thành công:', emailResult.messageId);
       res.status(200).json({
         success: true,
         message: 'Test email thành công',
@@ -908,7 +940,7 @@ const testEmail = async (req, res) => {
         }
       });
     } else {
-      console.error('❌ Kiểm tra email thất bại:', emailResult.error);
+      console.error('Kiểm tra email thất bại:', emailResult.error);
       res.status(500).json({
         success: false,
         message: 'Kiểm tra email thất bại',
@@ -926,6 +958,165 @@ const testEmail = async (req, res) => {
   }
 };
 
+// @desc    Quên mật khẩu - Gửi OTP
+// @route   POST /api/auth/forgot-password-otp
+// @access  Public
+const forgotPasswordOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email }).populate('profile');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Email không tồn tại trong hệ thống'
+      });
+    }
+    
+    // Kiểm tra tài khoản có active không
+    if (!user.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tài khoản đã bị vô hiệu hóa'
+      });
+    }
+    
+    // Tạo OTP
+    const otp = generateOTP();
+    const hashedOTP = hashOTP(otp);
+    
+    // Lưu OTP vào database
+    user.passwordResetOTP = hashedOTP;
+    user.passwordResetOTPExpires = generateOTPExpiry();
+    user.passwordResetOTPAttempts = 0;
+    await user.save();
+    
+    // Gửi email OTP
+    const emailTemplate = passwordResetOTPVerificationTemplate(user.profile.fullName, otp);
+    sendEmail(email, emailTemplate).then(emailResult => {
+      if (!emailResult.success) {
+        console.warn('Gửi email OTP quên mật khẩu thất bại:', emailResult.error);
+      } else {
+        console.log('Gửi email OTP quên mật khẩu thành công đến:', email);
+      }
+    }).catch(error => {
+      console.error('Lỗi gửi email OTP quên mật khẩu:', error);
+    });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
+    });
+    
+  } catch (error) {
+    console.error('Lỗi quên mật khẩu:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gửi mã OTP không thành công'
+    });
+  }
+};
+
+// @desc    Xác nhận OTP và đặt lại mật khẩu
+// @route   POST /api/auth/verify-forgot-password-otp
+// @access  Public
+const verifyForgotPasswordOTP = async (req, res) => {
+  try {
+    const { email, otp, password, confirmPassword } = req.body;
+    
+    if (!email || !otp || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng điền đầy đủ thông tin'
+      });
+    }
+    
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu xác nhận không khớp'
+      });
+    }
+    
+    // Tìm user
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Email không tồn tại trong hệ thống'
+      });
+    }
+    
+    // Kiểm tra OTP lock
+    if (user.passwordResetOTPLockUntil && user.passwordResetOTPLockUntil > Date.now()) {
+      const remainingMinutes = Math.ceil((user.passwordResetOTPLockUntil - Date.now()) / 60000);
+      return res.status(429).json({
+        success: false,
+        message: `Quá nhiều lần thử không thành công. Vui lòng thử lại sau ${remainingMinutes} phút.`
+      });
+    }
+    
+    // Kiểm tra OTP expired
+    if (!user.passwordResetOTPExpires || user.passwordResetOTPExpires < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.'
+      });
+    }
+    
+    // Verify OTP
+    const isValid = verifyOTP(otp, user.passwordResetOTP);
+    
+    if (!isValid) {
+      // Tăng số lần nhập sai
+      user.passwordResetOTPAttempts = (user.passwordResetOTPAttempts || 0) + 1;
+      
+      // Lock nếu nhập sai quá 5 lần
+      if (user.passwordResetOTPAttempts >= 5) {
+        user.passwordResetOTPLockUntil = new Date(Date.now() + 15 * 60 * 1000); // Lock 15 phút
+        user.passwordResetOTPAttempts = 0;
+        await user.save();
+        
+        return res.status(429).json({
+          success: false,
+          message: 'Quá nhiều lần thử không thành công. Tài khoản đã bị khóa trong 15 phút.'
+        });
+      }
+      
+      await user.save();
+      
+      return res.status(400).json({
+        success: false,
+        message: `Mã OTP không hợp lệ. Còn ${5 - user.passwordResetOTPAttempts} lần thử.`
+      });
+    }
+    
+    // Xác nhận thành công - cập nhật mật khẩu
+    user.password = password;
+    user.passwordResetOTP = undefined;
+    user.passwordResetOTPExpires = undefined;
+    user.passwordResetOTPAttempts = 0;
+    user.passwordResetOTPLockUntil = undefined;
+    user.loginAttempts = 0; // Reset login attempts
+    user.lockUntil = undefined;
+    
+    await user.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Mật khẩu đã được đặt lại thành công. Bạn có thể đăng nhập với mật khẩu mới.'
+    });
+    
+  } catch (error) {
+    console.error('Lỗi xác nhận OTP quên mật khẩu:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Đặt lại mật khẩu không thành công'
+    });
+  }
+};
+
 module.exports = {
   register,
   verifyEmailOTP,
@@ -939,5 +1130,7 @@ module.exports = {
   getMe,
   getTutors,
   getTutorById,
-  testEmail
+  testEmail,
+  forgotPasswordOTP,
+  verifyForgotPasswordOTP
 };

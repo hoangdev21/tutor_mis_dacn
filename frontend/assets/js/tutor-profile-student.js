@@ -48,6 +48,7 @@ async function loadTutorProfile() {
     
     currentTutor = data.data;
     renderProfile();
+    loadTutorReviews(); // Load reviews after profile rendered
     
   } catch (error) {
     console.error('❌ Load profile error:', error);
@@ -283,6 +284,11 @@ function renderProfile() {
             </div>
           </div>
         </section>
+        
+        <!-- Reviews Section -->
+        <div id="reviewsContainer" style="margin-top: 25px;">
+          <!-- Reviews will be loaded here -->
+        </div>
       </main>
     </div>
   `;
@@ -552,6 +558,234 @@ function openLocationInMap(encodedAddress) {
   // Open Google Maps with the address
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   window.open(mapsUrl, '_blank');
+}
+
+// ===== REVIEWS FUNCTIONS =====
+
+// Load tutor reviews
+async function loadTutorReviews() {
+  const container = document.getElementById('reviewsContainer');
+  
+  try {
+    console.log('📡 Loading tutor reviews for:', tutorId);
+    
+    const response = await fetch(`${API_BASE_URL}/reviews/tutor/${tutorId}`);
+    
+    if (!response.ok) {
+      console.warn('⚠️ Could not load reviews:', response.status);
+      return;
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+      console.log('ℹ️ No reviews data');
+      return;
+    }
+    
+    const reviews = data.data.reviews || [];
+    const stats = data.data.stats || {};
+    
+    console.log('✅ Reviews loaded:', reviews.length, 'reviews');
+    renderReviewsSection(reviews, stats);
+    
+  } catch (error) {
+    console.error('❌ Error loading reviews:', error);
+    // Don't show error to user, just skip reviews section
+  }
+}
+
+// Render reviews section
+function renderReviewsSection(reviews, stats) {
+  const container = document.getElementById('reviewsContainer');
+  
+  if (!reviews || reviews.length === 0) {
+    container.innerHTML = `
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <h2><i class="fas fa-star"></i> Đánh Giá</h2>
+        </div>
+        <div class="no-reviews">
+          <i class="fas fa-comment-slash"></i>
+          <p>Chưa có đánh giá nào</p>
+          <p class="no-reviews-msg">Hãy làm bài tập với gia sư này để có thể để lại đánh giá!</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  // Calculate average rating and count
+  const avgRating = stats.averageRating || 0;
+  const reviewCount = reviews.length;
+  const avgCriteria = stats.averageCriteria || {};
+  
+  let reviewsHTML = `
+    <div class="reviews-section">
+      <div class="reviews-header">
+        <div>
+          <h2><i class="fas fa-star"></i> Đánh Giá Của Học Sinh</h2>
+        </div>
+        <div class="reviews-summary">
+          <div class="review-rating-display">
+            <div class="stars">${generateStars(avgRating)}</div>
+            <div class="rating-value">${avgRating.toFixed(1)}</div>
+          </div>
+          <div class="review-count">
+            <i class="fas fa-comments"></i>
+            <span>${reviewCount} đánh giá</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="reviews-container">
+        ${reviews.map(review => renderReviewItem(review)).join('')}
+      </div>
+  `;
+  
+  // Add criteria breakdown if available
+  if (Object.keys(avgCriteria).length > 0) {
+    reviewsHTML += `
+      <div class="criteria-breakdown">
+        ${renderCriteriaBreakdown(avgCriteria)}
+      </div>
+    `;
+  }
+  
+  reviewsHTML += `
+    </div>
+  `;
+  
+  container.innerHTML = reviewsHTML;
+}
+
+// Render single review item
+function renderReviewItem(review) {
+  const rating = review.rating || 0;
+  const createdAt = new Date(review.createdAt).toLocaleDateString('vi-VN');
+  const reviewerName = review.reviewer?.profile?.fullName || review.reviewer?.email || 'Học sinh';
+  const reviewerAvatar = review.reviewer?.profile?.avatar || review.reviewer?.avatar || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=667eea&color=fff`;
+  
+  // Format status badge
+  // Only approved reviews are shown, so no need for status badge
+  const statusBadge = '';
+  
+  let html = `
+    <div class="review-item">
+      <div class="review-header">
+        <div class="review-author">
+          <img src="${reviewerAvatar}" alt="${reviewerName}" class="review-avatar" 
+            onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=667eea&color=fff'">
+          <div class="review-author-info">
+            <span class="review-author-name">${reviewerName}</span>
+            <span class="review-author-date">${createdAt}</span>
+          </div>
+        </div>
+        <div class="review-rating">
+          <div class="stars">${generateStars(rating)}</div>
+          <span class="score">${rating.toFixed(1)}</span>
+        </div>
+      </div>
+      
+      <div class="review-content">
+        ${review.comment ? `<p class="review-comment">${escapeHtml(review.comment)}</p>` : ''}
+        
+        ${review.criteria && Object.keys(review.criteria).length > 0 ? `
+          <div class="review-criteria">
+            ${renderReviewCriteria(review.criteria)}
+          </div>
+        ` : ''}
+      </div>
+  `;
+  
+  // Add tutor response if exists
+  if (review.tutorResponse && review.tutorResponse.message) {
+    html += `
+      <div class="tutor-response">
+        <div class="tutor-response-header">
+          <i class="fas fa-reply"></i>
+          <span>Phản hồi từ gia sư</span>
+        </div>
+        <div class="tutor-response-text">${escapeHtml(review.tutorResponse.message)}</div>
+      </div>
+    `;
+  }
+  
+  html += `
+    </div>
+  `;
+  
+  return html;
+}
+
+// Render review criteria
+function renderReviewCriteria(criteria) {
+  const criteriaNames = {
+    professionalism: 'Chuyên Nghiệp',
+    communication: 'Giao Tiếp',
+    knowledgeLevel: 'Kiến Thức',
+    patience: 'Kiên Nhẫn',
+    effectiveness: 'Hiệu Quả'
+  };
+  
+  return Object.entries(criteria).map(([key, value]) => {
+    if (!value || value < 1 || value > 5) return '';
+    
+    const name = criteriaNames[key] || key;
+    return `
+      <div class="criteria-item">
+        <span class="criteria-label">${name}</span>
+        <div class="criteria-value">
+          <div class="stars">${generateStars(value)}</div>
+          <span class="score">${value.toFixed(1)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Render criteria breakdown
+function renderCriteriaBreakdown(avgCriteria) {
+  const criteriaNames = {
+    professionalism: 'Chuyên Nghiệp',
+    communication: 'Giao Tiếp',
+    knowledgeLevel: 'Kiến Thức',
+    patience: 'Kiên Nhẫn',
+    effectiveness: 'Hiệu Quả'
+  };
+  
+  return Object.entries(avgCriteria).map(([key, value]) => {
+    if (!value || value < 1 || value > 5) return '';
+    
+    const name = criteriaNames[key] || key;
+    const percentage = (value / 5) * 100;
+    
+    return `
+      <div class="criteria-breakdown-item">
+        <span class="criteria-breakdown-name">${name}</span>
+        <div class="criteria-breakdown-score">
+          <div class="stars">${generateStars(value)}</div>
+          <span class="value">${value.toFixed(1)}</span>
+        </div>
+        <div class="criteria-breakdown-bar">
+          <div class="criteria-breakdown-bar-fill" style="width: ${percentage}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Utility function to escape HTML
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
 }
 
 console.log('✅ Tutor profile page script loaded');

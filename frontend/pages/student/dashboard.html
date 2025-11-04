@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
     <link rel="stylesheet" href="../../assets/css/student/student-dashboard-enhanced.css">
+    <link rel="stylesheet" href="../../assets/css/student/learning-progress-chart.css">
+    <link rel="stylesheet" href="../../assets/css/student/dashboard-improvements.css">
     <link rel="stylesheet" href="../../assets/css/notifications.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -41,7 +43,7 @@
                     </div>
                     <div class="menu-item" data-page="requests">
                         <img src="../../assets/images/dashboard-student/requests.png" alt="requests">
-                        <span>Yêu Cầu Gia Sư</span>
+                        <span>Đặt lịch</span>
                     </div>
                     <div class="menu-item" data-page="find-tutor">
                         <img src="../../assets/images/dashboard-student/find-tutor.png" alt="find-tutor">
@@ -183,41 +185,67 @@
                 </div>
 
                 <!-- Dashboard Main Grid -->
-                <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
                     
-                    <!-- Learning Progress Chart - Left Side -->
+                    <!-- Learning Progress Charts - Left Side -->
                     <div class="content-section" style="grid-column: 1;">
                         <div class="section-header">
                             <h2 class="section-title">
-                                <i class="fas fa-chart-line"></i>
+                                <i class="fas fa-graduation-cap"></i>
                                 Tiến Độ Học Tập
                             </h2>
-                        </div>
-                        <div id="learningProgressContainer" style="padding: 20px; background: white; border-radius: 8px;">
-                            <canvas id="learningProgressChart" style="max-height: 300px;"></canvas>
-                            <div id="progressStats" style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                                <!-- Progress stats will be inserted here -->
+                            <div class="progress-legend">
+                                <span class="legend-item"><span class="legend-dot completed"></span>Hoàn thành</span>
+                                <span class="legend-item"><span class="legend-dot active"></span>Đang học</span>
                             </div>
+                        </div>
+                        
+                        <!-- Progress Overview Cards -->
+                        <div id="progressStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                            <!-- Progress stats will be inserted here -->
+                        </div>
+                        
+                        <!-- Main Progress Chart -->
+                        <div id="learningProgressContainer" style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding: 20px; border-radius: 12px; box-shadow: inset 0 2px 8px rgba(102, 126, 234, 0.08);">
+                            <canvas id="learningProgressChart" style="max-height: 300px;"></canvas>
                         </div>
                     </div>
 
-                    <!-- Recent Notifications - Right Side -->
-                    <div class="content-section" style="grid-column: 2;">
-                        <div class="section-header">
-                            <h2 class="section-title">
-                                <i class="fas fa-bell"></i>
-                                Thông Báo Mới Nhất
-                            </h2>
-                            <div class="section-actions">
-                                <button class="action-btn secondary" onclick="showAllNotificationsModal()" style="font-size: 12px; padding: 6px 12px;">
-                                    <i class="fas fa-eye"></i>
-                                    Xem Tất Cả
-                                </button>
+                    <!-- Progress Summary & Notifications - Right Side -->
+                    <div style="grid-column: 2; display: flex; flex-direction: column; gap: 24px;">
+                        
+                        <!-- Circular Progress Chart -->
+                        <div class="content-section">
+                            <div class="section-header" style="margin-bottom: 14px;">
+                                <h2 class="section-title" style="font-size: 14px;">
+                                    <i class="fas fa-chart-pie"></i>
+                                    Tổng Quan
+                                </h2>
+                            </div>
+                            <div style="position: relative; padding: 16px;">
+                                <canvas id="progressDoughnutChart" style="max-height: 180px;"></canvas>
+                                <div id="progressCenterText" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
+                                    <!-- Center text will be inserted here -->
+                                </div>
                             </div>
                         </div>
-                        <div id="notificationsContainer" style="max-height: 400px; overflow-y: auto;">
-                            <div class="loading-spinner">
-                                <div class="spinner"></div>
+
+                        <!-- Recent Notifications -->
+                        <div class="content-section" style="flex: 1; display: flex; flex-direction: column;">
+                            <div class="section-header">
+                                <h2 class="section-title" style="font-size: 14px;">
+                                    <i class="fas fa-bell"></i>
+                                    Thông Báo
+                                </h2>
+                                <button class="action-btn secondary" onclick="showAllNotificationsModal()" style="font-size: 11px; padding: 4px 10px;">
+                                    <i class="fas fa-eye"></i>
+                                    Tất cả
+                                </button>
+                            </div>
+                            <div id="notificationsContainer" style="flex: 1; max-height: 280px; overflow-y: auto;">
+                                <div class="loading-spinner">
+                                    <div class="spinner"></div>
+                                </div>
                             </div>
                         </div>
                     </div>

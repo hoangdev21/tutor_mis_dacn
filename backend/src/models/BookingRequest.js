@@ -157,7 +157,7 @@ const bookingRequestSchema = new mongoose.Schema({
     type: Date
   },
   
-  // đánh giá
+  // đánh giá (lưu ý: đánh giá chi tiết lưu trong Review collection)
   rating: {
     score: {
       type: Number,
@@ -172,6 +172,24 @@ const bookingRequestSchema = new mongoose.Schema({
     ratedAt: {
       type: Date
     }
+  },
+  
+  // Liên kết đến đánh giá
+  review: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
+  },
+  
+  // Cờ để kiểm tra có thể đánh giá không
+  isReviewable: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Lý do không thể đánh giá
+  reviewBlockReason: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true,
@@ -236,6 +254,7 @@ bookingRequestSchema.methods.cancel = function(userId, reason) {
 bookingRequestSchema.methods.complete = function() {
   this.status = 'completed';
   this.completedAt = new Date();
+  this.isReviewable = true; // Cho phép đánh giá sau khi hoàn thành
   return this.save();
 };
 

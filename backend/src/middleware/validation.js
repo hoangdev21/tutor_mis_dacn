@@ -319,6 +319,35 @@ const validateNewPassword = [
   handleValidationErrors
 ];
 
+// Validation cho verify forgot password OTP
+const validateVerifyForgotPasswordOTP = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Vui lòng cung cấp một địa chỉ email hợp lệ'),
+
+  body('otp')
+    .isLength({ min: 6, max: 6 })
+    .isNumeric()
+    .withMessage('OTP phải là 6 chữ số'),
+
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Mật khẩu phải có ít nhất 6 ký tự')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage('Mật khẩu phải chứa ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số'),
+
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Xác nhận mật khẩu không khớp với mật khẩu');
+      }
+      return true;
+    }),
+    
+  handleValidationErrors
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
@@ -330,5 +359,6 @@ module.exports = {
   validateBlogPost,
   validatePasswordReset,
   validateNewPassword,
+  validateVerifyForgotPasswordOTP,
   handleValidationErrors
 };

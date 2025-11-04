@@ -94,6 +94,38 @@ const notificationConfig = {
       message: `Hồ sơ gia sư của bạn đã bị từ chối. Lý do: ${data.reason || 'Không đáp ứng yêu cầu'}`
     })
   },
+  review_received: {
+    icon: 'fa-star',
+    color: 'gold',
+    getTitleAndMessage: (data) => ({
+      title: 'Đánh Giá Mới',
+      message: `${data.studentName} đã đánh giá lịch học của bạn với ${data.rating} sao`
+    })
+  },
+  review_approved: {
+    icon: 'fa-check-circle',
+    color: 'green',
+    getTitleAndMessage: (data) => ({
+      title: 'Đánh Giá Được Phê Duyệt',
+      message: `Đánh giá từ ${data.studentName} đã được phê duyệt và hiển thị trên hồ sơ của bạn`
+    })
+  },
+  review_rejected: {
+    icon: 'fa-times-circle',
+    color: 'red',
+    getTitleAndMessage: (data) => ({
+      title: 'Đánh Giá Bị Từ Chối',
+      message: `Đánh giá của bạn đã bị từ chối. Lý do: ${data.reason || 'Vi phạm tiêu chuẩn cộng đồng'}`
+    })
+  },
+  tutor_response: {
+    icon: 'fa-reply',
+    color: 'blue',
+    getTitleAndMessage: (data) => ({
+      title: 'Gia Sư Đã Phản Hồi',
+      message: `${data.tutorName} đã phản hồi lại đánh giá của bạn`
+    })
+  },
   system: {
     icon: 'fa-info-circle',
     color: 'gray',
@@ -294,6 +326,67 @@ async function notifyProfileRejected(tutorId, reason) {
   });
 }
 
+/**
+ * Create notification for new review
+ */
+async function notifyNewReview(review, tutorId, studentName, rating) {
+  return createNotification({
+    type: 'review_received',
+    recipientId: tutorId,
+    senderId: review.reviewer,
+    data: {
+      studentName,
+      rating
+    },
+    link: `/pages/tutor/reviews.html`,
+    relatedId: review._id,
+    relatedModel: 'Review'
+  });
+}
+
+/**
+ * Create notification for review approved
+ */
+async function notifyReviewApproved(review, studentId, studentName) {
+  return createNotification({
+    type: 'review_approved',
+    recipientId: studentId,
+    data: { studentName },
+    link: `/pages/student/my-reviews.html`,
+    relatedId: review._id,
+    relatedModel: 'Review'
+  });
+}
+
+/**
+ * Create notification for review rejected
+ */
+async function notifyReviewRejected(review, studentId, reason) {
+  return createNotification({
+    type: 'review_rejected',
+    recipientId: studentId,
+    data: { reason },
+    link: `/pages/student/my-reviews.html`,
+    relatedId: review._id,
+    relatedModel: 'Review'
+  });
+}
+
+/**
+ * Create notification for tutor response to review
+ */
+async function notifyTutorResponse(review, studentId, tutorName) {
+  return createNotification({
+    type: 'tutor_response',
+    recipientId: studentId,
+    senderId: review.tutor,
+    data: { tutorName },
+    link: `/pages/student/my-reviews.html`,
+    relatedId: review._id,
+    relatedModel: 'Review'
+  });
+}
+
 module.exports = {
   createNotification,
   notifyBookingRequest,
@@ -304,5 +397,9 @@ module.exports = {
   notifyBlogRejected,
   notifyNewMessage,
   notifyProfileApproved,
-  notifyProfileRejected
+  notifyProfileRejected,
+  notifyNewReview,
+  notifyReviewApproved,
+  notifyReviewRejected,
+  notifyTutorResponse
 };

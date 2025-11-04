@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .debug-info {
+            background: #f9f9f9;
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            margin: 10px 0;
+            font-size: 12px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Income Chart Test</h1>
+        
+        <div id="status"></div>
+        
+        <button onclick="testAPI()">Test API</button>
+        <button onclick="testChart()">Render Chart</button>
+        
+        <div id="debugInfo"></div>
+        
+        <div class="chart-container">
+            <canvas id="testChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chartData = null;
+        let testChart = null;
+
+        async function testAPI() {
+            const status = document.getElementById('status');
+            const debug = document.getElementById('debugInfo');
+            
+            try {
+                const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+                
+                if (!token) {
+                    status.innerHTML = '<div class="status error">❌ No token found in localStorage</div>';
+                    return;
+                }
+                
+                status.innerHTML = '<div class="status">⏳ Loading...</div>';
+                
+                const response = await fetch('http://localhost:5000/api/tutor/income?period=year', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                chartData = data.data;
+                
+                if (data.success && chartData.incomeChartData) {
+                    status.innerHTML = `
+                        <div class="status success">
+                            ✅ API Response OK<br>
+                            Monthly Income: ${chartData.summary.monthlyIncome} đ<br>
+                            Chart Data - Actual: ${chartData.incomeChartData.actual.length} items<br>
+                            Chart Data - Predicted: ${chartData.incomeChartData.predicted.length} items
+                        </div>
+                    `;
+                    
+                    debug.innerHTML = `<div class="debug-info">
+                        <strong>incomeChartData.actual:</strong><br>
+                        ${JSON.stringify(chartData.incomeChartData.actual, null, 2)}
+                        <br><strong>incomeChartData.predicted:</strong><br>
+                        ${JSON.stringify(chartData.incomeChartData.predicted, null, 2)}
+                    </div>`;
+                } else {
+                    status.innerHTML = '<div class="status error">❌ No chart data in response</div>';
+                    debug.innerHTML = `<div class="debug-info">${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (err) {
+                status.innerHTML = `<div class="status error">❌ Error: ${err.message}</div>`;
+                debug.innerHTML = `<div class="debug-info">${err.stack}</div>`;
+            }
+        }
+
+        function testChart() {
+            if (!chartData || !chartData.incomeChartData) {
+                document.getElementById('status').innerHTML = '<div class="status error">❌ No chart data. Run Test API first.</div>';
+                return;
+            }
+            
+            const canvas = document.getElementById('testChart');
+            const ctx = canvas.getContext('2d');
+            
+            if (testChart) testChart.destroy();
+            
+            // Prepare data
+            const allDates = new Set();
+            chartData.incomeChartData.actual.forEach(d => allDates.add(d.date));
+            chartData.incomeChartData.predicted.forEach(d => allDates.add(d.date));
+            
+            const sortedDates = Array.from(allDates).sort();
+            
+            const actualData = sortedDates.map(date => {
+                const item = chartData.incomeChartData.actual.find(d => d.date === date);
+                return item ? item.amount : 0;
+            });
+            
+            const predictedData = sortedDates.map(date => {
+                const item = chartData.incomeChartData.predicted.find(d => d.date === date);
+                return item ? item.amount : 0;
+            });
+            
+            const labels = sortedDates.map(date => {
+                const d = new Date(date + 'T00:00:00');
+                return d.getDate() + '/' + (d.getMonth() + 1);
+            });
+            
+            testChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Thu nhập thực tế (VND)',
+                            data: actualData,
+                            borderColor: '#11998e',
+                            backgroundColor: 'rgba(17, 153, 142, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#11998e'
+                        },
+                        {
+                            label: 'Thu nhập dự kiến (VND)',
+                            data: predictedData,
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f093fb'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND'
+                                        }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            document.getElementById('status').innerHTML = '<div class="status success">✅ Chart rendered successfully</div>';
+        }
+    </script>
+</body>
+</html>

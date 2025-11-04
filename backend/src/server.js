@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
-// Activity logging middleware
+// Hoạt động ghi log cho mỗi yêu cầu
 app.use(requestLogger);
 
 app.use('/uploads', express.static('uploads'));
@@ -71,6 +71,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/blog', require('./routes/blog'));
 app.use('/api/bookings', require('./routes/booking'));
+app.use('/api/reviews', require('./routes/review'));
 app.use('/api/notifications', require('./routes/notification'));
 app.use('/api/support', require('./routes/support'));
 app.use('/api/ai', require('./routes/ai'));
@@ -135,16 +136,16 @@ process.on('SIGINT', () => {
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`
-🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}
-🔌 Socket.IO enabled for real-time messaging
-📚 API Documentation: http://localhost:${PORT}/api-docs
+Server chạy trong ${process.env.NODE_ENV} mode trên cổng ${PORT}
+Socket.IO đã được kích hoạt cho nhắn tin thời gian thực
+Tài liệu API: http://localhost:${PORT}/api-docs
   `);
 });
 
 process.on('unhandledRejection', (err, promise) => {
-  console.log('❌ Unhandled Promise Rejection:', err.message);
+  console.log('Lỗi không được xử lý:', err.message);
   server.close(() => process.exit(1));
 });
 

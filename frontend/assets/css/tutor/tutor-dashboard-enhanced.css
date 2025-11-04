@@ -124,6 +124,12 @@
   color: #667eea;
 }
 
+.course-count {
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
 .section-actions {
   display: flex;
   gap: 8px;
@@ -131,8 +137,29 @@
 
 /* Chart Container */
 .chart-container {
-  height: 300px;
+  height: 350px;
   position: relative;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.chart-container canvas {
+  display: block;
+}
+
+.chart-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  background: #f8fafc;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.chart-empty-state p {
+  margin: 0;
 }
 
 /* Button Styles */
@@ -234,6 +261,13 @@
 }
 
 /* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
 .spinner {
   border: 3px solid #f3f4f6;
   border-top: 3px solid #667eea;
@@ -247,6 +281,32 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.error-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error-state i {
+  font-size: 48px;
+  color: #ef4444;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.error-state h3 {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.error-state p {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0;
 }
 
 /* Responsive Design */

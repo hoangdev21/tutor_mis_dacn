@@ -78,13 +78,18 @@ const getDashboard = async (req, res) => {
       })
     ]);
     
-    // Thu nhập thực tế (đã hoàn thành) - sử dụng completedAt thay vì payment.paidDate
+    // Calculate current month date range (day 1 to last day of month)
+    // Automatically handles months with 28, 29, 30, or 31 days
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    
+    // Thu nhập thực tế (đã hoàn thành) - Chỉ tháng hiện tại (ngày 1 - ngày cuối)
     const actualIncomeData = await BookingRequest.aggregate([
       {
         $match: {
           tutor: tutorId,
           status: 'completed',
-          completedAt: { $gte: startDate, $lte: now }
+          completedAt: { $gte: monthStart, $lte: monthEnd }  // Only current month (1st to last day)
         }
       },
       {
@@ -98,13 +103,13 @@ const getDashboard = async (req, res) => {
       { $sort: { '_id.date': 1 } }
     ]);
     
-    // Thu nhập dự kiến (đang học)
+    // Thu nhập dự kiến (đang học trong tháng hiện tại)
     const predictedIncomeData = await BookingRequest.aggregate([
       {
         $match: {
           tutor: tutorId,
           status: 'accepted',
-          'schedule.startDate': { $gte: now, $lte: futureDate }
+          'schedule.startDate': { $gte: monthStart, $lte: monthEnd }  // Only current month
         }
       },
       {
@@ -125,9 +130,6 @@ const getDashboard = async (req, res) => {
     };
     
     // Tổng thu nhập thực tế (tháng này)
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-    
     const actualIncome = await BookingRequest.aggregate([
       {
         $match: {
@@ -144,16 +146,13 @@ const getDashboard = async (req, res) => {
       }
     ]);
     
-    // Tổng thu nhập dự kiến (tháng sau)
-    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
-    
+    // Tổng thu nhập dự kiến (các khóa học đang diễn ra trong tháng này)
     const predictedIncome = await BookingRequest.aggregate([
       {
         $match: {
           tutor: tutorId,
           status: 'accepted',
-          'schedule.startDate': { $gte: nextMonthStart, $lte: nextMonthEnd }
+          'schedule.startDate': { $gte: monthStart, $lte: monthEnd }
         }
       },
       {
@@ -962,6 +961,11 @@ const getIncome = async (req, res) => {
         break;
     }
     
+    // Calculate current month date range (day 1 to last day of month)
+    // Automatically handles months with 28, 29, 30, or 31 days
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    
     // 1. Tổng thu nhập thực tế (completed bookings)
     const completedIncome = await BookingRequest.aggregate([
       {
@@ -1000,13 +1004,12 @@ const getIncome = async (req, res) => {
     ]);
     
     // 3. Thu nhập tháng này
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthIncome = await BookingRequest.aggregate([
       {
         $match: {
           tutor: tutorId,
           status: 'completed',
-          completedAt: { $gte: monthStart, $lte: now }
+          completedAt: { $gte: monthStart, $lte: monthEnd }  // Only current month (1st to last day)
         }
       },
       {
@@ -1023,6 +1026,46 @@ const getIncome = async (req, res) => {
       tutor: tutorId,
       status: { $in: ['accepted', 'completed'] }
     });
+    
+    // 4a. Chart data - actual income (completed bookings this month) - ngày trong tháng hiện tại
+    const actualIncomeChartData = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'completed',
+          completedAt: { $gte: monthStart, $lte: monthEnd }  // Only current month (1st to last day)
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } }
+          },
+          amount: { $sum: '$pricing.totalAmount' }  
+        }
+      },
+      { $sort: { '_id.date': 1 } }
+    ]);
+    
+    // 4b. Chart data - predicted income (accepted bookings this month)
+    const predictedIncomeChartData = await BookingRequest.aggregate([
+      {
+        $match: {
+          tutor: tutorId,
+          status: 'accepted',
+          'schedule.startDate': { $gte: monthStart, $lte: monthEnd }  // Only current month
+        }
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$schedule.startDate' } }
+          },
+          amount: { $sum: '$pricing.totalAmount' }  
+        }
+      },
+      { $sort: { '_id.date': 1 } }
+    ]);
     
     // 5. Thu nhập theo tháng (12 tháng gần nhất)
     const monthlyIncomeData = await BookingRequest.aggregate([
@@ -1169,6 +1212,11 @@ const getIncome = async (req, res) => {
           averageHourlyRate: completedData.totalHours > 0 
             ? Math.round(completedData.total / completedData.totalHours) 
             : 0
+        },
+        // Chart data for current month (day by day)
+        incomeChartData: {
+          actual: actualIncomeChartData.map(d => ({ date: d._id.date, amount: d.amount })),
+          predicted: predictedIncomeChartData.map(d => ({ date: d._id.date, amount: d.amount }))
         },
         monthlyIncome: monthlyIncomeData,
         incomeBySubject: incomeBySubject,

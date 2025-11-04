@@ -371,8 +371,8 @@ function displayBookingDetail(booking) {
       <div class="detail-section">
         <h3><i class="fas fa-money-bill-wave"></i> Chi phí</h3>
         <p><strong>Học phí:</strong> ${formatCurrency(booking.pricing.hourlyRate)}/giờ</p>
-        <p><strong>Tổng số giờ:</strong> ${booking.pricing.totalHours} giờ</p>
-        <p><strong>Tổng chi phí:</strong> ${formatCurrency(booking.pricing.totalAmount)}</p>
+        <p><strong>Tổng số giờ:</strong> ${calculateTotalHoursBooking(booking)} giờ</p>
+        <p><strong>Tổng chi phí:</strong> ${formatCurrency(calculateTotalPriceBooking(booking))}</p>
       </div>
       
       ${booking.description ? `
@@ -647,6 +647,48 @@ function updateDate() {
 function logout() {
   localStorage.clear();
   window.location.href = '../../index.html';
+}
+
+// Calculate total hours for booking
+function calculateTotalHoursBooking(booking) {
+  const schedule = booking.schedule || {};
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Get duration in months
+  const duration = schedule.duration || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (duration in months)
+  const totalHours = daysPerWeek * 4 * hoursPerSession * duration;
+  
+  return totalHours;
+}
+
+// Calculate total price for booking
+function calculateTotalPriceBooking(booking) {
+  const pricing = booking.pricing || {};
+  const schedule = booking.schedule || {};
+  
+  // Get hourly rate
+  const hourlyRate = pricing.hourlyRate || 0;
+  
+  // Get days per week
+  const daysPerWeek = schedule.daysPerWeek || 0;
+  
+  // Get hours per session
+  const hoursPerSession = schedule.hoursPerSession || 0;
+  
+  // Get duration in months
+  const duration = schedule.duration || 0;
+  
+  // Calculate: (days per week) × (4 weeks per month) × (hours per session) × (hourly rate) × (duration in months)
+  const totalPrice = daysPerWeek * 4 * hoursPerSession * hourlyRate * duration;
+  
+  return totalPrice;
 }
 
 console.log('✅ Booking requests script loaded');

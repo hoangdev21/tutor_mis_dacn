@@ -11,13 +11,13 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
     
     // Tạo indexes
     await createIndexes();
     
   } catch (error) {
-    console.error('❌ MongoDB Connection Error:', error.message);
+    console.error('MongoDB Connection Lỗi:', error.message);
     process.exit(1);
   }
 };
@@ -31,29 +31,24 @@ const createIndexes = async () => {
     await db.collection('users').createIndex({ role: 1 });
     await db.collection('users').createIndex({ approvalStatus: 1 });
     
-    // TutorProfile indexes
     await db.collection('tutorprofiles').createIndex({ 'subjects.subject': 1 });
     await db.collection('tutorprofiles').createIndex({ 'subjects.level': 1 });
     await db.collection('tutorprofiles').createIndex({ 'address.city': 1 });
     
-    // TutorRequest indexes
     await db.collection('tutorrequests').createIndex({ subject: 1, level: 1 });
     await db.collection('tutorrequests').createIndex({ status: 1 });
     
-    // Course indexes
     await db.collection('courses').createIndex({ tutorId: 1, studentId: 1 });
     await db.collection('courses').createIndex({ status: 1 });
     
-    // Message indexes
     await db.collection('messages').createIndex({ senderId: 1, receiverId: 1 });
     await db.collection('messages').createIndex({ courseId: 1 });
     
-    // BlogPost indexes
     await db.collection('blogposts').createIndex({ category: 1 });
     
-    console.log('✅ Chỉ mục MongoDB đã được tạo thành công');
+    console.log('Chỉ mục MongoDB đã được tạo thành công');
   } catch (error) {
-    console.error('❌ Lỗi khi tạo chỉ mục:', error.message);
+    console.error('Lỗi khi tạo chỉ mục:', error.message);
   }
 };
 

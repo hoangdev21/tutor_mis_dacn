@@ -1,0 +1,370 @@
+/* ===== STUDENT DASHBOARD IMPROVEMENTS ===== */
+/* Professional UI enhancements with optimized spacing and colors */
+
+/* Dashboard Grid Optimization */
+.dashboard-grid {
+  gap: 18px !important;
+}
+
+/* Progress Stats Container - Compact & Professional */
+#progressStats {
+  gap: 12px !important;
+}
+
+#progressStats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 85px;
+  padding: 12px 10px !important;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#progressStats > div:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Stat Card Typography Optimization */
+#progressStats > div > div:first-child {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+#progressStats > div > div:last-child {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.92;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Learning Progress Container */
+#learningProgressContainer {
+  padding: 18px !important;
+}
+
+/* Course Card Optimization */
+.courses-list .course-card {
+  padding: 12px !important;
+  gap: 10px !important;
+}
+
+.courses-list .course-card img {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.courses-list .course-card h4 {
+  font-size: 13px !important;
+}
+
+.courses-list .course-card p {
+  font-size: 12px !important;
+}
+
+/* Messages List Optimization */
+.messages-list .message-item {
+  padding: 10px !important;
+  gap: 10px !important;
+}
+
+.messages-list .message-item img {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.messages-list .message-item h4 {
+  font-size: 13px !important;
+}
+
+.messages-list .message-item p {
+  font-size: 12px !important;
+}
+
+/* Notifications List Optimization */
+.notifications-list .notification-item {
+  padding: 10px !important;
+  gap: 10px !important;
+}
+
+.notifications-list .notification-item h4 {
+  font-size: 13px !important;
+}
+
+.notifications-list .notification-item p {
+  font-size: 12px !important;
+  line-clamp: 2;
+  -webkit-line-clamp: 2 !important;
+}
+
+/* Status Badge Sizing */
+.status-badge {
+  font-size: 10px !important;
+  padding: 3px 8px !important;
+}
+
+/* Legend Item Optimization */
+.legend-item {
+  font-size: 11px !important;
+  padding: 5px 10px !important;
+}
+
+.legend-dot {
+  width: 11px !important;
+  height: 11px !important;
+}
+
+/* Content Section Title Optimization */
+.section-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+.section-header {
+  margin-bottom: 14px !important;
+  padding-bottom: 10px !important;
+  gap: 8px !important;
+}
+
+/* Action Button Optimization */
+.action-btn {
+  font-size: 12px !important;
+  padding: 6px 12px !important;
+  gap: 6px !important;
+}
+
+.action-btn i {
+  font-size: 12px !important;
+}
+
+/* Responsive Improvements */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-grid > div:nth-child(2) {
+    grid-column: 1 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 16px !important;
+  }
+
+  .stats-grid {
+    gap: 12px !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .stat-card {
+    padding: 14px !important;
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+
+  .stat-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .stat-info h3 {
+    font-size: 20px !important;
+    text-align: center !important;
+  }
+
+  #progressStats {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  #progressStats > div {
+    min-height: 75px;
+    padding: 10px 8px !important;
+  }
+
+  #progressStats > div > div:first-child {
+    font-size: 18px;
+  }
+
+  #progressStats > div > div:last-child {
+    font-size: 9px;
+  }
+
+  .content-section {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .section-header {
+    margin-bottom: 12px !important;
+  }
+
+  .section-title {
+    font-size: 14px !important;
+  }
+
+  #learningProgressContainer {
+    padding: 14px !important;
+  }
+
+  .course-count {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding: 12px !important;
+  }
+
+  .stats-grid {
+    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .stat-card {
+    padding: 12px !important;
+  }
+
+  .stat-info h3 {
+    font-size: 18px !important;
+  }
+
+  .stat-info p {
+    font-size: 11px !important;
+  }
+
+  #progressStats {
+    grid-template-columns: 1fr !important;
+  }
+
+  #progressStats > div > div:first-child {
+    font-size: 16px;
+  }
+
+  .content-section {
+    padding: 14px !important;
+    margin-bottom: 14px !important;
+    border-radius: 8px;
+  }
+
+  .section-title {
+    font-size: 13px !important;
+  }
+
+  .action-btn {
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dashboard-header,
+  .dashboard-sidebar,
+  .section-actions {
+    display: none !important;
+  }
+
+  .dashboard-content {
+    padding: 0 !important;
+  }
+
+  .content-section {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ddd;
+  }
+
+  .stat-card {
+    page-break-inside: avoid;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  #progressStats > div {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  #progressStats > div > div:first-child,
+  #progressStats > div > div:last-child {
+    color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Animation for chart loading */
+@keyframes chartFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#learningProgressChart,
+#progressDoughnutChart {
+  animation: chartFadeIn 0.6s ease-out;
+}
+
+/* Hover Effects for Interactivity */
+.courses-list .course-card:hover,
+.messages-list .message-item:hover,
+.notifications-list .notification-item:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Badge Animation */
+.badge {
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.85;
+  }
+}
+
+/* Scrollbar Styling */
+#notificationsContainer::-webkit-scrollbar,
+.messages-list::-webkit-scrollbar,
+.notifications-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#notificationsContainer::-webkit-scrollbar-track,
+.messages-list::-webkit-scrollbar-track,
+.notifications-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#notificationsContainer::-webkit-scrollbar-thumb,
+.messages-list::-webkit-scrollbar-thumb,
+.notifications-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+#notificationsContainer::-webkit-scrollbar-thumb:hover,
+.messages-list::-webkit-scrollbar-thumb:hover,
+.notifications-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

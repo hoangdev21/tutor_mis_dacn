@@ -16,11 +16,11 @@ const validateCloudinaryConfig = () => {
   const { cloud_name, api_key, api_secret } = cloudinary.config();
   
   if (!cloud_name || !api_key || !api_secret) {
-    console.warn('⚠️  Cloudinary chưa được cấu hình đúng. Vui lòng kiểm tra các biến môi trường.');
+    console.warn(' Cloudinary chưa được cấu hình đúng. Vui lòng kiểm tra các biến môi trường.');
     return false;
   }
 
-  console.log('✅ Cloudinary đã được cấu hình thành công');
+  console.log('Cloudinary đã được cấu hình thành công');
   return true;
 };
 
