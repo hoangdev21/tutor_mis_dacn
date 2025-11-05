@@ -1,4 +1,4 @@
-const { TutorProfile, TutorRequest, Course, Message, User, BookingRequest } = require('../models');
+const { TutorProfile, TutorRequest, Course, Message, User, BookingRequest, StudentProfile } = require('../models');
 
 // @desc    Lấy thông tin dashboard gia sư
 // @route   GET /api/tutor/dashboard
@@ -179,14 +179,31 @@ const getDashboard = async (req, res) => {
     // Lấy thông tin StudentProfile cho mỗi booking
     const recentStudentsWithProfile = await Promise.all(
       recentStudents.map(async (booking) => {
-        const studentProfile = await require('../models/StudentProfile').findOne({ 
-          userId: booking.student._id 
-        }).select('fullName avatar phone').lean();
-        
-        return {
-          ...booking,
-          studentProfile
-        };
+        try {
+          // Kiểm tra booking.student có tồn tại không
+          if (!booking.student || !booking.student._id) {
+            console.warn('⚠️ Booking không có student:', booking._id);
+            return {
+              ...booking,
+              studentProfile: null
+            };
+          }
+
+          const studentProfile = await StudentProfile.findOne({ 
+            userId: booking.student._id 
+          }).select('fullName avatar phone').lean();
+          
+          return {
+            ...booking,
+            studentProfile
+          };
+        } catch (err) {
+          console.error('Error fetching student profile for booking:', err);
+          return {
+            ...booking,
+            studentProfile: null
+          };
+        }
       })
     );
     
@@ -225,14 +242,31 @@ const getDashboard = async (req, res) => {
     // Lấy thông tin StudentProfile cho lịch sắp tới
     const upcomingScheduleWithProfile = await Promise.all(
       upcomingSchedule.map(async (booking) => {
-        const studentProfile = await require('../models/StudentProfile').findOne({ 
-          userId: booking.student._id 
-        }).select('fullName avatar phone').lean();
-        
-        return {
-          ...booking,
-          studentProfile
-        };
+        try {
+          // Kiểm tra booking.student có tồn tại không
+          if (!booking.student || !booking.student._id) {
+            console.warn('⚠️ Upcoming schedule booking không có student:', booking._id);
+            return {
+              ...booking,
+              studentProfile: null
+            };
+          }
+
+          const studentProfile = await StudentProfile.findOne({ 
+            userId: booking.student._id 
+          }).select('fullName avatar phone').lean();
+          
+          return {
+            ...booking,
+            studentProfile
+          };
+        } catch (err) {
+          console.error('Error fetching student profile for upcoming schedule:', err);
+          return {
+            ...booking,
+            studentProfile: null
+          };
+        }
       })
     );
     
@@ -347,10 +381,12 @@ const getDashboard = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Lỗi khi tải dashboard tutor:', error);
+    console.error('❌ Lỗi khi tải dashboard tutor:', error.message);
+    console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi tải dashboard tutor'
+      message: 'Lỗi khi tải dashboard tutor',
+      error: error.message
     });
   }
 };
@@ -888,29 +924,45 @@ const getStudents = async (req, res) => {
     // Get total count
     const total = await BookingRequest.countDocuments(query);
     
-    // Get bookings
+    // Get bookings with student info
     const bookings = await BookingRequest.find(query)
       .populate({
         path: 'student',
-        select: 'email'
+        select: 'email _id'
       })
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limitNum)
       .lean();
     
-    // Get StudentProfile for each booking
+    // Get StudentProfile for each booking with error handling
     const bookingsWithProfile = await Promise.all(
       bookings.map(async (booking) => {
-        const StudentProfile = require('../models/StudentProfile');
-        const studentProfile = await StudentProfile.findOne({ 
-          userId: booking.student._id 
-        }).select('fullName avatar phone').lean();
-        
-        return {
-          ...booking,
-          studentProfile
-        };
+        try {
+          // Check if student exists
+          if (!booking.student || !booking.student._id) {
+            console.warn('⚠️ Booking không có student:', booking._id);
+            return {
+              ...booking,
+              studentProfile: null
+            };
+          }
+
+          const studentProfile = await StudentProfile.findOne({ 
+            userId: booking.student._id  // Use 'userId' field
+          }).select('fullName avatar phone').lean();
+          
+          return {
+            ...booking,
+            studentProfile: studentProfile || {}
+          };
+        } catch (err) {
+          console.error('❌ Lỗi khi lấy StudentProfile:', err.message);
+          return {
+            ...booking,
+            studentProfile: {}
+          };
+        }
       })
     );
     
@@ -925,10 +977,11 @@ const getStudents = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Lỗi khi lấy học sinh:', error);
+    console.error('❌ Lỗi khi lấy học sinh:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi lấy học sinh'
+      message: 'Lỗi khi lấy học sinh',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -1154,26 +1207,59 @@ const getIncome = async (req, res) => {
       .lean();
     
     // Lấy StudentProfile cho mỗi booking
-    const StudentProfile = require('../models/StudentProfile');
     const recentBookingsWithProfile = await Promise.all(
       recentCompletedBookings.map(async (booking) => {
-        const studentProfile = await StudentProfile.findOne({ 
-          userId: booking.student._id 
-        }).select('fullName avatar').lean();
-        
-        return {
-          _id: booking._id,
-          studentName: studentProfile?.fullName || 'Học sinh',
-          studentAvatar: studentProfile?.avatar,
-          subject: booking.subject?.name || 'N/A',
-          level: booking.subject?.level || 'N/A',
-          totalAmount: booking.pricing?.totalAmount || 0,
-          totalHours: booking.pricing?.totalHours || 0,
-          hourlyRate: booking.pricing?.hourlyRate || 0,
-          completedAt: booking.completedAt,
-          startDate: booking.schedule?.startDate,
-          rating: booking.rating?.score
-        };
+        try {
+          // Kiểm tra xem booking.student có tồn tại không
+          if (!booking.student || !booking.student._id) {
+            return {
+              _id: booking._id,
+              studentName: 'Học sinh',
+              studentAvatar: null,
+              subject: booking.subject?.name || 'N/A',
+              level: booking.subject?.level || 'N/A',
+              totalAmount: booking.pricing?.totalAmount || 0,
+              totalHours: booking.pricing?.totalHours || 0,
+              hourlyRate: booking.pricing?.hourlyRate || 0,
+              completedAt: booking.completedAt,
+              startDate: booking.schedule?.startDate,
+              rating: booking.rating?.score
+            };
+          }
+
+          const studentProfile = await StudentProfile.findOne({ 
+            userId: booking.student._id 
+          }).select('fullName avatar').lean();
+          
+          return {
+            _id: booking._id,
+            studentName: studentProfile?.fullName || 'Học sinh',
+            studentAvatar: studentProfile?.avatar,
+            subject: booking.subject?.name || 'N/A',
+            level: booking.subject?.level || 'N/A',
+            totalAmount: booking.pricing?.totalAmount || 0,
+            totalHours: booking.pricing?.totalHours || 0,
+            hourlyRate: booking.pricing?.hourlyRate || 0,
+            completedAt: booking.completedAt,
+            startDate: booking.schedule?.startDate,
+            rating: booking.rating?.score
+          };
+        } catch (err) {
+          console.error('❌ Error processing booking:', err.message);
+          return {
+            _id: booking._id,
+            studentName: 'Học sinh',
+            studentAvatar: null,
+            subject: booking.subject?.name || 'N/A',
+            level: booking.subject?.level || 'N/A',
+            totalAmount: booking.pricing?.totalAmount || 0,
+            totalHours: booking.pricing?.totalHours || 0,
+            hourlyRate: booking.pricing?.hourlyRate || 0,
+            completedAt: booking.completedAt,
+            startDate: booking.schedule?.startDate,
+            rating: booking.rating?.score
+          };
+        }
       })
     );
     

@@ -564,10 +564,11 @@
 /* Hero Trust Badges */
 .hero__trust-badges {
     display: flex;
-    gap: 16px;
+    gap: 20px;
     justify-content: center;
     margin-top: 24px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .hero__trust-badges .trust-badge {
@@ -589,7 +590,29 @@
 /* University Partners Section */
 .university-partners {
     padding: 60px 0;
-    background: white;
+    background-image: url('../images/backgrounds/university-1.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+    overflow: hidden;
+}
+
+.university-partners::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.university-partners > .container {
+    position: relative;
+    z-index: 2;
 }
 
 .universities__grid {

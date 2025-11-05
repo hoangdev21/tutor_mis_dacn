@@ -1,0 +1,590 @@
+/**
+ * ============================================
+ * CERTIFICATES CAROUSEL - CSS Styling
+ * ============================================
+ */
+
+/* ============ CERTIFICATES SWIPER CONTAINER ============ */
+.certificates {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+}
+
+.certificates .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.certificates__swiper {
+    position: relative;
+    max-width: 1300px;
+    margin: 50px auto 0;
+    padding: 40px 80px;
+    overflow: hidden;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* ============ SWIPER WRAPPER ============ */
+.certificates__swiper .swiper-wrapper {
+    transition-timing-function: ease-out;
+}
+
+.certificates__swiper .swiper-slide {
+    /* Để Swiper tự động tính width */
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Transition mượt mà */
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============ CERTIFICATE CARD - STYLING ============ */
+.certificate__card {
+    background: white;
+    padding: 32px 24px;
+    border-radius: 16px;
+    text-align: center;
+    
+    /* Màu sắc & Border */
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    
+    /* Shadow mặc định */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    
+    /* Transition mượt mà */
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Kích thước tối đa */
+    width: 100%;
+    max-width: 300px;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    /* Transform */
+    transform-origin: center;
+}
+
+/* Hover effect cho card */
+.certificate__card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(30, 64, 175, 0.2);
+}
+
+/* ============ CERTIFICATE CONTENT ============ */
+.certificate__icon {
+    font-size: 48px;
+    color: #1e40af;
+    margin-bottom: 16px;
+    display: none; /* Nếu không có icon, ẩn */
+}
+
+.certificate__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+}
+
+.certificate__description {
+    color: #6b7280;
+    margin-bottom: 16px;
+    line-height: 1.6;
+    font-size: 14px;
+    flex-grow: 1;
+}
+
+.certificate__count {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============ IMAGE INSIDE CARD ============ */
+.certificate__card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.certificate__card:hover img {
+    transform: scale(1.05);
+}
+
+/* ============ SWIPER NAVIGATION BUTTONS ============ */
+
+/* Custom Previous Button */
+.certificates__swiper .swiper-button-prev,
+.certificates__swiper .swiper-button-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    /* Styling */
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    
+    /* Icons */
+    color: #1e40af;
+    font-weight: bold;
+    font-size: 20px;
+    
+    /* Shadow */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    
+    /* Transition */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Z-index */
+    z-index: 20;
+    
+    /* Remove default Swiper styling */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.certificates__swiper .swiper-button-prev {
+    left: 15px;
+}
+
+.certificates__swiper .swiper-button-next {
+    right: 15px;
+}
+
+/* Hover state */
+.certificates__swiper .swiper-button-prev:hover,
+.certificates__swiper .swiper-button-next:hover {
+    background: #1e40af;
+    color: white;
+    transform: translateY(-50%) scale(1.12);
+    box-shadow: 0 8px 28px rgba(30, 64, 175, 0.3);
+}
+
+/* Active state */
+.certificates__swiper .swiper-button-prev:active,
+.certificates__swiper .swiper-button-next:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Disabled state */
+.certificates__swiper .swiper-button-prev.swiper-button-disabled,
+.certificates__swiper .swiper-button-next.swiper-button-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ============ CUSTOM NAVIGATION BUTTONS ============ */
+/* Nếu sử dụng custom buttons thay vì built-in */
+.custom-swiper-button-prev,
+.custom-swiper-button-next {
+    position: absolute;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+}
+
+.custom-swiper-button-prev {
+    left: 15px;
+    transform: translateY(-50%);
+}
+
+.custom-swiper-button-next {
+    right: 15px;
+    transform: translateY(-50%);
+}
+
+.custom-swiper-button-prev:hover,
+.custom-swiper-button-next:hover {
+    background: #1e40af;
+    transform: translateY(-50%) scale(1.12);
+    box-shadow: 0 8px 28px rgba(30, 64, 175, 0.3);
+}
+
+.custom-swiper-button-prev img,
+.custom-swiper-button-next img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0.3);
+    transition: filter 0.3s ease;
+}
+
+.custom-swiper-button-prev:hover img,
+.custom-swiper-button-next:hover img {
+    filter: brightness(1);
+}
+
+/* ============ SWIPER PAGINATION (DOTS) ============ */
+.certificates__swiper .swiper-pagination {
+    position: relative;
+    bottom: -50px;
+    padding: 20px 0 0 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.certificates__swiper .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #d1d5db;
+    border-radius: 50%;
+    opacity: 0.6;
+    cursor: pointer;
+    
+    /* Transition */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.certificates__swiper .swiper-pagination-bullet:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+.certificates__swiper .swiper-pagination-bullet-active {
+    background: #1e40af;
+    opacity: 1;
+    transform: scale(1.25);
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.4);
+}
+
+/* Dynamic bullets styling */
+.certificates__swiper .swiper-pagination-bullet-dynamic {
+    transition: all 0.3s ease;
+}
+
+/* ============ SLIDE ACTIVE STATE ============ */
+.certificates__swiper .swiper-slide-active {
+    z-index: 10;
+}
+
+.certificates__swiper .swiper-slide-active .certificate__card {
+    /* Scale active slide */
+    transform: scale(1.12);
+    
+    /* Enhanced shadow */
+    box-shadow: 0 12px 40px rgba(30, 64, 175, 0.25);
+    
+    /* Opacity 100% */
+    opacity: 1;
+}
+
+/* Adjacent slides (prev/next) */
+.certificates__swiper .swiper-slide-prev,
+.certificates__swiper .swiper-slide-next {
+    z-index: 5;
+}
+
+.certificates__swiper .swiper-slide-prev .certificate__card,
+.certificates__swiper .swiper-slide-next .certificate__card {
+    /* Scale side slides */
+    transform: scale(0.88);
+    
+    /* Reduced opacity */
+    opacity: 0.65;
+    
+    /* Softer shadow */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Other slides */
+.certificates__swiper .swiper-slide:not(.swiper-slide-active):not(.swiper-slide-prev):not(.swiper-slide-next) .certificate__card {
+    /* Minimal scale */
+    transform: scale(0.85);
+    
+    /* Low opacity */
+    opacity: 0.5;
+    
+    /* Subtle shadow */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    
+    z-index: 1;
+}
+
+/* ============ RESPONSIVE DESIGN ============ */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .certificates__swiper {
+        padding: 30px 60px;
+        max-width: 100%;
+    }
+
+    .certificate__card {
+        max-width: 280px;
+        min-height: 360px;
+        padding: 28px 20px;
+    }
+
+    .certificate__title {
+        font-size: 18px;
+    }
+
+    .certificate__description {
+        font-size: 13px;
+    }
+
+    .certificates__swiper .swiper-button-prev,
+    .certificates__swiper .swiper-button-next {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .certificates__swiper .swiper-button-prev {
+        left: 10px;
+    }
+
+    .certificates__swiper .swiper-button-next {
+        right: 10px;
+    }
+}
+
+/* Mobile (<768px) */
+@media (max-width: 768px) {
+    .certificates {
+        padding: 60px 0;
+    }
+
+    .certificates__swiper {
+        padding: 20px 50px;
+        margin: 40px auto 0;
+        border-radius: 16px;
+    }
+
+    .certificate__card {
+        max-width: 260px;
+        min-height: 340px;
+        padding: 24px 18px;
+    }
+
+    .certificate__title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .certificate__description {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .certificate__count {
+        font-size: 12px;
+    }
+
+    .certificate__card img {
+        height: 120px;
+        margin-bottom: 15px;
+    }
+
+    /* Navigation buttons nhỏ hơn */
+    .certificates__swiper .swiper-button-prev,
+    .certificates__swiper .swiper-button-next {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .certificates__swiper .swiper-button-prev {
+        left: 8px;
+    }
+
+    .certificates__swiper .swiper-button-next {
+        right: 8px;
+    }
+
+    /* Pagination dots nhỏ hơn */
+    .certificates__swiper .swiper-pagination-bullet {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Hide pagination trên mobile */
+    .certificates__swiper .swiper-pagination {
+        bottom: -40px;
+        gap: 6px;
+    }
+}
+
+/* Small Mobile (<480px) */
+@media (max-width: 480px) {
+    .certificates__swiper {
+        padding: 15px 40px;
+    }
+
+    .certificate__card {
+        max-width: 240px;
+        min-height: 320px;
+        padding: 20px 16px;
+    }
+
+    .certificate__title {
+        font-size: 15px;
+    }
+
+    .certificate__description {
+        font-size: 11px;
+    }
+
+    .certificates__swiper .swiper-button-prev,
+    .certificates__swiper .swiper-button-next {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .certificates__swiper .swiper-button-prev {
+        left: 5px;
+    }
+
+    .certificates__swiper .swiper-button-next {
+        right: 5px;
+    }
+}
+
+/* ============ ANIMATION CLASSES ============ */
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Apply animations when section comes into view */
+.certificates {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.certificate__card {
+    animation: scaleIn 0.5s ease-out;
+}
+
+/* ============ ACCESSIBILITY ============ */
+
+/* Focus state for keyboard navigation */
+.certificates__swiper .swiper-button-prev:focus,
+.certificates__swiper .swiper-button-next:focus {
+    outline: 2px solid #1e40af;
+    outline-offset: 2px;
+}
+
+.certificates__swiper .swiper-pagination-bullet:focus {
+    outline: 2px solid #1e40af;
+    outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .certificate__card,
+    .certificates__swiper .swiper-button-prev,
+    .certificates__swiper .swiper-button-next,
+    .certificates__swiper .swiper-pagination-bullet {
+        transition: none;
+    }
+
+    .certificates {
+        animation: none;
+    }
+}
+
+/* ============ DARK MODE SUPPORT ============ */
+
+@media (prefers-color-scheme: dark) {
+    .certificates {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+
+    .certificates__swiper {
+        background: #1f2937;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .certificate__card {
+        background: #111827;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .certificate__title {
+        color: #f3f4f6;
+    }
+
+    .certificate__description {
+        color: #d1d5db;
+    }
+
+    .certificates__swiper .swiper-button-prev,
+    .certificates__swiper .swiper-button-next {
+        background: rgba(255, 255, 255, 0.1);
+        color: #93c5fd;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .certificates__swiper .swiper-pagination-bullet {
+        background: #4b5563;
+    }
+
+    .certificates__swiper .swiper-pagination-bullet-active {
+        background: #60a5fa;
+    }
+}
+
+/* ============ PRINT STYLES ============ */
+
+@media print {
+    .certificates__swiper .swiper-button-prev,
+    .certificates__swiper .swiper-button-next {
+        display: none;
+    }
+
+    .certificates__swiper .swiper-pagination {
+        display: none;
+    }
+
+    .certificates__swiper .swiper-slide {
+        page-break-inside: avoid;
+    }
+}

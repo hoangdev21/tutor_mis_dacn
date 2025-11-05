@@ -34,6 +34,7 @@ const emailVerificationTemplate = (name, verificationUrl) => {
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <h1 style="margin: 0; font-size: 28px;">TutorMis</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px;">Nền tảng gia sư hàng đầu</p>
         </div>
@@ -93,6 +94,7 @@ const welcomeEmailTemplate = (name, role) => {
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <h1 style="margin: 0; font-size: 28px;">🎉 Chào mừng đến với TutorMis!</h1>
         </div>
         
@@ -158,6 +160,7 @@ const tutorApprovalTemplate = (name, isApproved, reason = '') => {
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="background: ${isApproved ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' : 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'}; padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <h1 style="margin: 0; font-size: 28px;">${isApproved ? '✅' : '❌'} TutorMis</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px;">${isApproved ? 'Hồ sơ đã được duyệt!' : 'Hồ sơ cần chỉnh sửa'}</p>
         </div>
@@ -248,6 +251,7 @@ const otpVerificationTemplate = (name, otp) => {
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <h1 style="margin: 0; font-size: 28px;">🔐 TutorMis</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px;">Mã xác thực tài khoản</p>
         </div>
@@ -334,6 +338,7 @@ const newBookingNotificationTemplate = (tutorName, studentName, bookingDetails) 
       <div style="max-width: 650px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 35px; text-align: center; color: white; border-radius: 15px 15px 0 0; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <div style="font-size: 48px; margin-bottom: 10px;">📚</div>
           <h1 style="margin: 0; font-size: 28px; font-weight: bold;">TutorMis</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.95;">Yêu cầu đặt lịch mới</p>
@@ -397,7 +402,7 @@ const newBookingNotificationTemplate = (tutorName, studentName, bookingDetails) 
                 </div>
                 ${bookingDetails.location.address ? `
                   <div style="margin-bottom: 5px;">📍 ${bookingDetails.location.address}</div>
-                  <div>${bookingDetails.location.district}, ${bookingDetails.location.city}</div>
+                  <div>${[bookingDetails.location.district, bookingDetails.location.city].filter(Boolean).join(', ')}</div>
                 ` : '<div style="color: #999;">Không yêu cầu địa điểm cụ thể</div>'}
               </div>
             </div>
@@ -533,6 +538,7 @@ const bookingAcceptedNotificationTemplate = (studentName, tutorName, bookingDeta
       <div style="max-width: 650px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); padding: 35px; text-align: center; color: white; border-radius: 15px 15px 0 0; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
           <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Chúc Mừng!</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.95;">Yêu cầu của bạn đã được chấp nhận</p>
@@ -593,7 +599,7 @@ const bookingAcceptedNotificationTemplate = (studentName, tutorName, bookingDeta
               <div style="color: #999; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Địa điểm</div>
               <div style="color: #333; font-size: 14px;">
                 ${locationTypeText[bookingDetails.location.type] || bookingDetails.location.type}
-                ${bookingDetails.location.address ? `<br>📍 ${bookingDetails.location.address}, ${bookingDetails.location.district}, ${bookingDetails.location.city}` : ''}
+                ${bookingDetails.location.address ? `<br>📍 ${bookingDetails.location.address}${[bookingDetails.location.district, bookingDetails.location.city].filter(Boolean).length ? ', ' + [bookingDetails.location.district, bookingDetails.location.city].filter(Boolean).join(', ') : ''}` : ''}
               </div>
             </div>
             
@@ -682,6 +688,7 @@ const bookingRejectedNotificationTemplate = (studentName, tutorName, bookingDeta
       <div style="max-width: 650px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); padding: 35px; text-align: center; color: white; border-radius: 15px 15px 0 0; box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <div style="font-size: 48px; margin-bottom: 10px;">📝</div>
           <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Thông Báo Về Yêu Cầu</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.95;">Yêu cầu đặt lịch chưa được chấp nhận</p>
@@ -805,6 +812,7 @@ const passwordResetOTPVerificationTemplate = (name, otp) => {
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/assets/images/logo/logo-3.png" alt="TutorMis Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;">
           <h1 style="margin: 0; font-size: 28px;">🔐 Đặt lại mật khẩu</h1>
           <p style="margin: 10px 0 0 0; font-size: 16px;">TutorMis</p>
         </div>

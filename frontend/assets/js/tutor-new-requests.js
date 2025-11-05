@@ -167,18 +167,16 @@ function createRequestCard(request) {
       <div class="request-footer">
         <small class="request-date">
           <i class="fas fa-clock"></i>
-          Tạo: ${formatDateTime(request.createdAt)}
+          ${formatDateTime(request.createdAt)}
         </small>
         <div class="request-actions">
-          <button class="btn btn-success btn-sm" onclick="acceptRequest('${request._id}')" title="Chấp nhận">
+          <button class="btn-icon" onclick="acceptRequest('${request._id}')" title="Chấp nhận">
             <i class="fas fa-check"></i>
-            Chấp nhận
           </button>
-          <button class="btn btn-danger btn-sm" onclick="rejectRequest('${request._id}')" title="Từ chối">
+          <button class="btn-icon" onclick="rejectRequest('${request._id}')" title="Từ chối">
             <i class="fas fa-times"></i>
-            Từ chối
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="viewRequestDetail('${request._id}')" title="Xem chi tiết">
+          <button class="btn-icon" onclick="viewRequestDetail('${request._id}')" title="Xem chi tiết">
             <i class="fas fa-eye"></i>
           </button>
         </div>

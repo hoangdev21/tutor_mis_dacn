@@ -129,12 +129,35 @@ button {
 }
 
 .highlight {
-  background: linear-gradient(135deg, #9fe9d1, #d6dd78);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #c06177, #ff4b2b, #ff7b00);
   background-clip: text;
-  font-weight: 700;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 3rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: shine 3s ease-in-out infinite;
+  letter-spacing: 1px;
+  transition: transform 0.3s ease;
 }
+
+.highlight:hover {
+  transform: scale(1.05);
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
 /* ===== BUTTONS ===== */
 .btn {
@@ -842,9 +865,9 @@ body.sidebar-open {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding-top: var(--header-height);
+  margin-top: var(--header-height);
   position: relative;
-  background-image: url('../images/backgrounds/bg-hero-1.png');
+  background-image: url('../images/backgrounds/bg-hero-3.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -883,6 +906,7 @@ body.sidebar-open {
   text-align: left;
   max-width: 600px;
   margin: 0;
+  padding-bottom: 200px;
 }
 
 .hero__title {
@@ -892,6 +916,10 @@ body.sidebar-open {
   margin-bottom: var(--spacing-6);
   padding-left: 80px;
   color: var(--gray-900);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease-out forwards;
+  animation-delay: 0.2s;
 }
 
 .hero__description {
@@ -900,7 +928,22 @@ body.sidebar-open {
   margin-bottom: var(--spacing-8);
   line-height: 1.8;
   padding-left: 120px;
-  padding-bottom: 30px;
+
+  /* Hiệu ứng đổ bóng chữ */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+
+  /* Hiệu ứng xuất hiện mượt mà */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero__buttons {

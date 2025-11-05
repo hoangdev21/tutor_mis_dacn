@@ -428,23 +428,25 @@ function showStudentDetailModal(bookingId) {
   modal.className = 'modal active';
   modal.innerHTML = `
     <div class="modal-overlay" onclick="this.parentElement.remove()"></div>
-    <div class="modal-content" style="max-width: 700px;">
-      <div class="modal-header">
-        <h2><i class="fas fa-user-graduate"></i> Chi Tiết Học Sinh</h2>
-        <button class="modal-close" onclick="this.closest('.modal').remove()">
+    <div class="modal-content" style="max-width: 550px; width: 95%; max-height: calc(100vh - 60px);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #2d8c3fff 0%, #336b19ff 100%); padding: 14px 18px; border-radius: 12px 12px 0 0;">
+        <h2 style="color: white; margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-user-graduate" style="font-size: 16px;"></i> Chi Tiết Học Sinh
+        </h2>
+        <button class="modal-close" onclick="this.closest('.modal').remove()" style="background: rgba(255,255,255,0.2); color: white; font-size: 20px; border: none; padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; transition: all 0.2s;">
           <i class="fas fa-times"></i>
         </button>
       </div>
       
-      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+      <div class="modal-body" style="padding: 14px 16px; max-height: calc(100vh - 140px); overflow-y: auto;">
         ${renderStudentDetailContent(booking)}
       </div>
       
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="this.closest('.modal').remove()">
+      <div class="modal-footer" style="padding: 10px 16px; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn-secondary" onclick="this.closest('.modal').remove()" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
           <i class="fas fa-times"></i> Đóng
         </button>
-        <button class="btn-primary" onclick="contactStudent('${booking.student?._id}'); this.closest('.modal').remove();">
+        <button class="btn-primary" onclick="contactStudent('${booking.student?._id}'); this.closest('.modal').remove();" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
           <i class="fas fa-comment"></i> Nhắn tin
         </button>
       </div>
@@ -463,107 +465,98 @@ function renderStudentDetailContent(booking) {
   const name = studentProfile?.fullName || 'Học sinh';
   
   return `
-    <div style="text-align: center; margin-bottom: 30px;">
-      <img src="${avatar}" alt="${name}" style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; border: 3px solid #667eea;">
-      <h3 style="font-size: 20px; margin-bottom: 5px;">${name}</h3>
-      <p style="color: #64748b;">${student?.email || 'N/A'}</p>
+    <div style="text-align: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0;">
+      <img src="${avatar}" alt="${name}" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 8px; border: 3px solid #667eea;">
+      <h3 style="font-size: 16px; margin: 0 0 2px; color: #1e293b; font-weight: 600;">${name}</h3>
+      <p style="margin: 0; font-size: 13px; color: #64748b;">${student?.email || 'N/A'}</p>
     </div>
     
-    <div style="display: grid; gap: 20px;">
-      <div class="detail-section">
-        <h4 style="font-size: 16px; margin-bottom: 12px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-book" style="color: #667eea;"></i> Thông Tin Khóa Học
-        </h4>
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; display: grid; gap: 10px;">
+    <div style="display: grid; gap: 12px; font-size: 13px;">
+      <!-- Thông Tin Khóa Học -->
+      <div style="background: linear-gradient(135deg, #7a8fedff 0%, #52ba76ff 100%); padding: 10px 12px; border-radius: 8px; color: white;">
+        <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 8px; font-size: 13px;">
+          <i class="fas fa-book" style="font-size: 14px;"></i> Khóa Học
+        </div>
+        <div style="display: grid; gap: 6px; font-size: 12px;">
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Môn học:</span>
-            <strong>${booking.subject?.name || 'N/A'} - ${booking.subject?.level || 'N/A'}</strong>
+            <span style="opacity: 0.9;">Môn học:</span>
+            <strong>${booking.subject?.name || 'N/A'} ${booking.subject?.level ? '- ' + booking.subject.level : ''}</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Trạng thái:</span>
-            <span class="status-badge ${booking.status === 'accepted' ? 'success' : booking.status === 'completed' ? 'info' : 'warning'}">
+            <span style="opacity: 0.9;">Trạng thái:</span>
+            <span style="padding: 2px 6px; background: rgba(255,255,255,0.2); border-radius: 4px;">
               ${booking.status === 'accepted' ? 'Đang học' : booking.status === 'completed' ? 'Hoàn thành' : 'Chờ xác nhận'}
             </span>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Ngày bắt đầu:</span>
-            <strong>${booking.schedule?.startDate ? new Date(booking.schedule.startDate).toLocaleDateString('vi-VN') : 'N/A'}</strong>
+            <span style="opacity: 0.9;">Khoá thời gian:</span>
+            <strong>${booking.schedule?.startDate ? new Date(booking.schedule.startDate).toLocaleDateString('vi-VN') : 'N/A'} → ${calculateEndDate(booking.schedule?.startDate, booking.schedule?.duration)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Ngày kết thúc:</span>
-            <strong>${calculateEndDate(booking.schedule?.startDate, booking.schedule?.duration)}</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Thời lượng:</span>
+            <span style="opacity: 0.9;">Thời lượng:</span>
             <strong>${booking.schedule?.duration || 0} tháng</strong>
           </div>
         </div>
       </div>
       
-      <div class="detail-section">
-        <h4 style="font-size: 16px; margin-bottom: 12px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-calendar-alt" style="color: #10b981;"></i> Lịch Học
-        </h4>
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; display: grid; gap: 10px;">
+      <!-- Lịch Học -->
+      <div style="background: linear-gradient(135deg, #10b6b9ff 0%, #52ba76ff 100%); padding: 10px 12px; border-radius: 8px; color: white;">
+        <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 8px; font-size: 13px;">
+          <i class="fas fa-calendar-alt" style="font-size: 14px;"></i> Lịch Học
+        </div>
+        <div style="display: grid; gap: 6px; font-size: 12px;">
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Thời gian:</span>
+            <span style="opacity: 0.9;">Thời gian:</span>
             <strong>${booking.schedule?.preferredTime || 'Chưa xác định'}</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Số buổi/tuần:</span>
-            <strong>${booking.schedule?.daysPerWeek || 0} buổi</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Giờ/buổi:</span>
-            <strong>${booking.schedule?.hoursPerSession || 0} giờ</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Tổng số giờ:</span>
-            <strong>${calculateTotalHoursTutor(booking)} giờ</strong>
+            <span style="opacity: 0.9;">Buổi/tuần:</span>
+            <strong>${booking.schedule?.daysPerWeek || 0} · ${booking.schedule?.hoursPerSession || 0}h/buổi · ${calculateTotalHoursTutor(booking)}h tổng</strong>
           </div>
         </div>
       </div>
       
-      <div class="detail-section">
-        <h4 style="font-size: 16px; margin-bottom: 12px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-map-marker-alt" style="color: #f59e0b;"></i> Địa Điểm
-        </h4>
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-          <p style="margin: 0;">
-            ${booking.location?.type === 'online' ? 
-              '<i class="fas fa-laptop"></i> <strong>Trực tuyến</strong>' : 
-              `<i class="fas fa-home"></i> ${booking.location?.address || 'Tại nhà học sinh'}<br>
-               ${booking.location?.district ? booking.location.district + ', ' : ''}
-               ${booking.location?.city || ''}`
-            }
-          </p>
+      <!-- Địa Điểm -->
+      <div style="background: linear-gradient(135deg, #988edeff 0%, #52ba76ff 100%); padding: 10px 12px; border-radius: 8px; color: white;">
+        <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 6px; font-size: 13px;">
+          <i class="fas fa-map-marker-alt" style="font-size: 14px;"></i> Địa Điểm
+        </div>
+        <div style="font-size: 12px; opacity: 0.95;">
+          ${booking.location?.type === 'online' ? 
+            '<i class="fas fa-laptop" style="margin-right: 4px;"></i>Trực tuyến' : 
+            `<i class="fas fa-home" style="margin-right: 4px;"></i>${booking.location?.address || 'Tại nhà'}<br><span style="font-size: 11px; opacity: 0.8;">${booking.location?.district ? booking.location.district + ', ' : ''}${booking.location?.city || ''}</span>`
+          }
         </div>
       </div>
       
-      <div class="detail-section">
-        <h4 style="font-size: 16px; margin-bottom: 12px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-dollar-sign" style="color: #059669;"></i> Học Phí
-        </h4>
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; display: grid; gap: 10px;">
+      <!-- Học Phí -->
+      <div style="background: linear-gradient(135deg, #55b38aff 0%, #8d9ba7ff 100%); padding: 10px 12px; border-radius: 8px; color: white;">
+        <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 8px; font-size: 13px;">
+          <i class="fas fa-dollar-sign" style="font-size: 14px;"></i> Học Phí
+        </div>
+        <div style="display: grid; gap: 6px; font-size: 12px;">
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #64748b;">Học phí/giờ:</span>
-            <strong style="color: #059669;">${formatCurrency(booking.pricing?.hourlyRate || 0)}</strong>
+            <span style="opacity: 0.9;">/giờ:</span>
+            <strong style="color: #b15333ff">${formatCurrency(booking.pricing?.hourlyRate || 0)}</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 2px dashed #e2e8f0;">
-            <span style="color: #64748b; font-size: 16px;">Tổng thu nhập dự kiến:</span>
-            <strong style="color: #059669; font-size: 18px;">${formatCurrency(calculateTotalPriceTutor(booking))}</strong>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="opacity: 0.9;">/tháng:</span>
+            <strong style="color: #b15333ff">${formatCurrency(calculateMonthlyPrice(booking))}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 6px;">
+            <span style="opacity: 0.9;">Tổng:</span>
+            <strong style="font-size: 13px; color: #d94413ff;">${formatCurrency(calculateTotalPriceTutor(booking))}</strong>
           </div>
         </div>
       </div>
       
       ${booking.description ? `
-      <div class="detail-section">
-        <h4 style="font-size: 16px; margin-bottom: 12px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-info-circle" style="color: #3b82f6;"></i> Ghi Chú
-        </h4>
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-          <p style="margin: 0; line-height: 1.6;">${booking.description}</p>
+      <!-- Ghi Chú -->
+      <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 10px 12px; border-radius: 8px; color: white;">
+        <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 6px; font-size: 13px;">
+          <i class="fas fa-sticky-note" style="font-size: 14px;"></i> Ghi Chú
         </div>
+        <p style="margin: 0; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; max-height: 80px; overflow-y: auto;">${booking.description}</p>
       </div>
       ` : ''}
     </div>
