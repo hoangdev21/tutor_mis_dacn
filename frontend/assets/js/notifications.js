@@ -268,7 +268,7 @@ function renderNotifications(notifications, totalCount = 0) {
     const moreDiv = document.createElement('div');
     moreDiv.className = 'notification-more-indicator';
     moreDiv.innerHTML = `
-      <p>Còn ${totalCount - notifications.length} thông báo khác</p>
+      <p style="text-align: center; font-size: 14px;">Còn ${totalCount - notifications.length} thông báo khác</p>
     `;
     container.appendChild(moreDiv);
     console.log('➕ Added "more" indicator');

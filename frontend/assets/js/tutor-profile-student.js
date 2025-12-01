@@ -24,10 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load tutor profile
 async function loadTutorProfile() {
   const container = document.getElementById('profileContainer');
-  
+
   try {
     console.log('📡 Fetching tutor from:', `${API_BASE_URL}/auth/tutor/${tutorId}`);
-    
+
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/auth/tutor/${tutorId}`, {
       headers: {
@@ -38,18 +38,18 @@ async function loadTutorProfile() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     console.log('✅ Tutor data received:', data);
-    
+
     if (!data.success || !data.data) {
       throw new Error('Invalid response data');
     }
-    
+
     currentTutor = data.data;
     renderProfile();
     loadTutorReviews(); // Load reviews after profile rendered
-    
+
   } catch (error) {
     console.error('❌ Load profile error:', error);
     container.innerHTML = `
@@ -74,20 +74,19 @@ function renderProfile() {
 
   // Format basic info
   const name = profile.fullName || 'Gia sư';
-  // Prioritize profile.avatar, fallback to tutor.avatar, then default
   const avatar = profile.avatar || currentTutor.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff`;
   const bio = profile.bio || 'Chưa có giới thiệu.';
-  
+
   // Format rating
   const rating = profile.averageRating || 0;
   const reviewCount = profile.totalReviews || 0;
-  
+
   // Format stats
   const yearsOfExp = profile.yearsOfExperience || 0;
   const totalStudents = profile.totalStudents || 0;
   const totalLessons = profile.totalLessons || 0;
   const hourlyRate = profile.hourlyRate || 0;
-  
+
   // Format address
   let addressStr = 'Chưa cập nhật';
   if (profile.address) {
@@ -103,326 +102,266 @@ function renderProfile() {
       addressStr = parts.length > 0 ? parts.join(', ') : 'Chưa cập nhật';
     }
   }
-  
+
   // Format teaching locations
   const teachingLocations = profile.teachingLocation || [];
   let locationsStr = 'Chưa cập nhật';
   if (teachingLocations.length > 0) {
     const locationMap = {
-      'home': 'Dạy tại nhà gia sư',
-      'student_home': 'Dạy tại nhà học sinh',
-      'online': 'Dạy online'
+      'home': 'Tại nhà gia sư',
+      'student_home': 'Tại nhà học sinh',
+      'online': 'Online'
     };
     locationsStr = teachingLocations.map(loc => locationMap[loc] || loc).join(', ');
   }
-  
+
   // Render HTML
   container.innerHTML = `
-    <div class="profile-layout">
-      <!-- Sidebar -->
-      <aside class="profile-sidebar">
-        <div class="tutor-card-profile">
-          <div class="tutor-avatar-large">
-            <img src="${avatar}" alt="${name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff'">
-            ${profile.universityImage ? `
-            <div class="university-badge" title="Trường đại học">
-              <img src="${profile.universityImage}" alt="University" onerror="this.style.display='none'">
+    <!-- Hero Section -->
+    <div class="profile-hero">
+      <div class="hero-card">
+        <div class="hero-avatar-wrapper">
+          <img src="${avatar}" alt="${name}" class="hero-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=667eea&color=fff'">
+          ${profile.universityImage ? `
+          <div class="hero-badge" title="Trường đại học">
+            <img src="${profile.universityImage}" alt="University" onerror="this.style.display='none'">
+          </div>
+          ` : ''}
+        </div>
+        
+        <div class="hero-info">
+          <div class="hero-name-row">
+            <h1 class="hero-name">${name}</h1>
+            ${currentTutor.approvalStatus === 'approved' ? `
+            <div class="verified-badge">
+              <i class="fas fa-check-circle"></i> Đã xác thực
             </div>
             ` : ''}
           </div>
           
-          <div class="tutor-basic-info">
-            <h1>${name}</h1>
-            <div class="tutor-rating">
-              <div class="stars">${generateStars(rating)}</div>
-              <span>${rating.toFixed(1)} (${reviewCount} đánh giá)</span>
+          <div class="hero-title">${profile.title || 'Gia sư chuyên nghiệp'}</div>
+          
+          <div class="hero-stats-row">
+            <div class="hero-stat">
+              <i class="fas fa-star rating-star"></i>
+              <strong>${rating.toFixed(1)}</strong>
+              <span>(${reviewCount} đánh giá)</span>
             </div>
-            <div class="tutor-status ${currentTutor.approvalStatus === 'approved' ? 'verified' : 'pending'}">
-              ${currentTutor.approvalStatus === 'approved' 
-                ? '<i class="fas fa-check-circle"></i> Đã xác thực' 
-                : '<i class="fas fa-clock"></i> Đang chờ xác thực'}
+            
+            <div class="hero-stat">
+              <i class="fas fa-briefcase"></i>
+              <strong>${yearsOfExp}</strong>
+              <span>năm kinh nghiệm</span>
+            </div>
+            
+            <div class="hero-stat">
+              <i class="fas fa-user-graduate"></i>
+              <strong>${totalStudents}</strong>
+              <span>học sinh</span>
             </div>
           </div>
-          
-          <div class="tutor-stats">
-            <div class="stat-item">
-              <div class="stat-value">${yearsOfExp}</div>
-              <div class="stat-label">Năm kinh nghiệm</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">${totalStudents}</div>
-              <div class="stat-label">Học sinh</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">${totalLessons}</div>
-              <div class="stat-label">Buổi học</div>
-            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="profile-grid">
+      <!-- Left Column: Main Content -->
+      <div class="profile-main">
+        
+        <!-- About Section -->
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-user"></i></div>
+            <h3 class="card-title">Giới Thiệu</h3>
+          </div>
+          <div class="about-text">${bio}</div>
+        </div>
+        
+        <!-- Subjects Section -->
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-book"></i></div>
+            <h3 class="card-title">Môn Học Giảng Dạy</h3>
+          </div>
+          <div class="subjects-wrapper">
+            ${renderSubjects(profile.subjects || [])}
+          </div>
+        </div>
+        
+        <!-- Education & Experience Section -->
+        ${(profile.education && profile.education.length > 0) || (profile.workExperience && profile.workExperience.length > 0) ? `
+        <div class="content-card">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3 class="card-title">Hồ Sơ Năng Lực</h3>
           </div>
           
-          <div class="tutor-price-card">
-            <div class="price-label">Học phí</div>
-            <div class="price-value" style="font-size: 24px;">${formatCurrency(hourlyRate)}/giờ</div>
+          <div class="timeline">
+            ${renderEducation(profile.education || [])}
+            ${renderWorkExperience(profile.workExperience || [])}
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Reviews Section -->
+        <div class="content-card" id="reviewsContainer">
+          <!-- Reviews will be loaded here -->
+        </div>
+      </div>
+      
+      <!-- Right Column: Sidebar -->
+      <aside class="profile-sidebar">
+        
+        <!-- Booking Card -->
+        <div class="booking-card">
+          <div class="price-tag">
+            <span class="price-label">Học phí tham khảo</span>
+            <div class="price-amount">${formatCurrency(hourlyRate)}<span class="price-unit">/giờ</span></div>
           </div>
           
           <div class="action-buttons">
-            <button class="btn btn-primary btn-block" onclick="contactTutor()">
-              <i class="fas fa-comment"></i>
-              Liên Hệ
-            </button>
-            <button class="btn btn-outline btn-block" onclick="requestTutor()">
+            <button class="btn-book" onclick="requestTutor()">
               <i class="fas fa-paper-plane"></i>
               Gửi Yêu Cầu
             </button>
+            <button class="btn-message" onclick="contactTutor()">
+              <i class="fas fa-comment-dots"></i>
+              Nhắn Tin
+            </button>
           </div>
         </div>
-      </aside>
-      
-      <!-- Main Content -->
-      <main class="profile-main">
-        <!-- About Section -->
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-user"></i> Giới Thiệu</h2>
-          </div>
-          <div class="section-content">
-            <p class="bio-text">${bio}</p>
-          </div>
-        </section>
         
-        <!-- Subjects Section -->
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-book"></i> Môn Học Giảng Dạy</h2>
-          </div>
-          <div class="section-content">
-            <div class="subjects-grid">
-              ${renderSubjects(profile.subjects || [])}
+        <!-- Information Card -->
+        <div class="content-card" style="padding: 1.5rem;">
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <div class="info-content">
+                <h6>Địa chỉ</h6>
+                <p>${addressStr}</p>
+                <button class="btn-link" onclick="openLocationInMap('${encodeURIComponent(addressStr)}')" style="font-size: 0.85rem; color: #667eea; margin-top: 4px; background: none; border: none; cursor: pointer; padding: 0;">Xem bản đồ</button>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+              <div class="info-content">
+                <h6>Hình thức dạy</h6>
+                <p>${locationsStr}</p>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
         
-        <!-- Education Section -->
-        ${(profile.education && profile.education.length > 0) ? `
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-graduation-cap"></i> Học Vấn</h2>
-          </div>
-          <div class="section-content">
-            <div class="timeline">
-              ${renderEducation(profile.education)}
-            </div>
-          </div>
-        </section>
-        ` : ''}
-        
-        <!-- Work Experience Section -->
-        ${(profile.workExperience && profile.workExperience.length > 0) ? `
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-briefcase"></i> Kinh Nghiệm Làm Việc</h2>
-          </div>
-          <div class="section-content">
-            <div class="timeline">
-              ${renderWorkExperience(profile.workExperience)}
-            </div>
-          </div>
-        </section>
-        ` : ''}
-        
-        <!-- Certificates Section -->
-        ${(profile.certificates && profile.certificates.length > 0) ? `
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-certificate"></i> Chứng Chỉ</h2>
-          </div>
-          <div class="section-content">
-            <div class="certificates-grid">
-              ${renderCertificates(profile.certificates)}
-            </div>
-          </div>
-        </section>
-        ` : ''}
-        
-        <!-- Availability Section -->
+        <!-- Availability Card -->
         ${(profile.availability && profile.availability.length > 0) ? `
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-clock"></i> Lịch Rảnh</h2>
+        <div class="content-card" style="padding: 1.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Lịch Rảnh</h4>
+          <div class="info-list">
+            ${renderAvailability(profile.availability)}
           </div>
-          <div class="section-content">
-            <div class="availability-grid">
-              ${renderAvailability(profile.availability)}
-            </div>
-          </div>
-        </section>
+        </div>
         ` : ''}
         
-        <!-- Location Section -->
-        <section class="profile-section">
-          <div class="section-header">
-            <h2><i class="fas fa-map-marker-alt"></i> Địa Điểm Dạy Học</h2>
-          </div>
-          <div class="section-content">
-            <div class="location-info">
-              <div class="info-row">
-                <i class="fas fa-home"></i>
-                <div>
-                  <strong>Địa chỉ:</strong>
-                  <span>${addressStr}</span>
-                  <button class="location-btn" onclick="openLocationInMap('${encodeURIComponent(addressStr)}')" title="Xem trên bản đồ">
-                    <i class="fas fa-map-marker-alt"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="info-row">
-                <i class="fas fa-location-arrow"></i>
-                <div>
-                  <strong>Hình thức dạy:</strong>
-                  <span>${locationsStr}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        <!-- Reviews Section -->
-        <div id="reviewsContainer" style="margin-top: 25px;">
-          <!-- Reviews will be loaded here -->
-        </div>
-      </main>
+      </aside>
     </div>
   `;
 }
 
-// Render subjects
+// Render subjects (Modern Chips)
 function renderSubjects(subjects) {
   if (!subjects || subjects.length === 0) {
-    return '<p class="empty-message">Chưa có môn học nào</p>';
+    return '<p class="text-muted">Chưa có môn học nào</p>';
   }
 
   return subjects.map(subject => {
     let subjectName = '';
     let level = '';
-    let experience = 0;
-    
+
     if (typeof subject === 'string') {
       subjectName = subject;
     } else {
       subjectName = subject.subject || subject.name || '';
       level = subject.level || '';
-      experience = subject.experience || 0;
     }
-    
+
     return `
-      <div class="subject-card">
-        <div class="subject-header">
-          <div class="subject-icon">
-            <i class="fas fa-book"></i>
-          </div>
-          <div class="subject-name">${subjectName}</div>
-        </div>
-        ${level || experience ? `
-        <div class="subject-details">
-          ${level ? `
-          <div class="subject-detail">
-            <i class="fas fa-layer-group"></i>
-            <span>${level}</span>
-          </div>
-          ` : ''}
-          ${experience ? `
-          <div class="subject-detail">
-            <i class="fas fa-clock"></i>
-            <span>${experience} năm kinh nghiệm</span>
-          </div>
-          ` : ''}
-        </div>
-        ` : ''}
+      <div class="subject-tag">
+        <i class="fas fa-check"></i>
+        <span>${subjectName} ${level ? `(${level})` : ''}</span>
       </div>
     `;
   }).join('');
 }
 
-// Render education
+// Render education (Timeline Item)
 function renderEducation(education) {
   return education.map(edu => {
-    // Use institution first, fallback to university
     const schoolName = edu.institution || edu.university || 'Trường';
-    
-    // Use endYear if available, otherwise use graduationYear
     const yearEnd = edu.endYear || edu.graduationYear;
-    
-    // Format the year range
+
     let yearRange = '';
     if (edu.startYear && yearEnd) {
       yearRange = `${edu.startYear} - ${yearEnd}`;
     } else if (edu.startYear) {
       yearRange = `${edu.startYear} - Hiện tại`;
     } else if (yearEnd) {
-      yearRange = `Năm tốt nghiệp: ${yearEnd}`;
-    } else if (edu.graduationYear) {
-      yearRange = `Năm tốt nghiệp: ${edu.graduationYear}`;
+      yearRange = `Tốt nghiệp: ${yearEnd}`;
     }
-    
+
     return `
     <div class="timeline-item">
+      <div class="timeline-dot"></div>
       <div class="timeline-content">
-        <div class="timeline-title">${edu.degree || 'Học vị'}</div>
-        <div class="timeline-subtitle">${schoolName}</div>
-        ${edu.major ? `<div class="timeline-major"><i class="fas fa-book-open"></i> Chuyên ngành: <strong>${edu.major}</strong></div>` : ''}
-        ${yearRange ? `<div class="timeline-date">${yearRange}</div>` : ''}
-        ${edu.gpa ? `<div class="timeline-gpa"><i class="fas fa-star"></i> GPA: <strong>${edu.gpa}/4.0</strong></div>` : ''}
-        ${edu.description ? `<div class="timeline-description">${edu.description}</div>` : ''}
+        <h4>${edu.degree || 'Học vị'}</h4>
+        <div class="place">${schoolName}</div>
+        ${yearRange ? `<div class="time">${yearRange}</div>` : ''}
+        ${edu.major ? `<p>Chuyên ngành: ${edu.major}</p>` : ''}
+        ${edu.description ? `<p>${edu.description}</p>` : ''}
       </div>
     </div>
   `;
   }).join('');
 }
 
-// Render work experience
+// Render work experience (Timeline Item)
 function renderWorkExperience(experience) {
   return experience.map(exp => `
     <div class="timeline-item">
+      <div class="timeline-dot" style="border-color: #f6d365;"></div>
       <div class="timeline-content">
-        <div class="timeline-title">${exp.position || 'Vị trí'}</div>
-        <div class="timeline-subtitle">${exp.company || 'Công ty'}</div>
-        <div class="timeline-date">
+        <h4>${exp.position || 'Vị trí'}</h4>
+        <div class="place">${exp.company || 'Công ty'}</div>
+        <div class="time">
           ${exp.startYear || ''} ${exp.endYear ? `- ${exp.endYear}` : '- Hiện tại'}
         </div>
-        ${exp.description ? `<div class="timeline-description">${exp.description}</div>` : ''}
+        ${exp.description ? `<p>${exp.description}</p>` : ''}
       </div>
     </div>
   `).join('');
 }
 
-// Render certificates
+// Render certificates - Not used in this layout or can be added if needed
 function renderCertificates(certificates) {
-  return certificates.map(cert => `
-    <div class="certificate-card">
-      <div class="certificate-icon">
-        <i class="fas fa-award"></i>
-      </div>
-      <div class="certificate-name">${cert.name || 'Chứng chỉ'}</div>
-      ${cert.issuer ? `<div class="certificate-issuer">${cert.issuer}</div>` : ''}
-      ${cert.year ? `<div class="certificate-year">${cert.year}</div>` : ''}
-    </div>
-  `).join('');
+  return '';
 }
 
-// Render availability
+// Render availability (List Item)
 function renderAvailability(availability) {
   const days = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
 
   return days.map((day, index) => {
     const dayData = availability.find(a => a.day === (index + 1));
-    const isAvailable = dayData && dayData.slots && dayData.slots.length > 0;
+    if (!dayData || !dayData.slots || dayData.slots.length === 0) return '';
 
     return `
-      <div class="availability-day ${isAvailable ? 'available' : ''}">
-        <span class="day-name">${day}</span>
-        <div class="day-times">
-          ${isAvailable 
-            ? dayData.slots.map(slot => `${slot.start || ''} - ${slot.end || ''}`).join('<br>') 
-            : 'Không có'}
+      <div class="info-item" style="padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+        <div style="flex: 1;">
+          <strong style="display: block; font-size: 0.9rem; margin-bottom: 4px;">${day}</strong>
+          <span style="font-size: 0.85rem; color: #667eea;">
+            ${dayData.slots.map(slot => `${slot.start || ''} - ${slot.end || ''}`).join(', ')}
+          </span>
         </div>
       </div>
     `;
@@ -432,24 +371,24 @@ function renderAvailability(availability) {
 // Contact tutor - redirect to messages
 function contactTutor() {
   const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-  
+
   if (!token) {
     alert('Vui lòng đăng nhập để liên hệ gia sư');
     window.location.href = '../../index.html';
     return;
   }
-  
+
   if (!tutorId) {
     alert('Không tìm thấy thông tin gia sư');
     return;
   }
-  
+
   console.log('💬 Redirecting to messages with tutorId:', tutorId);
-  
+
   // Redirect to messages page with tutor ID and tutor info
   const tutorName = currentTutor?.profile?.fullName || 'Gia sư';
   const tutorAvatar = currentTutor?.profile?.avatar || currentTutor?.avatar || '';
-  
+
   // Store recipient info for messages page
   localStorage.setItem('chatRecipient', JSON.stringify({
     id: tutorId,
@@ -457,7 +396,7 @@ function contactTutor() {
     avatar: tutorAvatar,
     role: 'tutor'
   }));
-  
+
   // Redirect to messages page (relative path from pages/student/)
   window.location.href = `./messages.html?recipientId=${tutorId}`;
 }
@@ -466,38 +405,38 @@ function contactTutor() {
 function requestTutor() {
   console.log('🔥 requestTutor() called - VERSION 2.0');
   console.log('📍 Current location:', window.location.href);
-  
+
   const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
   console.log('🔑 Token exists:', !!token);
-  
+
   if (!token) {
     console.error('❌ No token found');
     alert('Vui lòng đăng nhập để gửi yêu cầu');
     window.location.href = '../../index.html';
     return;
   }
-  
+
   console.log('👨‍🏫 Current tutorId:', tutorId);
   if (!tutorId) {
     console.error('❌ No tutorId found');
     alert('Không tìm thấy thông tin gia sư');
     return;
   }
-  
+
   // Store tutor ID and tutor info for the booking form
   localStorage.setItem('selectedTutorId', tutorId);
   console.log('💾 Stored tutorId to localStorage:', tutorId);
-  
+
   // Store complete tutor data for reference
   if (currentTutor) {
     localStorage.setItem('selectedTutorData', JSON.stringify(currentTutor));
-    console.log('� Stored tutor data:', currentTutor.profile?.fullName);
+    console.log(' Stored tutor data:', currentTutor.profile?.fullName);
   }
-  
+
   const targetUrl = `./tutor_request.html?tutorId=${tutorId}`;
   console.log('🚀 REDIRECTING TO:', targetUrl);
   console.log('🔗 Full URL will be:', new URL(targetUrl, window.location.href).href);
-  
+
   // Force redirect
   window.location.href = targetUrl;
 }
@@ -551,10 +490,10 @@ function openLocationInMap(encodedAddress) {
     alert('Địa chỉ chưa được cập nhật');
     return;
   }
-  
+
   // Decode the address for display
   const address = decodeURIComponent(encodedAddress);
-  
+
   // Open Google Maps with the address
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
   window.open(mapsUrl, '_blank');
@@ -565,30 +504,30 @@ function openLocationInMap(encodedAddress) {
 // Load tutor reviews
 async function loadTutorReviews() {
   const container = document.getElementById('reviewsContainer');
-  
+
   try {
     console.log('📡 Loading tutor reviews for:', tutorId);
-    
+
     const response = await fetch(`${API_BASE_URL}/reviews/tutor/${tutorId}`);
-    
+
     if (!response.ok) {
       console.warn('⚠️ Could not load reviews:', response.status);
       return;
     }
-    
+
     const data = await response.json();
-    
+
     if (!data.success || !data.data) {
       console.log('ℹ️ No reviews data');
       return;
     }
-    
+
     const reviews = data.data.reviews || [];
     const stats = data.data.stats || {};
-    
+
     console.log('✅ Reviews loaded:', reviews.length, 'reviews');
     renderReviewsSection(reviews, stats);
-    
+
   } catch (error) {
     console.error('❌ Error loading reviews:', error);
     // Don't show error to user, just skip reviews section
@@ -598,64 +537,52 @@ async function loadTutorReviews() {
 // Render reviews section
 function renderReviewsSection(reviews, stats) {
   const container = document.getElementById('reviewsContainer');
-  
+
   if (!reviews || reviews.length === 0) {
     container.innerHTML = `
-      <div class="reviews-section">
-        <div class="reviews-header">
-          <h2><i class="fas fa-star"></i> Đánh Giá</h2>
-        </div>
-        <div class="no-reviews">
-          <i class="fas fa-comment-slash"></i>
-          <p>Chưa có đánh giá nào</p>
-          <p class="no-reviews-msg">Hãy làm bài tập với gia sư này để có thể để lại đánh giá!</p>
-        </div>
+      <div class="card-header">
+        <div class="card-icon"><i class="fas fa-star"></i></div>
+        <h3 class="card-title">Đánh Giá</h3>
+      </div>
+      <div class="no-reviews" style="text-align: center; padding: 2rem; color: #9ca3af;">
+        <i class="fas fa-comment-slash" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+        <p>Chưa có đánh giá nào</p>
+        <p style="font-size: 0.9rem;">Hãy làm bài tập với gia sư này để có thể để lại đánh giá!</p>
       </div>
     `;
     return;
   }
-  
+
   // Calculate average rating and count
   const avgRating = stats.averageRating || 0;
   const reviewCount = reviews.length;
   const avgCriteria = stats.averageCriteria || {};
-  
+
   let reviewsHTML = `
-    <div class="reviews-section">
-      <div class="reviews-header">
-        <div>
-          <h2><i class="fas fa-star"></i> Đánh Giá Của Học Sinh</h2>
-        </div>
-        <div class="reviews-summary">
-          <div class="review-rating-display">
-            <div class="stars">${generateStars(avgRating)}</div>
-            <div class="rating-value">${avgRating.toFixed(1)}</div>
-          </div>
-          <div class="review-count">
-            <i class="fas fa-comments"></i>
-            <span>${reviewCount} đánh giá</span>
-          </div>
-        </div>
+    <div class="card-header">
+      <div class="card-icon"><i class="fas fa-star"></i></div>
+      <h3 class="card-title">Đánh Giá Của Học Sinh</h3>
+    </div>
+    
+    <div class="reviews-summary" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 1rem;">
+      <div class="review-rating-display" style="text-align: center;">
+        <div class="rating-value" style="font-size: 2.5rem; font-weight: 800; color: #1f2937; line-height: 1;">${avgRating.toFixed(1)}</div>
+        <div class="stars" style="color: #fbbf24; font-size: 1rem; margin: 0.5rem 0;">${generateStars(avgRating)}</div>
+        <div class="review-count" style="font-size: 0.9rem; color: #6b7280;">${reviewCount} đánh giá</div>
       </div>
       
-      <div class="reviews-container">
-        ${reviews.map(review => renderReviewItem(review)).join('')}
-      </div>
-  `;
-  
-  // Add criteria breakdown if available
-  if (Object.keys(avgCriteria).length > 0) {
-    reviewsHTML += `
-      <div class="criteria-breakdown">
+      ${Object.keys(avgCriteria).length > 0 ? `
+      <div class="criteria-breakdown" style="flex: 1; border-left: 1px solid #e5e7eb; padding-left: 1.5rem;">
         ${renderCriteriaBreakdown(avgCriteria)}
       </div>
-    `;
-  }
-  
-  reviewsHTML += `
+      ` : ''}
+    </div>
+    
+    <div class="reviews-list">
+      ${reviews.map(review => renderReviewItem(review)).join('')}
     </div>
   `;
-  
+
   container.innerHTML = reviewsHTML;
 }
 
@@ -664,58 +591,52 @@ function renderReviewItem(review) {
   const rating = review.rating || 0;
   const createdAt = new Date(review.createdAt).toLocaleDateString('vi-VN');
   const reviewerName = review.reviewer?.profile?.fullName || review.reviewer?.email || 'Học sinh';
-  const reviewerAvatar = review.reviewer?.profile?.avatar || review.reviewer?.avatar || 
+  const reviewerAvatar = review.reviewer?.profile?.avatar || review.reviewer?.avatar ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=667eea&color=fff`;
-  
-  // Format status badge
-  // Only approved reviews are shown, so no need for status badge
-  const statusBadge = '';
-  
+
   let html = `
-    <div class="review-item">
+    <div class="review-card">
       <div class="review-header">
-        <div class="review-author">
-          <img src="${reviewerAvatar}" alt="${reviewerName}" class="review-avatar" 
+        <div class="reviewer-info">
+          <img src="${reviewerAvatar}" alt="${reviewerName}" class="reviewer-avatar" 
             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=667eea&color=fff'">
-          <div class="review-author-info">
-            <span class="review-author-name">${reviewerName}</span>
-            <span class="review-author-date">${createdAt}</span>
+          <div class="reviewer-details">
+            <h5>${reviewerName}</h5>
+            <span>${createdAt}</span>
           </div>
         </div>
         <div class="review-rating">
-          <div class="stars">${generateStars(rating)}</div>
-          <span class="score">${rating.toFixed(1)}</span>
+          ${generateStars(rating)}
         </div>
       </div>
       
-      <div class="review-content">
-        ${review.comment ? `<p class="review-comment">${escapeHtml(review.comment)}</p>` : ''}
+      <div class="review-body">
+        ${review.comment ? `<p>${escapeHtml(review.comment)}</p>` : ''}
         
         ${review.criteria && Object.keys(review.criteria).length > 0 ? `
-          <div class="review-criteria">
+          <div class="review-criteria" style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
             ${renderReviewCriteria(review.criteria)}
           </div>
         ` : ''}
       </div>
   `;
-  
+
   // Add tutor response if exists
   if (review.tutorResponse && review.tutorResponse.message) {
     html += `
-      <div class="tutor-response">
-        <div class="tutor-response-header">
-          <i class="fas fa-reply"></i>
-          <span>Phản hồi từ gia sư</span>
+      <div class="tutor-response" style="margin-top: 1rem; padding: 1rem; background: #f0f4ff; border-radius: 0.5rem; border-left: 3px solid #667eea;">
+        <div style="font-weight: 600; color: #667eea; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <i class="fas fa-reply"></i> Phản hồi từ gia sư
         </div>
-        <div class="tutor-response-text">${escapeHtml(review.tutorResponse.message)}</div>
+        <div style="font-size: 0.95rem; color: #4b5563;">${escapeHtml(review.tutorResponse.message)}</div>
       </div>
     `;
   }
-  
+
   html += `
     </div>
   `;
-  
+
   return html;
 }
 
@@ -728,19 +649,15 @@ function renderReviewCriteria(criteria) {
     patience: 'Kiên Nhẫn',
     effectiveness: 'Hiệu Quả'
   };
-  
+
   return Object.entries(criteria).map(([key, value]) => {
     if (!value || value < 1 || value > 5) return '';
-    
+
     const name = criteriaNames[key] || key;
     return `
-      <div class="criteria-item">
-        <span class="criteria-label">${name}</span>
-        <div class="criteria-value">
-          <div class="stars">${generateStars(value)}</div>
-          <span class="score">${value.toFixed(1)}</span>
-        </div>
-      </div>
+      <span style="font-size: 0.8rem; background: white; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #e5e7eb; color: #6b7280;">
+        ${name}: <strong>${value}</strong>
+      </span>
     `;
   }).join('');
 }
@@ -754,23 +671,20 @@ function renderCriteriaBreakdown(avgCriteria) {
     patience: 'Kiên Nhẫn',
     effectiveness: 'Hiệu Quả'
   };
-  
+
   return Object.entries(avgCriteria).map(([key, value]) => {
     if (!value || value < 1 || value > 5) return '';
-    
+
     const name = criteriaNames[key] || key;
     const percentage = (value / 5) * 100;
-    
+
     return `
-      <div class="criteria-breakdown-item">
-        <span class="criteria-breakdown-name">${name}</span>
-        <div class="criteria-breakdown-score">
-          <div class="stars">${generateStars(value)}</div>
-          <span class="value">${value.toFixed(1)}</span>
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+        <span style="width: 100px; font-size: 0.85rem; color: #4b5563;">${name}</span>
+        <div style="flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+          <div style="width: ${percentage}%; height: 100%; background: #667eea; border-radius: 3px;"></div>
         </div>
-        <div class="criteria-breakdown-bar">
-          <div class="criteria-breakdown-bar-fill" style="width: ${percentage}%"></div>
-        </div>
+        <span style="width: 30px; font-size: 0.85rem; font-weight: 600; text-align: right;">${value.toFixed(1)}</span>
       </div>
     `;
   }).join('');

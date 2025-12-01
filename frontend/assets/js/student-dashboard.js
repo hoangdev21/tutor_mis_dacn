@@ -315,15 +315,15 @@ function renderLearningProgressChart(progressData) {
     const remainingHours = totalHours - completedHours;
     
     statsContainer.innerHTML = `
-      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #66d4eaff 0%, #594ba2ff 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
         <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">${Math.round(totalHours)}h</div>
         <div style="font-size: 11px; opacity: 0.9; font-weight: 500;">Tổng giờ học</div>
       </div>
-      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #2f9865ff 0%, #059691ff 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
         <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">${Math.round(completedHours)}h</div>
         <div style="font-size: 11px; opacity: 0.9; font-weight: 500;">Đã hoàn thành</div>
       </div>
-      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+      <div style="text-align: center; padding: 16px 12px; background: linear-gradient(135deg, #b2f63bff 0%, #1d4ed8 100%); border-radius: 10px; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
         <div style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">${progressPercentage}%</div>
         <div style="font-size: 11px; opacity: 0.9; font-weight: 500;">Tiến độ</div>
       </div>

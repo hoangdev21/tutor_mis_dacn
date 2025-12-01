@@ -246,65 +246,65 @@ function renderStudentCard(booking) {
       <div class="student-card-body">
         <div class="info-row">
           <div class="info-item">
-            <i class="fas fa-book"></i>
-            <div>
-              <span class="info-label">Môn học</span>
-              <span class="info-value">${subjectDisplay}</span>
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-book" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Môn học</span>
             </div>
+            <span class="info-value">${subjectDisplay}</span>
           </div>
           <div class="info-item">
-            <i class="fas fa-calendar"></i>
-            <div>
-              <span class="info-label">Ngày bắt đầu</span>
-              <span class="info-value">${startDate}</span>
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-calendar" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Ngày bắt đầu</span>
             </div>
-          </div>
-        </div>
-        
-        <div class="info-row">
-          <div class="info-item">
-            <i class="fas fa-calendar-check"></i>
-            <div>
-              <span class="info-label">Kết thúc</span>
-              <span class="info-value">${endDate}</span>
-            </div>
-          </div>
-          <div class="info-item">
-            <i class="fas fa-clock"></i>
-            <div>
-              <span class="info-label">Thời gian</span>
-              <span class="info-value">${preferredTime}</span>
-            </div>
+            <span class="info-value">${startDate}</span>
           </div>
         </div>
         
         <div class="info-row">
           <div class="info-item">
-            <i class="fas fa-calendar-week"></i>
-            <div>
-              <span class="info-label">Lịch học</span>
-              <span class="info-value">${booking.schedule?.daysPerWeek || 0} buổi/tuần</span>
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-calendar-check" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Kết thúc</span>
             </div>
+            <span class="info-value">${endDate}</span>
           </div>
           <div class="info-item">
-            <i class="fas fa-hourglass-end"></i>
-            <div>
-              <span class="info-label">Thời lượng buổi</span>
-              <span class="info-value">${booking.schedule?.hoursPerSession || 0}h/buổi</span>
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-clock" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Thời gian</span>
             </div>
+            <span class="info-value">${preferredTime}</span>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-item">
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-calendar-week" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Lịch học</span>
+            </div>
+            <span class="info-value">${booking.schedule?.daysPerWeek || 0} buổi/tuần</span>
+          </div>
+          <div class="info-item">
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-hourglass-end" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Thời lượng buổi</span>
+            </div>
+            <span class="info-value">${booking.schedule?.hoursPerSession || 0}h/buổi</span>
           </div>
         </div>
         
         <div class="info-row">
           <div class="info-item full-width">
-            <i class="fas fa-map-marker-alt"></i>
-            <div>
-              <span class="info-label">Địa điểm</span>
-              <span class="info-value">${location}</span>
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0;">
+              <i class="fas fa-map-marker-alt" style="flex-shrink: 0;"></i>
+              <span class="info-label" style="white-space: nowrap;">Địa điểm</span>
             </div>
+            <span class="info-value">${location}</span>
           </div>
         </div>
-        
+         
         <div class="pricing-info">
           <div class="pricing-item">
             <span class="pricing-label">Học phí/giờ</span>
@@ -312,11 +312,11 @@ function renderStudentCard(booking) {
           </div>
           <div class="pricing-item">
             <span class="pricing-label">Học phí/tháng</span>
-            <span class="pricing-value">${formatCurrency(calculateMonthlyPrice(booking))}</span>
+            <span class="pricing-value" style="color: #4373aaff;">${formatCurrency(calculateMonthlyPrice(booking))}</span>
           </div>
           <div class="pricing-item">
             <span class="pricing-label">Tổng học phí</span>
-            <span class="pricing-value total">${formatCurrency(calculateTotalPriceTutor(booking))}</span>
+            <span class="pricing-value total" style="color: #e01818ff;">${formatCurrency(calculateTotalPriceTutor(booking))}</span>
           </div>
         </div>
       </div>

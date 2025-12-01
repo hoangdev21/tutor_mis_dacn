@@ -1,0 +1,277 @@
+/**
+ * ============================================
+ * CERTIFICATES SECTION - PREMIUM REDESIGN
+ * Style: Glassmorphism + 3D Coverflow + Neon Glow
+ * ============================================
+ */
+
+/* ============ SECTION BACKGROUND & CONTAINER ============ */
+.certificates {
+    position: relative;
+    padding: 100px 0;
+    background: #0f172a;
+    /* Fallback */
+    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%);
+    overflow: hidden;
+    color: #fff;
+}
+
+/* Decorative Background Elements (Animated Blobs) */
+.certificates::before,
+.certificates::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    z-index: 0;
+    animation: floatBlob 10s infinite alternate ease-in-out;
+}
+
+.certificates::before {
+    background: #3b82f6;
+    /* Blue */
+    top: -100px;
+    left: -100px;
+}
+
+.certificates::after {
+    background: #8b5cf6;
+    /* Purple */
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+@keyframes floatBlob {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(50px, 50px) scale(1.1);
+    }
+}
+
+.certificates .container {
+    position: relative;
+    z-index: 2;
+    /* Above background blobs */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ============ SECTION HEADER ============ */
+.certificates .section__header {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.certificates .section__title {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(to right, #fff, #93c5fd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.certificates .section__subtitle {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ============ SWIPER CONTAINER ============ */
+.certificates__swiper {
+    width: 100%;
+    padding-top: 50px;
+    padding-bottom: 80px;
+    perspective: 1000px;
+}
+
+/* ============ CERTIFICATE CARD - GLASSMORPHISM ============ */
+.certificate__card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s ease;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* 3D Effect inside card */
+    transform-style: preserve-3d;
+}
+
+/* Shine Effect */
+.certificate__card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    transition: 0.5s;
+    pointer-events: none;
+}
+
+.certificate__card:hover::before {
+    left: 100%;
+}
+
+/* Hover Glow */
+.certificate__card:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(59, 130, 246, 0.3);
+    /* Blue glow */
+    transform: translateY(-5px);
+}
+
+/* ============ CARD CONTENT ============ */
+.certificate__card img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    transition: transform 0.5s ease;
+}
+
+.certificate__card:hover img {
+    transform: scale(1.1) rotate(2deg);
+}
+
+.certificate__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.certificate__description {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    margin-bottom: 24px;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.certificate__count {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* ============ SWIPER NAVIGATION BUTTONS ============ */
+.custom-swiper-button-prev,
+.custom-swiper-button-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.custom-swiper-button-prev {
+    left: 20px;
+}
+
+.custom-swiper-button-next {
+    right: 20px;
+}
+
+.custom-swiper-button-prev:hover,
+.custom-swiper-button-next:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+.custom-swiper-button-prev img,
+.custom-swiper-button-next img {
+    width: 24px;
+    height: 24px;
+    filter: invert(1);
+    /* Make icons white */
+}
+
+/* ============ PAGINATION ============ */
+.certificates__swiper .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.certificates__swiper .swiper-pagination-bullet-active {
+    background: #3b82f6;
+    width: 30px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    .certificates .section__title {
+        font-size: 2rem;
+    }
+
+    .certificate__card {
+        padding: 30px 20px;
+    }
+
+    .custom-swiper-button-prev,
+    .custom-swiper-button-next {
+        width: 44px;
+        height: 44px;
+    }
+
+    .custom-swiper-button-prev img,
+    .custom-swiper-button-next img {
+        width: 20px;
+        height: 20px;
+    }
+}

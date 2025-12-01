@@ -512,7 +512,7 @@ function showRequestDetailModal(request) {
   modal.className = 'modal show';
   modal.id = 'requestDetailModal';
   modal.innerHTML = `
-    <div class="modal-content" style="max-width: 800px;">
+    <div class="modal-content">
       <div class="modal-header">
         <h3>Chi Tiết Yêu Cầu</h3>
         <button class="modal-close" onclick="closeRequestDetailModal()">

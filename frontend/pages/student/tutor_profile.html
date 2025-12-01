@@ -1,40 +1,65 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hồ Sơ Gia Sư - TutorMis</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
-    <link rel="stylesheet" href="../../assets/css/tutor/tutor-profile.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/tutor/tutor-profile-modern.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="navbar-brand">
-                <a href="../../index.html">
-                    <span class="logo-icon">🎓</span>
+    <nav class="premium-navbar">
+        <div class="navbar-glass-bg"></div>
+        <div class="navbar-container">
+            <!-- Left Section: Back Button -->
+            <div class="navbar-left">
+                <button class="nav-btn nav-btn-back" onclick="goBack()">
+                    <span class="btn-icon-wrapper">
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                    <span class="btn-text">Quay Lại</span>
+                    <span class="btn-ripple"></span>
+                </button>
+            </div>
+
+            <!-- Center Section: Logo -->
+            <div class="navbar-center">
+                <a href="../../index.html" class="navbar-logo-link">
+                    <div class="logo-container">
+                        <div class="logo-glow"></div>
+                        <img src="../../assets/images/logo/logo-3.png" alt="TutorMis Logo" class="navbar-logo">
+                        <div class="logo-ring"></div>
+                    </div>
                     <span class="logo-text">TutorMis</span>
                 </a>
             </div>
-            
-            <div class="navbar-menu">
-                <button class="btn btn-outline" onclick="goBack()">
-                    <i class="fas fa-arrow-left"></i>
-                    Quay Lại
-                </button>
-                <a href="#" onclick="contactTutor(); return false;" class="btn btn-primary">
-                    <i class="fas fa-comment"></i>
-                    Nhắn Tin
+
+            <!-- Right Section: Contact Button -->
+            <div class="navbar-right">
+                <a href="#" onclick="contactTutor(); return false;" class="nav-btn nav-btn-primary">
+                    <span class="btn-icon-wrapper">
+                        <i class="fas fa-comment-dots"></i>
+                    </span>
+                    <span class="btn-text">Nhắn Tin</span>
+                    <span class="btn-shine"></span>
                 </a>
             </div>
         </div>
+
+        <!-- Decorative Elements -->
+        <div class="navbar-decoration navbar-decoration-left"></div>
+        <div class="navbar-decoration navbar-decoration-right"></div>
     </nav>
 
     <!-- Main Content -->
     <div class="profile-page">
+        <div class="profile-bg-decoration"></div>
         <div class="container">
             <div id="profileContainer">
                 <div class="loading-spinner">
@@ -47,6 +72,7 @@
 
     <!-- Scripts -->
     <script src="../../assets/js/main.js"></script>
-    <script src="../../assets/js/tutor-profile-student.js?v=2.0"></script>
+    <script src="../../assets/js/tutor-profile-student.js"></script>
 </body>
+
 </html>

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserInfo();
     setupChatHandlers();
     loadChatHistory();
+    checkChatStatus();
 });
 
 // Load user info
@@ -19,6 +20,23 @@ function loadUserInfo() {
     if (userData.name || userProfile.fullName) {
         const avatarUrl = userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.fullName || userData.name || 'User')}&background=667eea&color=fff`;
         userAvatar.src = avatarUrl;
+    }
+}
+
+// Check chat status and toggle quick questions
+function checkChatStatus() {
+    const messagesContainer = document.getElementById('chatMessages');
+    const quickQuestionsPanel = document.getElementById('quickQuestionsPanel');
+    
+    // Count user messages (excluding first AI welcome message)
+    const userMessages = messagesContainer.querySelectorAll('.user-message');
+    
+    if (userMessages.length === 0) {
+        // No chat yet, show quick questions
+        quickQuestionsPanel.style.display = 'block';
+    } else {
+        // Chat started, hide quick questions
+        quickQuestionsPanel.style.display = 'none';
     }
 }
 
@@ -52,6 +70,9 @@ async function handleSendMessage(e) {
     
     // Add user message to UI
     addMessageToUI(message, 'user');
+    
+    // Hide quick questions after first message
+    checkChatStatus();
     
     // Show typing indicator
     showTypingIndicator();
@@ -265,6 +286,8 @@ function clearChat() {
         `;
         chatHistory = [];
         localStorage.removeItem('aiChatHistory');
+        // Show quick questions again
+        checkChatStatus();
     }
 }
 

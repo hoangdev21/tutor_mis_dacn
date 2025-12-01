@@ -126,38 +126,6 @@
             <!-- AI Chat Content -->
             <div class="dashboard-content">
                 <div class="ai-container">
-                    <!-- AI Info Card -->
-                    <div class="ai-info-card">
-                        <div class="ai-avatar">
-                            <img src="../../assets/images/avatar/ai-avatar.png" alt="AI Avatar">
-                        </div>
-                        <h3>TutorMis AI Assistant</h3>
-                        <p>Xin chào! Tôi là trợ lý AI của TutorMis. Tôi có thể giúp bạn:</p>
-                        <ul class="ai-capabilities">
-                            <li><i class="fas fa-check"></i> Tìm gia sư phù hợp</li>
-                            <li><i class="fas fa-check"></i> Hướng dẫn sử dụng website</li>
-                            <li><i class="fas fa-check"></i> Trả lời câu hỏi thường gặp</li>
-                            <li><i class="fas fa-check"></i> Giải đáp vấn đề học tập</li>
-                            <li><i class="fas fa-check"></i> Tư vấn khóa học</li>
-                        </ul>
-
-                        <div class="quick-questions">
-                            <h4>Câu hỏi gợi ý:</h4>
-                            <button class="quick-question-btn" onclick="sendQuickQuestion('Làm sao để tìm gia sư phù hợp?')">
-                                Làm sao để tìm gia sư?
-                            </button>
-                            <button class="quick-question-btn" onclick="sendQuickQuestion('Quy trình đặt lịch học như thế nào?')">
-                                Quy trình đặt lịch học?
-                            </button>
-                            <button class="quick-question-btn" onclick="sendQuickQuestion('Phương thức thanh toán nào được chấp nhận?')">
-                                Phương thức thanh toán?
-                            </button>
-                            <button class="quick-question-btn" onclick="sendQuickQuestion('Tôi muốn hủy lịch học thì làm sao?')">
-                                Làm sao để hủy lịch?
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Chat Interface -->
                     <div class="chat-card">
                         <div class="chat-header">
@@ -195,6 +163,23 @@
                         </div>
 
                         <div class="chat-input-container">
+                            <div class="quick-questions" id="quickQuestionsPanel">
+                                <h4>💡 Câu hỏi gợi ý:</h4>
+                                <div class="quick-questions-wrapper">
+                                    <button class="quick-question-btn" onclick="sendQuickQuestion('Làm sao để tìm gia sư phù hợp?')">
+                                        Tìm gia sư
+                                    </button>
+                                    <button class="quick-question-btn" onclick="sendQuickQuestion('Quy trình đặt lịch học như thế nào?')">
+                                        Đặt lịch học
+                                    </button>
+                                    <button class="quick-question-btn" onclick="sendQuickQuestion('Phương thức thanh toán nào được chấp nhận?')">
+                                        Thanh toán
+                                    </button>
+                                    <button class="quick-question-btn" onclick="sendQuickQuestion('Tôi muốn hủy lịch học thì làm sao?')">
+                                        Hủy lịch
+                                    </button>
+                                </div>
+                            </div>
                             <form id="chatForm" class="chat-input-form">
                                 <button type="button" class="attachment-btn" title="Đính kèm file">
                                     <i class="fas fa-paperclip"></i>

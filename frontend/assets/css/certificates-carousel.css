@@ -20,11 +20,12 @@
     position: relative;
     max-width: 1300px;
     margin: 50px auto 0;
-    padding: 40px 80px;
+    padding: 40px 80px 90px; /* Increased bottom padding for staggered layout */
     overflow: hidden;
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    height: 500px;
 }
 
 /* ============ SWIPER WRAPPER ============ */
@@ -37,10 +38,15 @@
     width: auto;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Changed to flex-start for staggered layout */
     
     /* Transition mượt mà */
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============ STAGGERED LAYOUT ============ */
+.certificates__swiper .swiper-slide:nth-child(even) .certificate__card {
+    margin-top: 50px; /* Push even cards down */
 }
 
 /* ============ CERTIFICATE CARD - STYLING ============ */

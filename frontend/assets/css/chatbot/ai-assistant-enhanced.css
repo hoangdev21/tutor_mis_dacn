@@ -5,13 +5,14 @@
     color: #667eea;
     text-decoration: none;
     font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 3px 6px;
+    border-radius: 4px;
     background: rgba(102, 126, 234, 0.1);
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .message-text .ai-link:hover {
@@ -29,38 +30,39 @@
 .message-text .ai-header {
     color: #667eea;
     font-weight: 700;
-    margin: 16px 0 8px;
-    padding-bottom: 8px;
+    margin: 12px 0 6px;
+    padding-bottom: 6px;
     border-bottom: 2px solid rgba(102, 126, 234, 0.2);
 }
 
 .message-text h2.ai-header {
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .message-text h3.ai-header {
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .message-text h4.ai-header {
-    font-size: 16px;
+    font-size: 13px;
 }
 
 /* AI Lists Styling */
 .message-text .ai-list {
     list-style: none;
     padding: 0;
-    margin: 12px 0;
+    margin: 10px 0;
 }
 
 .message-text .ai-list li {
-    padding: 8px 12px 8px 32px;
-    margin: 6px 0;
+    padding: 6px 10px 6px 28px;
+    margin: 4px 0;
     background: rgba(102, 126, 234, 0.05);
     border-left: 3px solid #667eea;
-    border-radius: 6px;
+    border-radius: 4px;
     position: relative;
-    line-height: 1.6;
+    line-height: 1.4;
+    font-size: 12px;
 }
 
 .message-text .ai-list li:before {
@@ -75,8 +77,8 @@
 .message-text .tutor-name {
     display: inline-block;
     color: #764ba2;
-    font-size: 16px;
-    margin: 12px 0 4px;
+    font-size: 13px;
+    margin: 8px 0 2px;
 }
 
 /* Tutor Card in Message (if AI returns structured data) */
@@ -95,7 +97,7 @@
 }
 
 .tutor-card-inline .tutor-name {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #333;
     margin-bottom: 8px;
@@ -106,7 +108,7 @@
     align-items: center;
     gap: 8px;
     margin: 6px 0;
-    font-size: 14px;
+    font-size: 13px;
     color: #666;
 }
 
@@ -126,7 +128,7 @@
     text-decoration: none;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
     transition: all 0.3s ease;
 }
 
@@ -141,7 +143,7 @@
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Courier New', monospace;
-    font-size: 13px;
+    font-size: 12px;
     color: #e83e8c;
 }
 
@@ -190,7 +192,7 @@
     padding: 4px 12px;
     border-radius: 20px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     margin: 0 4px;
 }
 
@@ -257,7 +259,7 @@
     padding: 4px 10px;
     background: #f5f7fa;
     border-radius: 12px;
-    font-size: 12px;
+    font-size: 11px;
     color: #666;
 }
 
@@ -273,7 +275,7 @@
     gap: 6px;
     padding: 6px 12px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     margin: 8px 0;
 }

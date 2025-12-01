@@ -261,7 +261,7 @@ const getPost = async (req, res) => {
     // kiểm tra những bài viết chưa được duyệt
     if (post.status !== 'approved') {
       // Only author and admin can view non-approved posts
-      if (!req.user || 
+      if (!post.author || !req.user || 
           (post.author._id.toString() !== req.user._id.toString() && req.user.role !== 'admin')) {
         return res.status(403).json({
           success: false,
@@ -276,14 +276,16 @@ const getPost = async (req, res) => {
       await post.save();
     }
 
-    // lấy thông tin hồ sơ tác giả
+    // lấy thông tin hồ sơ tác giả (kiểm tra author không null)
     let authorProfile = null;
-    if (post.authorRole === 'student') {
-      authorProfile = await StudentProfile.findOne({ userId: post.author._id })
-        .select('fullName avatar bio');
-    } else if (post.authorRole === 'tutor') {
-      authorProfile = await TutorProfile.findOne({ userId: post.author._id })
-        .select('fullName avatar bio expertise');
+    if (post.author && post.author._id) {
+      if (post.authorRole === 'student') {
+        authorProfile = await StudentProfile.findOne({ userId: post.author._id })
+          .select('fullName avatar bio');
+      } else if (post.authorRole === 'tutor') {
+        authorProfile = await TutorProfile.findOne({ userId: post.author._id })
+          .select('fullName avatar bio expertise');
+      }
     }
 
     res.json({
@@ -377,15 +379,19 @@ const getAllPosts = async (req, res) => {
 
     // Lấy hồ sơ tác giả và hồ sơ người bình luận cho mỗi bài viết
     for (const post of posts) {
-      // Lấy hồ sơ tác giả
-      if (post.authorRole === 'student') {
-        post.authorProfile = await StudentProfile.findOne({ userId: post.author._id })
-          .select('fullName avatar bio')
-          .lean();
-      } else if (post.authorRole === 'tutor') {
-        post.authorProfile = await TutorProfile.findOne({ userId: post.author._id })
-          .select('fullName avatar bio expertise')
-          .lean();
+      // Lấy hồ sơ tác giả (kiểm tra author không null)
+      if (post.author && post.author._id) {
+        if (post.authorRole === 'student') {
+          post.authorProfile = await StudentProfile.findOne({ userId: post.author._id })
+            .select('fullName avatar bio')
+            .lean();
+        } else if (post.authorRole === 'tutor') {
+          post.authorProfile = await TutorProfile.findOne({ userId: post.author._id })
+            .select('fullName avatar bio expertise')
+            .lean();
+        }
+      } else {
+        post.authorProfile = null; // Set default if author is null
       }
 
       // Lấy hồ sơ người bình luận
@@ -868,8 +874,8 @@ const getMyPosts = async (req, res) => {
 
     // nhận hồ sơ tác giả và hồ sơ người bình luận cho mỗi bài viết
     for (const post of posts) {
-      // Lấy hồ sơ tác giả bài viết
-      if (post.author && post.author.role) {
+      // Lấy hồ sơ tác giả bài viết (kiểm tra author không null)
+      if (post.author && post.author._id && post.author.role) {
         if (post.author.role === 'student') {
           post.authorProfile = await StudentProfile.findOne({ userId: post.author._id })
             .select('fullName avatar bio')
@@ -879,6 +885,8 @@ const getMyPosts = async (req, res) => {
             .select('fullName avatar bio expertise')
             .lean();
         }
+      } else {
+        post.authorProfile = null; // Set default if author is null
       }
 
       // Lấy hồ sơ người bình luận

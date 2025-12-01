@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,11 +11,14 @@
     <link rel="stylesheet" href="assets/css/otp.css">
     <link rel="stylesheet" href="assets/css/landing-page.css">
     <link rel="stylesheet" href="assets/css/intro-animation.css">
-    <link rel="stylesheet" href="assets/css/certificates-carousel.css">
+    <link rel="stylesheet" href="assets/css/certificates-new.css">
+    <link rel="stylesheet" href="assets/css/footer-universe.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="assets/css/how-it-works-new.css">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -26,22 +30,33 @@
         <nav class="nav__menu">
             <ul class="nav__list">
                 <li class="nav__item">
-                    <a href="#home" class="nav__link"><img src="assets/images/icon-home/home.png" alt="Trang Chủ" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Trang Chủ</a>
+                    <a href="#home" class="nav__link"><img src="assets/images/icon-home/home.png" alt="Trang Chủ"
+                            style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Trang Chủ</a>
                 </li>
                 <li class="nav__item">
-                    <a href="#university-partners" class="nav__link"><img src="assets/images/icon-home/handshake.png" alt="Đối Tác" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Đối Tác</a>
+                    <a href="#university-partners" class="nav__link"><img src="assets/images/icon-home/handshake.png"
+                            alt="Đối Tác" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Đối
+                        Tác</a>
                 </li>
                 <li class="nav__item">
-                    <a href="#how-it-works" class="nav__link"><img src="assets/images/icon-home/settings.png" alt="Cách Hoạt Động" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Cách Hoạt Động</a>
+                    <a href="#how-it-works" class="nav__link"><img src="assets/images/icon-home/settings.png"
+                            alt="Cách Hoạt Động"
+                            style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Cách Hoạt
+                        Động</a>
                 </li>
                 <li class="nav__item">
-                    <a href="#featured-tutors" class="nav__link"><img src="assets/images/icon-home/star.png" alt="Gia Sư Tiêu Biểu" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Gia Sư Tiêu Biểu</a>
+                    <a href="#featured-tutors" class="nav__link"><img src="assets/images/icon-home/star.png"
+                            alt="Gia Sư Tiêu Biểu"
+                            style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Gia Sư Tiêu
+                        Biểu</a>
                 </li>
                 <li class="nav__item">
-                    <a href="#testimonials" class="nav__link"><img src="assets/images/icon-home/chat.png" alt="Nhận Xét" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Nhận Xét</a>
+                    <a href="#testimonials" class="nav__link"><img src="assets/images/icon-home/chat.png" alt="Nhận Xét"
+                            style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Nhận Xét</a>
                 </li>
                 <li class="nav__item">
-                    <a href="#contact" class="nav__link"><img src="assets/images/icon-home/mail.png" alt="Liên Hệ" style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Liên Hệ</a>
+                    <a href="#contact" class="nav__link"><img src="assets/images/icon-home/mail.png" alt="Liên Hệ"
+                            style="width:20px; height:20px; margin-right:8px; vertical-align:middle;"> Liên Hệ</a>
                 </li>
             </ul>
         </nav>
@@ -84,15 +99,20 @@
                             Kết nối với 1,000+ gia sư đã xác thực. Học tập cá nhân hóa, tiến bộ nhanh chóng.
                         </p>
                         <div class="hero__buttons">
-                            <button class="btn btn--primary btn--large" onclick="showRegisterModal('student')" style="display:inline-flex;align-items:center;gap:8px;">
-                                <dotlottie-wc src="https://lottie.host/40f4b784-6ff4-4b20-b065-4e6ca08c7973/Phf0VFiJ0U.lottie" style="width:40px;height:40px;display:inline-block;vertical-align:middle;margin-right:0;" autoplay loop></dotlottie-wc>
+                            <button class="btn btn--primary btn--large" onclick="showRegisterModal('student')"
+                                style="display:inline-flex;align-items:center;gap:8px;">
+                                <dotlottie-wc
+                                    src="https://lottie.host/40f4b784-6ff4-4b20-b065-4e6ca08c7973/Phf0VFiJ0U.lottie"
+                                    style="width:40px;height:40px;display:inline-block;vertical-align:middle;margin-right:0;"
+                                    autoplay loop></dotlottie-wc>
                                 <span>Tôi cần gia sư</span>
                                 <span class="right-arrow">
                                     <i class="fas fa-arrow-right" style="font-size:20px; color: #ffffff;"></i>
                                 </span>
                             </button>
                             <button class="btn btn--outline btn--large" onclick="showRegisterModal('tutor')">
-                                <img src="assets/images/icon/coaching.png" alt="Tôi là gia sư" style="width: 40px; height: 40px; display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                <img src="assets/images/icon/coaching.png" alt="Tôi là gia sư"
+                                    style="width: 40px; height: 40px; display: inline-block; vertical-align: middle; margin-right: 8px;">
                                 Tôi là gia sư
                             </button>
                         </div>
@@ -134,7 +154,7 @@
                     </div>
                     <div class="trust-badge-item">
                         <i class="fas fa-graduation-cap"></i>
-                        <span>Hợp tác với Bộ GD&ĐT</span>
+                        <span>Hợp tác với Bộ GD&ĐT</span>11
                     </div>
                 </div>
             </div>
@@ -145,138 +165,177 @@
             <div class="container">
                 <div class="section__header">
                     <h2 class="section__title">Chúng tôi hợp tác với 80+ trường đại học và giáo dục hàng đầu</h2>
-                    <p class="section__subtitle">Đồng hành cùng các trường đại học và tổ chức giáo dục uy tín trên toàn quốc</p>
+                    <p class="section__subtitle">Đồng hành cùng các trường đại học và tổ chức giáo dục uy tín trên toàn
+                        quốc</p>
                 </div>
-                                <div class="universities__grid">
+                <div class="universities__grid">
                     <div class="logo-row row-odd">
                         <div class="logos">
                             <div class="university__card">
-                                <img src="https://cdn.haitrieu.com/wp-content/uploads/2021/12/Logo-DH-Quoc-Gia-Ha-Noi-VNU.png" alt="Đại học Quốc gia Hà Nội" class="university__logo">
+                                <img src="https://cdn.haitrieu.com/wp-content/uploads/2021/12/Logo-DH-Quoc-Gia-Ha-Noi-VNU.png"
+                                    alt="Đại học Quốc gia Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://media.loveitopcdn.com/3807/thumb/logo-dai-hoc-quoc-gia-tphcm-03.png" alt="Đại học Quốc gia TP.HCM" class="university__logo">
+                                <img src="https://media.loveitopcdn.com/3807/thumb/logo-dai-hoc-quoc-gia-tphcm-03.png"
+                                    alt="Đại học Quốc gia TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/e/ef/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg/375px-Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg.png?20210110184431" alt="Đại học Bách khoa Hà Nội" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/e/ef/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg/375px-Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg.png?20210110184431"
+                                    alt="Đại học Bách khoa Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/8e/FTU_logo_2020.png?20210401121301" alt="Đại học Ngoại thương Hà Nội" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/8e/FTU_logo_2020.png?20210401121301"
+                                    alt="Đại học Ngoại thương Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/3/30/Logo-NEU.PNG?20130619172909" alt="Đại học Kinh tế Quốc dân" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/3/30/Logo-NEU.PNG?20130619172909"
+                                    alt="Đại học Kinh tế Quốc dân" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://ulis.vnu.edu.vn/files/uploads/2024/05/ULIS-logo-2023-2048x2048.png" alt="Đại học Ngoại ngữ Hà Nội" class="university__logo">
+                                <img src="https://ulis.vnu.edu.vn/files/uploads/2024/05/ULIS-logo-2023-2048x2048.png"
+                                    alt="Đại học Ngoại ngữ Hà Nội" class="university__logo">
                             </div>
                         </div>
                         <div class="logos">
                             <div class="university__card">
-                                <img src="https://cdn.haitrieu.com/wp-content/uploads/2021/12/Logo-DH-Quoc-Gia-Ha-Noi-VNU.png" alt="Đại học Quốc gia Hà Nội" class="university__logo">
+                                <img src="https://cdn.haitrieu.com/wp-content/uploads/2021/12/Logo-DH-Quoc-Gia-Ha-Noi-VNU.png"
+                                    alt="Đại học Quốc gia Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://media.loveitopcdn.com/3807/thumb/logo-dai-hoc-quoc-gia-tphcm-03.png" alt="Đại học Quốc gia TP.HCM" class="university__logo">
+                                <img src="https://media.loveitopcdn.com/3807/thumb/logo-dai-hoc-quoc-gia-tphcm-03.png"
+                                    alt="Đại học Quốc gia TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/e/ef/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg/375px-Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg.png?20210110184431" alt="Đại học Bách khoa Hà Nội" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/e/ef/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg/375px-Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_B%C3%A1ch_Khoa_H%C3%A0_N%E1%BB%99i.svg.png?20210110184431"
+                                    alt="Đại học Bách khoa Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/8e/FTU_logo_2020.png?20210401121301" alt="Đại học Ngoại thương Hà Nội" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/8e/FTU_logo_2020.png?20210401121301"
+                                    alt="Đại học Ngoại thương Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/3/30/Logo-NEU.PNG?20130619172909" alt="Đại học Kinh tế Quốc dân" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/3/30/Logo-NEU.PNG?20130619172909"
+                                    alt="Đại học Kinh tế Quốc dân" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://ulis.vnu.edu.vn/files/uploads/2024/05/ULIS-logo-2023-2048x2048.png" alt="Đại học Ngoại ngữ Hà Nội" class="university__logo">
+                                <img src="https://ulis.vnu.edu.vn/files/uploads/2024/05/ULIS-logo-2023-2048x2048.png"
+                                    alt="Đại học Ngoại ngữ Hà Nội" class="university__logo">
                             </div>
                         </div>
                     </div>
                     <div class="logo-row row-even">
                         <div class="logos">
                             <div class="university__card">
-                                <img src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoasang.png" alt="Đại học Bách khoa TP.HCM" class="university__logo">
+                                <img src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoasang.png"
+                                    alt="Đại học Bách khoa TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://daihoc.fpt.edu.vn/wp-content/uploads/2020/01/logo.png" alt="Đại học FPT" class="university__logo">
+                                <img src="https://daihoc.fpt.edu.vn/wp-content/uploads/2020/01/logo.png"
+                                    alt="Đại học FPT" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Logo_van_lang.webp/1200px-Logo_van_lang.webp.png" alt="Đại học Văn Lang" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Logo_van_lang.webp/1200px-Logo_van_lang.webp.png"
+                                    alt="Đại học Văn Lang" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/6/6c/Logo_Dai_hoc_Can_Tho.svg/1200px-Logo_Dai_hoc_Can_Tho.svg.png" alt="Đại học Cần Thơ" class="university__logo">    
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/6/6c/Logo_Dai_hoc_Can_Tho.svg/1200px-Logo_Dai_hoc_Can_Tho.svg.png"
+                                    alt="Đại học Cần Thơ" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_H%E1%BB%8Dc_S%C6%B0_Ph%E1%BA%A1m_K%E1%BB%B9_Thu%E1%BA%ADt_TP_H%E1%BB%93_Ch%C3%AD_Minh.png" alt="Đại học Sư phạm Kỹ thuật Sơn Đông" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_H%E1%BB%8Dc_S%C6%B0_Ph%E1%BA%A1m_K%E1%BB%B9_Thu%E1%BA%ADt_TP_H%E1%BB%93_Ch%C3%AD_Minh.png"
+                                    alt="Đại học Sư phạm Kỹ thuật Sơn Đông" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://inkythuatso.com/uploads/images/2021/12/logo-dai-hoc-mo-ha-noi-inkythuatso-01-23-08-57-54.jpg" alt="Đại học Mở Hà Nội" class="university__logo">
+                                <img src="https://inkythuatso.com/uploads/images/2021/12/logo-dai-hoc-mo-ha-noi-inkythuatso-01-23-08-57-54.jpg"
+                                    alt="Đại học Mở Hà Nội" class="university__logo">
                             </div>
                         </div>
                         <div class="logos">
                             <div class="university__card">
-                                <img src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoasang.png" alt="Đại học Bách khoa TP.HCM" class="university__logo">
+                                <img src="https://hcmut.edu.vn/img/nhanDienThuongHieu/01_logobachkhoasang.png"
+                                    alt="Đại học Bách khoa TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://daihoc.fpt.edu.vn/wp-content/uploads/2020/01/logo.png" alt="Đại học FPT" class="university__logo">
+                                <img src="https://daihoc.fpt.edu.vn/wp-content/uploads/2020/01/logo.png"
+                                    alt="Đại học FPT" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Logo_van_lang.webp/1200px-Logo_van_lang.webp.png" alt="Đại học Văn Lang" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Logo_van_lang.webp/1200px-Logo_van_lang.webp.png"
+                                    alt="Đại học Văn Lang" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/6/6c/Logo_Dai_hoc_Can_Tho.svg/1200px-Logo_Dai_hoc_Can_Tho.svg.png" alt="Đại học Cần Thơ" class="university__logo">    
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/thumb/6/6c/Logo_Dai_hoc_Can_Tho.svg/1200px-Logo_Dai_hoc_Can_Tho.svg.png"
+                                    alt="Đại học Cần Thơ" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_H%E1%BB%8Dc_S%C6%B0_Ph%E1%BA%A1m_K%E1%BB%B9_Thu%E1%BA%ADt_TP_H%E1%BB%93_Ch%C3%AD_Minh.png" alt="Đại học Sư phạm Kỹ thuật Sơn Đông" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_H%E1%BB%8Dc_S%C6%B0_Ph%E1%BA%A1m_K%E1%BB%B9_Thu%E1%BA%ADt_TP_H%E1%BB%93_Ch%C3%AD_Minh.png"
+                                    alt="Đại học Sư phạm Kỹ thuật Sơn Đông" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://inkythuatso.com/uploads/images/2021/12/logo-dai-hoc-mo-ha-noi-inkythuatso-01-23-08-57-54.jpg" alt="Đại học Mở Hà Nội" class="university__logo">
+                                <img src="https://inkythuatso.com/uploads/images/2021/12/logo-dai-hoc-mo-ha-noi-inkythuatso-01-23-08-57-54.jpg"
+                                    alt="Đại học Mở Hà Nội" class="university__logo">
                             </div>
                         </div>
                     </div>
                     <div class="logo-row row-odd">
                         <div class="logos">
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_K%E1%BB%B9_thu%E1%BA%ADt_%C4%90%C3%A0_N%E1%BA%B5ng.png" alt="Đại học Sư phạm kỹ thuật Đà Nẵng" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_K%E1%BB%B9_thu%E1%BA%ADt_%C4%90%C3%A0_N%E1%BA%B5ng.png"
+                                    alt="Đại học Sư phạm kỹ thuật Đà Nẵng" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/1/1e/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_H%C3%A0_N%E1%BB%99i.png" alt="Đại học Sư phạm Hà Nội" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/1/1e/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_H%C3%A0_N%E1%BB%99i.png"
+                                    alt="Đại học Sư phạm Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Logo_UEH_xanh.png/1200px-Logo_UEH_xanh.png" alt="Đại học Kinh tế TP.HCM" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Logo_UEH_xanh.png/1200px-Logo_UEH_xanh.png"
+                                    alt="Đại học Kinh tế TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQslgzKO1ppyxLra6GhJxlfu3hmqeF4qMhGhw&s" alt="Đại học Sư phạm Đà Nẵng" class="university__logo">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQslgzKO1ppyxLra6GhJxlfu3hmqeF4qMhGhw&s"
+                                    alt="Đại học Sư phạm Đà Nẵng" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Logo_dhbkdn.jpg" alt="Đại học Bách khoa Đà Nẵng" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Logo_dhbkdn.jpg"
+                                    alt="Đại học Bách khoa Đà Nẵng" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/81/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_C%C3%B4ng_ngh%E1%BB%87_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.png" alt="Đại học Công nghệ TP.HCM" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/81/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_C%C3%B4ng_ngh%E1%BB%87_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.png"
+                                    alt="Đại học Công nghệ TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/RMIT_University_Logo.svg" alt="Đại học RMIT" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/RMIT_University_Logo.svg"
+                                    alt="Đại học RMIT" class="university__logo">
                             </div>
                         </div>
                         <div class="logos">
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_K%E1%BB%B9_thu%E1%BA%ADt_%C4%90%C3%A0_N%E1%BA%B5ng.png" alt="Đại học Sư phạm kỹ thuật Đà Nẵng" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Logo_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_K%E1%BB%B9_thu%E1%BA%ADt_%C4%90%C3%A0_N%E1%BA%B5ng.png"
+                                    alt="Đại học Sư phạm kỹ thuật Đà Nẵng" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/1/1e/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_H%C3%A0_N%E1%BB%99i.png" alt="Đại học Sư phạm Hà Nội" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/1/1e/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_S%C6%B0_ph%E1%BA%A1m_H%C3%A0_N%E1%BB%99i.png"
+                                    alt="Đại học Sư phạm Hà Nội" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Logo_UEH_xanh.png/1200px-Logo_UEH_xanh.png" alt="Đại học Kinh tế TP.HCM" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Logo_UEH_xanh.png/1200px-Logo_UEH_xanh.png"
+                                    alt="Đại học Kinh tế TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQslgzKO1ppyxLra6GhJxlfu3hmqeF4qMhGhw&s" alt="Đại học Sư phạm Đà Nẵng" class="university__logo">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQslgzKO1ppyxLra6GhJxlfu3hmqeF4qMhGhw&s"
+                                    alt="Đại học Sư phạm Đà Nẵng" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Logo_dhbkdn.jpg" alt="Đại học Bách khoa Đà Nẵng" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Logo_dhbkdn.jpg"
+                                    alt="Đại học Bách khoa Đà Nẵng" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/81/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_C%C3%B4ng_ngh%E1%BB%87_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.png" alt="Đại học Công nghệ TP.HCM" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/8/81/Logo_Tr%C6%B0%E1%BB%9Dng_%C4%90%E1%BA%A1i_h%E1%BB%8Dc_C%C3%B4ng_ngh%E1%BB%87_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.png"
+                                    alt="Đại học Công nghệ TP.HCM" class="university__logo">
                             </div>
                             <div class="university__card">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/RMIT_University_Logo.svg" alt="Đại học RMIT" class="university__logo">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/RMIT_University_Logo.svg"
+                                    alt="Đại học RMIT" class="university__logo">
                             </div>
                         </div>
                     </div>
@@ -288,88 +347,95 @@
             </div>
         </section>
 
-        <!-- HOW IT WORKS SECTION - PROFESSIONAL VERSION -->
-<section class="how-it-works" id="how-it-works">
-    <div class="container">
-        <div class="section__header">
-            <span class="section__badge">Quy trình</span>
-            <h2 class="section__title">Cách hoạt động</h2>
-            <p class="section__subtitle">3 bước đơn giản để bắt đầu hành trình học tập hiệu quả</p>
-        </div>
-        
-        <div class="steps">
-            <div class="step" data-step="1" onclick="showRegisterModal()">
-                <div class="step__icon-wrapper">
-                    <div class="step__icon">
-                        <img src="assets/images/logo/register.png" alt="Đăng ký tài khoản">
-                    </div>
-                    <div class="step__number">01</div>
+        <!-- HOW IT WORKS SECTION - PROFESSIONAL REDESIGN -->
+        <section class="how-it-works-section" id="how-it-works">
+            <div class="hiw-container">
+                <div class="hiw-header">
+                    <span class="hiw-badge">Quy trình tối ưu</span>
+                    <h2 class="hiw-title">Hành Trình Chinh Phục Tri Thức</h2>
+                    <p class="hiw-subtitle">Khám phá 3 bước đơn giản để kết nối với gia sư hàng đầu và bứt phá điểm số
+                        của bạn ngay hôm nay.</p>
                 </div>
-                <div class="step__content">
-                    <h3 class="step__title">Đăng ký miễn phí - Xác minh nhanh chóng</h3>
-                    <p class="step__description">
-                        Tạo tài khoản chỉ trong 30 giây. Hoàn thiện hồ sơ và xác minh email để đảm bảo bảo mật tuyệt đối.
-                    </p>
-                    <div class="step__features">
-                        <span class="step__feature">✓ Miễn phí 100%</span>
-                        <span class="step__feature">✓ Bảo mật cao</span>
-                    </div>
-                </div>
-                <div class="step__connector"></div>
-            </div>
 
-            <div class="step" data-step="2">
-                <div class="step__icon-wrapper">
-                    <div class="step__icon">
-                        <img src="assets/images/logo/search.png" alt="Tim kiếm gia sư">
-                    </div>
-                    <div class="step__number">02</div>
-                </div>
-                <div class="step__content">
-                    <h3 class="step__title">Tìm gia sư phù hợp - Lọc thông minh</h3>
-                    <p class="step__description">
-                        Sử dụng bộ lọc để tìm gia sư gần nhất. Xem profile chi tiết, đánh giá thực và liên hệ trực tiếp.
-                    </p>
-                    <div class="step__features">
-                        <span class="step__feature">✓ Lọc thông minh</span>
-                        <span class="step__feature">✓ Đánh giá thực</span>
-                    </div>
-                </div>
-                <div class="step__connector"></div>
-            </div>
+                <div class="hiw-steps">
+                    <div class="hiw-line"></div>
 
-            <div class="step" data-step="3">
-                <div class="step__icon-wrapper">
-                    <div class="step__icon">
-                        <img src="assets/images/logo/payment.png" alt="Bắt đầu học">
+                    <!-- Step 1 -->
+                    <div class="hiw-step">
+                        <div class="hiw-content">
+                            <div class="hiw-number">01</div>
+                            <h3 class="hiw-step-title">Đăng Ký & Xác Thực</h3>
+                            <p class="hiw-step-desc">Tạo tài khoản miễn phí chỉ trong 30 giây. Hệ thống xác thực thông
+                                minh đảm bảo an toàn và bảo mật tuyệt đối cho cộng đồng.</p>
+                            <div class="hiw-features">
+                                <span class="hiw-feature"><i class="fas fa-check-circle"></i> Miễn phí 100%</span>
+                                <span class="hiw-feature"><i class="fas fa-shield-alt"></i> Bảo mật cao</span>
+                            </div>
+                        </div>
+                        <div class="hiw-node"></div>
+                        <div class="hiw-visual">
+                            <div class="hiw-icon-circle">
+                                <img src="assets/images/logo/register.png" alt="Đăng ký">
+                            </div>
+                        </div>
                     </div>
-                    <div class="step__number">03</div>
+
+                    <!-- Step 2 -->
+                    <div class="hiw-step">
+                        <div class="hiw-content">
+                            <div class="hiw-number">02</div>
+                            <h3 class="hiw-step-title">Tìm Kiếm & Kết Nối</h3>
+                            <p class="hiw-step-desc">Sử dụng bộ lọc AI để tìm gia sư phù hợp nhất. Xem hồ sơ chi tiết,
+                                đánh giá thực tế và kết nối trực tiếp không qua trung gian.</p>
+                            <div class="hiw-features">
+                                <span class="hiw-feature"><i class="fas fa-search"></i> Lọc thông minh</span>
+                                <span class="hiw-feature"><i class="fas fa-star"></i> Đánh giá thực</span>
+                            </div>
+                        </div>
+                        <div class="hiw-node"></div>
+                        <div class="hiw-visual">
+                            <div class="hiw-icon-circle">
+                                <img src="assets/images/logo/search.png" alt="Tìm kiếm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="hiw-step">
+                        <div class="hiw-content">
+                            <div class="hiw-number">03</div>
+                            <h3 class="hiw-step-title">Học Tập & Thanh Toán</h3>
+                            <p class="hiw-step-desc">Thống nhất lịch học linh hoạt. Thanh toán an toàn qua cổng bảo mật
+                                và bắt đầu hành trình bứt phá điểm số ngay lập tức.</p>
+                            <div class="hiw-features">
+                                <span class="hiw-feature"><i class="fas fa-calendar-alt"></i> Lịch linh hoạt</span>
+                                <span class="hiw-feature"><i class="fas fa-lock"></i> Thanh toán an toàn</span>
+                            </div>
+                        </div>
+                        <div class="hiw-node"></div>
+                        <div class="hiw-visual">
+                            <div class="hiw-icon-circle">
+                                <img src="assets/images/logo/payment.png" alt="Thanh toán">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="step__content">
-                    <h3 class="step__title">Bắt đầu học - Thanh toán an toàn</h3>
-                    <p class="step__description">
-                        Thống nhất lịch học linh hoạt, thanh toán bảo mật và bắt đầu hành trình học tập hiệu quả ngay.
-                    </p>
-                    <div class="step__features">
-                        <span class="step__feature">✓ Lịch linh hoạt</span>
-                        <span class="step__feature">✓ Thanh toán an toàn</span>
-                    </div>
+
+                <div class="hiw-cta">
+                    <button class="hiw-btn-primary" onclick="showRegisterModal()">
+                        Bắt Đầu Hành Trình Ngay <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <div class="how-it-works__cta">
-            <button class="btn-primary" onclick="showRegisterModal()">Bắt đầu ngay</button>
-            <a href="#contact" class="btn-secondary">Tìm hiểu thêm</a>
-        </div>
-    </div>
+        </section>
 
         <!-- Certificates Section -->
         <section class="certificates" id="certificates">
             <div class="container">
                 <div class="section__header">
                     <h2 class="section__title">Các Chứng Chỉ Nổi Bật Khi Tham Gia TutorMis</h2>
-                    <p class="section__subtitle">Được công nhận và khen thưởng cho những đóng góp và thành tích xuất sắc của bạn</p>
+                    <p class="section__subtitle">Được công nhận và khen thưởng cho những đóng góp và thành tích xuất sắc
+                        của bạn</p>
                 </div>
                 <div class="swiper certificates__swiper">
                     <div class="swiper-wrapper">
@@ -377,7 +443,8 @@
                             <div class="certificate__card">
                                 <h3 class="certificate__title">Gia Sư Xuất Sắc</h3>
                                 <img src="assets/images/certificate/GiaSuXS.png" alt="Chứng chỉ gia sư xuất sắc">
-                                <p class="certificate__description">Chứng chỉ dành cho gia sư có điểm đánh giá cao và đóng góp tích cực cho cộng đồng học tập</p>
+                                <p class="certificate__description">Chứng chỉ dành cho gia sư có điểm đánh giá cao và
+                                    đóng góp tích cực cho cộng đồng học tập</p>
                                 <span class="certificate__count">200+ gia sư nhận được</span>
                             </div>
                         </div>
@@ -385,39 +452,48 @@
                             <div class="certificate__card">
                                 <h3 class="certificate__title">Học Viên Tiến Bộ</h3>
                                 <img src="assets/images/certificate/HocVienTienBo.png" alt="Chứng chỉ học viên tiến bộ">
-                                <p class="certificate__description">Chứng nhận cho học viên đạt được tiến bộ vượt trội trong quá trình học tập</p>
+                                <p class="certificate__description">Chứng nhận cho học viên đạt được tiến bộ vượt trội
+                                    trong quá trình học tập</p>
                                 <span class="certificate__count">500+ học viên đạt được</span>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="certificate__card">
                                 <h3 class="certificate__title">Người Chiến Thắng Cuộc Thi</h3>
-                                <img src="assets/images/certificate/ChienThangCuocThi.png" alt="Chứng chỉ người chiến thắng các cuộc thi ">
-                                <p class="certificate__description">Chứng chỉ dành cho người thắng cuộc trong các cuộc thi kiến thức do TutorMis tổ chức</p>
+                                <img src="assets/images/certificate/ChienThangCuocThi.png"
+                                    alt="Chứng chỉ người chiến thắng các cuộc thi ">
+                                <p class="certificate__description">Chứng chỉ dành cho người thắng cuộc trong các cuộc
+                                    thi kiến thức do TutorMis tổ chức</p>
                                 <span class="certificate__count">50+ người chiến thắng</span>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="certificate__card">
                                 <h3 class="certificate__title">Tham Gia Tích Cực</h3>
-                                <img src="assets/images/certificate/ThamGiaTichCuc.png" alt="Chứng chỉ tham gia tích cực">
-                                <p class="certificate__description">Chứng nhận cho những thành viên tích cực tham gia các hoạt động cộng đồng và sự kiện</p>
+                                <img src="assets/images/certificate/ThamGiaTichCuc.png"
+                                    alt="Chứng chỉ tham gia tích cực">
+                                <p class="certificate__description">Chứng nhận cho những thành viên tích cực tham gia
+                                    các hoạt động cộng đồng và sự kiện</p>
                                 <span class="certificate__count">1000+ thành viên nhận được</span>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="certificate__card">
                                 <h3 class="certificate__title">Chuyên Gia Môn Học</h3>
-                                <img src="assets/images/certificate/ChuyenGiaMonHoc.png" alt="Chứng chỉ chuyên gia môn học">
-                                <p class="certificate__description">Chứng chỉ xác nhận chuyên môn sâu về một môn học cụ thể sau khi hoàn thành các khóa đào tạo</p>
+                                <img src="assets/images/certificate/ChuyenGiaMonHoc.png"
+                                    alt="Chứng chỉ chuyên gia môn học">
+                                <p class="certificate__description">Chứng chỉ xác nhận chuyên môn sâu về một môn học cụ
+                                    thể sau khi hoàn thành các khóa đào tạo</p>
                                 <span class="certificate__count">150+ chuyên gia</span>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <div class="certificate__card">
                                 <h3 class="certificate__title">Đóng Góp Cộng Đồng</h3>
-                                <img src="assets/images/certificate/DongGopCongDong.png" alt="Chứng chỉ đóng góp cộng đồng ">
-                                <p class="certificate__description">Chứng nhận cho những đóng góp ý nghĩa cho cộng đồng TutorMis và giáo dục</p>
+                                <img src="assets/images/certificate/DongGopCongDong.png"
+                                    alt="Chứng chỉ đóng góp cộng đồng ">
+                                <p class="certificate__description">Chứng nhận cho những đóng góp ý nghĩa cho cộng đồng
+                                    TutorMis và giáo dục</p>
                                 <span class="certificate__count">300+ đóng góp viên</span>
                             </div>
                         </div>
@@ -441,7 +517,8 @@
                 <div class="tutors__row1">
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://cdn-i.vtcnews.vn/resize/th/upload/2025/09/09/pho-giao-su-10464589.png" alt="Gia sư Hồ Viết Dũng">
+                            <img src="https://cdn-i.vtcnews.vn/resize/th/upload/2025/09/09/pho-giao-su-10464589.png"
+                                alt="Gia sư Hồ Viết Dũng">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Hồ Viết Dũng</h3>
@@ -459,7 +536,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-chan-dung-co-giao-thay-giao-giao-vien-o-ha-noi-studio-yeu-media-phuc-vu-nha-truong-school-08.jpg?v=1612760881463" alt="Gia sư Trần Thị Bích Thủy">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-chan-dung-co-giao-thay-giao-giao-vien-o-ha-noi-studio-yeu-media-phuc-vu-nha-truong-school-08.jpg?v=1612760881463"
+                                alt="Gia sư Trần Thị Bích Thủy">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Trần Thị Bích Thủy</h3>
@@ -495,7 +573,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/11/7/screenshot-2024-11-07-114847-68003.png?width=0&s=UwLy7Wgq5Mx6FzQKlQJOhA" alt="Gia sư Nguyễn Thị Lan">
+                            <img src="https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/11/7/screenshot-2024-11-07-114847-68003.png?width=0&s=UwLy7Wgq5Mx6FzQKlQJOhA"
+                                alt="Gia sư Nguyễn Thị Lan">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Nguyễn Thị Lan</h3>
@@ -513,7 +592,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://danviet.ex-cdn.com/files/f1/296231569849192448/2022/1/12/bach-khoa-1-docx-1612941731952-2481-1641968737592-1641968738905332571471.jpeg" alt="Gia sư Trần Văn Minh">
+                            <img src="https://danviet.ex-cdn.com/files/f1/296231569849192448/2022/1/12/bach-khoa-1-docx-1612941731952-2481-1641968737592-1641968738905332571471.jpeg"
+                                alt="Gia sư Trần Văn Minh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Trần Văn Minh</h3>
@@ -531,7 +611,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://cafefcdn.com/203337114487263232/2023/8/5/img2509-1691140538916777218478-1691194278981-16911942791821515686834.jpg" alt="Gia sư Lê Thị Mai">
+                            <img src="https://cafefcdn.com/203337114487263232/2023/8/5/img2509-1691140538916777218478-1691194278981-16911942791821515686834.jpg"
+                                alt="Gia sư Lê Thị Mai">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Lê Thị Mai</h3>
@@ -550,7 +631,8 @@
                     <!-- Duplicate for infinite scroll -->
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://cdn-i.vtcnews.vn/resize/th/upload/2025/09/09/pho-giao-su-10464589.png" alt="Gia sư Hồ Viết Dũng">
+                            <img src="https://cdn-i.vtcnews.vn/resize/th/upload/2025/09/09/pho-giao-su-10464589.png"
+                                alt="Gia sư Hồ Viết Dũng">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Hồ Viết Dũng</h3>
@@ -568,7 +650,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-chan-dung-co-giao-thay-giao-giao-vien-o-ha-noi-studio-yeu-media-phuc-vu-nha-truong-school-08.jpg?v=1612760881463" alt="Gia sư Trần Thị Bích Thủy">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-chan-dung-co-giao-thay-giao-giao-vien-o-ha-noi-studio-yeu-media-phuc-vu-nha-truong-school-08.jpg?v=1612760881463"
+                                alt="Gia sư Trần Thị Bích Thủy">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Trần Thị Bích Thủy</h3>
@@ -604,7 +687,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/11/7/screenshot-2024-11-07-114847-68003.png?width=0&s=UwLy7Wgq5Mx6FzQKlQJOhA" alt="Gia sư Nguyễn Thị Lan">
+                            <img src="https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/11/7/screenshot-2024-11-07-114847-68003.png?width=0&s=UwLy7Wgq5Mx6FzQKlQJOhA"
+                                alt="Gia sư Nguyễn Thị Lan">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Nguyễn Thị Lan</h3>
@@ -622,7 +706,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://danviet.ex-cdn.com/files/f1/296231569849192448/2022/1/12/bach-khoa-1-docx-1612941731952-2481-1641968737592-1641968738905332571471.jpeg" alt="Gia sư Trần Văn Minh">
+                            <img src="https://danviet.ex-cdn.com/files/f1/296231569849192448/2022/1/12/bach-khoa-1-docx-1612941731952-2481-1641968737592-1641968738905332571471.jpeg"
+                                alt="Gia sư Trần Văn Minh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Trần Văn Minh</h3>
@@ -640,7 +725,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://cafefcdn.com/203337114487263232/2023/8/5/img2509-1691140538916777218478-1691194278981-16911942791821515686834.jpg" alt="Gia sư Lê Thị Mai">
+                            <img src="https://cafefcdn.com/203337114487263232/2023/8/5/img2509-1691140538916777218478-1691194278981-16911942791821515686834.jpg"
+                                alt="Gia sư Lê Thị Mai">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Lê Thị Mai</h3>
@@ -660,7 +746,8 @@
                 <div class="tutors__row2">
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://ss-images.saostar.vn/wp700/2019/01/24/4500761/3.jpg" alt="Gia sư Phạm Quốc Anh">
+                            <img src="https://ss-images.saostar.vn/wp700/2019/01/24/4500761/3.jpg"
+                                alt="Gia sư Phạm Quốc Anh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Phạm Quốc Anh</h3>
@@ -678,7 +765,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://photo.znews.vn/w660/Uploaded/ofh_btgazspf/2020_05_15/29597928_10155165050996949_186901651400465378_n.jpg" alt="Gia sư Hoàng Thị Linh">
+                            <img src="https://photo.znews.vn/w660/Uploaded/ofh_btgazspf/2020_05_15/29597928_10155165050996949_186901651400465378_n.jpg"
+                                alt="Gia sư Hoàng Thị Linh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Hoàng Thị Linh</h3>
@@ -696,7 +784,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://channel.mediacdn.vn/428462621602512896/2023/7/25/photo-4-16902795974311173597142.jpg" alt="Gia sư Đỗ Minh Tuấn">
+                            <img src="https://channel.mediacdn.vn/428462621602512896/2023/7/25/photo-4-16902795974311173597142.jpg"
+                                alt="Gia sư Đỗ Minh Tuấn">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Đỗ Minh Tuấn</h3>
@@ -714,7 +803,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-giang-vien-giao-vien-trung-tam-dao-tao-lam-profile-website-quang-cao-03.jpg?v=1599634947027" alt="Gia sư Bùi Thị Hương">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-giang-vien-giao-vien-trung-tam-dao-tao-lam-profile-website-quang-cao-03.jpg?v=1599634947027"
+                                alt="Gia sư Bùi Thị Hương">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Bùi Thị Hương</h3>
@@ -732,7 +822,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://ht.edu.vn/wp-content/uploads/2023/05/325896371_1172206643413360_2832689520362645936_n-e1683810244954.jpg" alt="Gia sư Vũ Văn Đức">
+                            <img src="https://ht.edu.vn/wp-content/uploads/2023/05/325896371_1172206643413360_2832689520362645936_n-e1683810244954.jpg"
+                                alt="Gia sư Vũ Văn Đức">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Vũ Văn Đức</h3>
@@ -750,7 +841,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://cdn.pixabay.com/photo/2025/02/20/12/48/ai-generated-9419886_640.jpg" alt="Gia sư Nguyễn Minh Anh">
+                            <img src="https://cdn.pixabay.com/photo/2025/02/20/12/48/ai-generated-9419886_640.jpg"
+                                alt="Gia sư Nguyễn Minh Anh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Nguyễn Minh Anh</h3>
@@ -769,7 +861,8 @@
                     <!-- Duplicate for infinite scroll -->
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://ss-images.saostar.vn/wp700/2019/01/24/4500761/3.jpg" alt="Gia sư Phạm Quốc Anh">
+                            <img src="https://ss-images.saostar.vn/wp700/2019/01/24/4500761/3.jpg"
+                                alt="Gia sư Phạm Quốc Anh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Phạm Quốc Anh</h3>
@@ -787,7 +880,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://photo.znews.vn/w660/Uploaded/ofh_btgazspf/2020_05_15/29597928_10155165050996949_186901651400465378_n.jpg" alt="Gia sư Hoàng Thị Linh">
+                            <img src="https://photo.znews.vn/w660/Uploaded/ofh_btgazspf/2020_05_15/29597928_10155165050996949_186901651400465378_n.jpg"
+                                alt="Gia sư Hoàng Thị Linh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Hoàng Thị Linh</h3>
@@ -805,7 +899,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://channel.mediacdn.vn/428462621602512896/2023/7/25/photo-4-16902795974311173597142.jpg" alt="Gia sư Đỗ Minh Tuấn">
+                            <img src="https://channel.mediacdn.vn/428462621602512896/2023/7/25/photo-4-16902795974311173597142.jpg"
+                                alt="Gia sư Đỗ Minh Tuấn">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Đỗ Minh Tuấn</h3>
@@ -823,7 +918,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-giang-vien-giao-vien-trung-tam-dao-tao-lam-profile-website-quang-cao-03.jpg?v=1599634947027" alt="Gia sư Bùi Thị Hương">
+                            <img src="https://bizweb.dktcdn.net/100/175/849/files/chup-anh-giang-vien-giao-vien-trung-tam-dao-tao-lam-profile-website-quang-cao-03.jpg?v=1599634947027"
+                                alt="Gia sư Bùi Thị Hương">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Bùi Thị Hương</h3>
@@ -841,7 +937,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://ht.edu.vn/wp-content/uploads/2023/05/325896371_1172206643413360_2832689520362645936_n-e1683810244954.jpg" alt="Gia sư Vũ Văn Đức">
+                            <img src="https://ht.edu.vn/wp-content/uploads/2023/05/325896371_1172206643413360_2832689520362645936_n-e1683810244954.jpg"
+                                alt="Gia sư Vũ Văn Đức">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Thầy Vũ Văn Đức</h3>
@@ -859,7 +956,8 @@
                     </div>
                     <div class="tutor__card">
                         <div class="tutor__avatar">
-                            <img src="https://cdn.pixabay.com/photo/2025/02/20/12/48/ai-generated-9419886_640.jpg" alt="Gia sư Nguyễn Minh Anh">
+                            <img src="https://cdn.pixabay.com/photo/2025/02/20/12/48/ai-generated-9419886_640.jpg"
+                                alt="Gia sư Nguyễn Minh Anh">
                         </div>
                         <div class="tutor__info">
                             <h3 class="tutor__name">Cô Nguyễn Minh Anh</h3>
@@ -889,8 +987,9 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Con tôi đã tiến bộ vượt bậc môn Toán chỉ sau 1 tháng học cùng gia sư trên TutorMis. 
-                                Gia sư rất tận tâm và phương pháp dạy rất hiệu quả. Nền tảng rất dễ sử dụng và đáng tin cậy."
+                                "Con tôi đã tiến bộ vượt bậc môn Toán chỉ sau 1 tháng học cùng gia sư trên TutorMis.
+                                Gia sư rất tận tâm và phương pháp dạy rất hiệu quả. Nền tảng rất dễ sử dụng và đáng tin
+                                cậy."
                             </p>
                             <div class="testimonial__rating">
                                 <i class="fas fa-star"></i>
@@ -901,7 +1000,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://vwu.vn/documents/20182/3244000/10_Dec_2021_141142_GMTucmy.jpg/d17e017b-cf4c-4565-8b75-bfa2358fcea9" alt="Chị Lan Anh" class="testimonial__avatar">
+                            <img src="https://vwu.vn/documents/20182/3244000/10_Dec_2021_141142_GMTucmy.jpg/d17e017b-cf4c-4565-8b75-bfa2358fcea9"
+                                alt="Chị Lan Anh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chị Lan Anh</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 9</p>
@@ -911,7 +1011,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Tôi đã cải thiện điểm Tiếng Anh từ 6.0 lên 7.5 IELTS chỉ trong 2 tháng nhờ gia sư trên TutorMis. 
+                                "Tôi đã cải thiện điểm Tiếng Anh từ 6.0 lên 7.5 IELTS chỉ trong 2 tháng nhờ gia sư trên
+                                TutorMis.
                                 Gia sư rất chuyên nghiệp và lịch học linh hoạt. Rất hài lòng với dịch vụ!"
                             </p>
                             <div class="testimonial__rating">
@@ -923,7 +1024,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://cdn.tuoitrethudo.vn/stores/news_dataimages/2024/032024/13/22/chang-sinh-vien-120240313220913.jpg?rt=20240313220922" alt="Anh Minh" class="testimonial__avatar">
+                            <img src="https://cdn.tuoitrethudo.vn/stores/news_dataimages/2024/032024/13/22/chang-sinh-vien-120240313220913.jpg?rt=20240313220922"
+                                alt="Anh Minh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Anh Minh</h4>
                                 <p class="testimonial__role">Sinh viên năm 3</p>
@@ -933,8 +1035,9 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Gia sư Hóa học trên TutorMis giúp con tôi đạt giải trong kỳ thi học sinh giỏi. 
-                                Gia sư có kinh nghiệm và phương pháp dạy rất khoa học. Cảm ơn TutorMis đã kết nối chúng tôi!"
+                                "Gia sư Hóa học trên TutorMis giúp con tôi đạt giải trong kỳ thi học sinh giỏi.
+                                Gia sư có kinh nghiệm và phương pháp dạy rất khoa học. Cảm ơn TutorMis đã kết nối chúng
+                                tôi!"
                             </p>
                             <div class="testimonial__rating">
                                 <i class="fas fa-star"></i>
@@ -945,7 +1048,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://pepsilan.com/wp-content/uploads/2022/12/full-bo-anh-dan-ong-trung-nien-viet-nam-dep-nhat-vn-1.jpg" alt="Chú Thành" class="testimonial__avatar">
+                            <img src="https://pepsilan.com/wp-content/uploads/2022/12/full-bo-anh-dan-ong-trung-nien-viet-nam-dep-nhat-vn-1.jpg"
+                                alt="Chú Thành" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chú Thành</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 11</p>
@@ -955,7 +1059,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "TutorMis giúp tôi tìm được gia sư Tiếng Pháp xuất sắc. Chỉ sau 3 tháng, tôi đã có thể giao tiếp cơ bản. 
+                                "TutorMis giúp tôi tìm được gia sư Tiếng Pháp xuất sắc. Chỉ sau 3 tháng, tôi đã có thể
+                                giao tiếp cơ bản.
                                 Gia sư rất kiên nhẫn và phương pháp dạy rất thú vị. Khuyến khích mọi người sử dụng!"
                             </p>
                             <div class="testimonial__rating">
@@ -967,7 +1072,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://giadinh.mediacdn.vn/2017/photo-0-1509607329029.jpg" alt="Cô Mai" class="testimonial__avatar">
+                            <img src="https://giadinh.mediacdn.vn/2017/photo-0-1509607329029.jpg" alt="Cô Mai"
+                                class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Cô Mai</h4>
                                 <p class="testimonial__role">Nhân viên văn phòng</p>
@@ -977,7 +1083,7 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Con trai tôi học kém môn Lý, nhưng nhờ gia sư trên TutorMis, điểm số cải thiện đáng kể. 
+                                "Con trai tôi học kém môn Lý, nhưng nhờ gia sư trên TutorMis, điểm số cải thiện đáng kể.
                                 Gia sư giải thích rất dễ hiểu và tạo động lực học tập cho con. Cảm ơn TutorMis!"
                             </p>
                             <div class="testimonial__rating">
@@ -989,7 +1095,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://channel.mediacdn.vn/2021/1/14/photo-1-1610602796546963495282.jpg" alt="Chị Linh" class="testimonial__avatar">
+                            <img src="https://channel.mediacdn.vn/2021/1/14/photo-1-1610602796546963495282.jpg"
+                                alt="Chị Linh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chị Linh</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 10</p>
@@ -999,7 +1106,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Tôi là sinh viên IT, cần ôn lại kiến thức cơ bản. Gia sư trên TutorMis rất am hiểu và dạy rất chi tiết. 
+                                "Tôi là sinh viên IT, cần ôn lại kiến thức cơ bản. Gia sư trên TutorMis rất am hiểu và
+                                dạy rất chi tiết.
                                 Học phí hợp lý và lịch học linh hoạt. Rất hài lòng với trải nghiệm!"
                             </p>
                             <div class="testimonial__rating">
@@ -1011,7 +1119,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://photo.znews.vn/w660/Uploaded/hointt/2024_11_30/z6080162402916_1ca24423e857d4ae3ccc34e68d39d12f_116505.jpg" alt="Anh Khoa" class="testimonial__avatar">
+                            <img src="https://photo.znews.vn/w660/Uploaded/hointt/2024_11_30/z6080162402916_1ca24423e857d4ae3ccc34e68d39d12f_116505.jpg"
+                                alt="Anh Khoa" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Anh Khoa</h4>
                                 <p class="testimonial__role">Sinh viên năm 2 CNTT</p>
@@ -1021,8 +1130,9 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Gia sư Ngữ văn trên TutorMis giúp con tôi yêu thích môn học này hơn. 
-                                Gia sư không chỉ dạy kiến thức mà còn truyền cảm hứng. Điểm Văn của con tăng từ 6 lên 8.5!"
+                                "Gia sư Ngữ văn trên TutorMis giúp con tôi yêu thích môn học này hơn.
+                                Gia sư không chỉ dạy kiến thức mà còn truyền cảm hứng. Điểm Văn của con tăng từ 6 lên
+                                8.5!"
                             </p>
                             <div class="testimonial__rating">
                                 <i class="fas fa-star"></i>
@@ -1033,7 +1143,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://giadinh.mediacdn.vn/zoom/740_463/2017/nusinh1-1510734837497-1510798135145.jpg" alt="Chị Hương" class="testimonial__avatar">
+                            <img src="https://giadinh.mediacdn.vn/zoom/740_463/2017/nusinh1-1510734837497-1510798135145.jpg"
+                                alt="Chị Hương" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chị Hương</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 12</p>
@@ -1043,7 +1154,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Tôi học gia sư Toán cao cấp để chuẩn bị thi đại học. Gia sư rất giỏi và dạy rất có hệ thống. 
+                                "Tôi học gia sư Toán cao cấp để chuẩn bị thi đại học. Gia sư rất giỏi và dạy rất có hệ
+                                thống.
                                 Nhờ vậy mà tôi tự tin hơn với môn thi. TutorMis là lựa chọn tuyệt vời!"
                             </p>
                             <div class="testimonial__rating">
@@ -1055,7 +1167,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://icdn.dantri.com.vn/thumb_w/960/2018/10/6/minh-tuyen-top18-miss-teen-1-1538763544844454673946.jpg" alt="Em Lan" class="testimonial__avatar">
+                            <img src="https://icdn.dantri.com.vn/thumb_w/960/2018/10/6/minh-tuyen-top18-miss-teen-1-1538763544844454673946.jpg"
+                                alt="Em Lan" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Em Lan</h4>
                                 <p class="testimonial__role">Học sinh lớp 12</p>
@@ -1065,7 +1178,7 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Gia sư Sinh học trên TutorMis giúp tôi hiểu rõ hơn về các quá trình sống. 
+                                "Gia sư Sinh học trên TutorMis giúp tôi hiểu rõ hơn về các quá trình sống.
                                 Gia sư có cách giảng dạy rất sinh động và dễ nhớ. Điểm Sinh của tôi cải thiện đáng kể!"
                             </p>
                             <div class="testimonial__rating">
@@ -1077,7 +1190,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://images2.thanhnien.vn/528068263637045248/2024/5/7/1-17150696746752126116094.jpg" alt="Anh Tùng" class="testimonial__avatar">
+                            <img src="https://images2.thanhnien.vn/528068263637045248/2024/5/7/1-17150696746752126116094.jpg"
+                                alt="Anh Tùng" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Anh Tùng</h4>
                                 <p class="testimonial__role">Sinh viên năm 1 Y khoa</p>
@@ -1087,7 +1201,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "TutorMis giúp tôi tìm gia sư Tiếng Trung nhanh chóng. Gia sư là người bản xứ và dạy rất chuyên nghiệp. 
+                                "TutorMis giúp tôi tìm gia sư Tiếng Trung nhanh chóng. Gia sư là người bản xứ và dạy rất
+                                chuyên nghiệp.
                                 Tôi đã có thể nói chuyện cơ bản sau 2 tháng. Dịch vụ rất tốt!"
                             </p>
                             <div class="testimonial__rating">
@@ -1099,7 +1214,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://studiochupanhdep.com/Upload/Images/Album/chan-dung-beauty-05.jpg" alt="Chị Nga" class="testimonial__avatar">
+                            <img src="https://studiochupanhdep.com/Upload/Images/Album/chan-dung-beauty-05.jpg"
+                                alt="Chị Nga" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chị Nga</h4>
                                 <p class="testimonial__role">Nhân viên kinh doanh</p>
@@ -1110,8 +1226,9 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Con tôi đã tiến bộ vượt bậc môn Toán chỉ sau 1 tháng học cùng gia sư trên TutorMis. 
-                                Gia sư rất tận tâm và phương pháp dạy rất hiệu quả. Nền tảng rất dễ sử dụng và đáng tin cậy."
+                                "Con tôi đã tiến bộ vượt bậc môn Toán chỉ sau 1 tháng học cùng gia sư trên TutorMis.
+                                Gia sư rất tận tâm và phương pháp dạy rất hiệu quả. Nền tảng rất dễ sử dụng và đáng tin
+                                cậy."
                             </p>
                             <div class="testimonial__rating">
                                 <i class="fas fa-star"></i>
@@ -1122,7 +1239,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://vwu.vn/documents/20182/3244000/10_Dec_2021_141142_GMTucmy.jpg/d17e017b-cf4c-4565-8b75-bfa2358fcea9" alt="Chị Lan Anh" class="testimonial__avatar">
+                            <img src="https://vwu.vn/documents/20182/3244000/10_Dec_2021_141142_GMTucmy.jpg/d17e017b-cf4c-4565-8b75-bfa2358fcea9"
+                                alt="Chị Lan Anh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chị Lan Anh</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 9</p>
@@ -1132,7 +1250,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Tôi đã cải thiện điểm Tiếng Anh từ 6.0 lên 7.5 IELTS chỉ trong 2 tháng nhờ gia sư trên TutorMis. 
+                                "Tôi đã cải thiện điểm Tiếng Anh từ 6.0 lên 7.5 IELTS chỉ trong 2 tháng nhờ gia sư trên
+                                TutorMis.
                                 Gia sư rất chuyên nghiệp và lịch học linh hoạt. Rất hài lòng với dịch vụ!"
                             </p>
                             <div class="testimonial__rating">
@@ -1144,7 +1263,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://cdn.tuoitrethudo.vn/stores/news_dataimages/2024/032024/13/22/chang-sinh-vien-120240313220913.jpg?rt=20240313220922" alt="Anh Minh" class="testimonial__avatar">
+                            <img src="https://cdn.tuoitrethudo.vn/stores/news_dataimages/2024/032024/13/22/chang-sinh-vien-120240313220913.jpg?rt=20240313220922"
+                                alt="Anh Minh" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Anh Minh</h4>
                                 <p class="testimonial__role">Sinh viên năm 3</p>
@@ -1154,8 +1274,9 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Gia sư Hóa học trên TutorMis giúp con tôi đạt giải trong kỳ thi học sinh giỏi. 
-                                Gia sư có kinh nghiệm và phương pháp dạy rất khoa học. Cảm ơn TutorMis đã kết nối chúng tôi!"
+                                "Gia sư Hóa học trên TutorMis giúp con tôi đạt giải trong kỳ thi học sinh giỏi.
+                                Gia sư có kinh nghiệm và phương pháp dạy rất khoa học. Cảm ơn TutorMis đã kết nối chúng
+                                tôi!"
                             </p>
                             <div class="testimonial__rating">
                                 <i class="fas fa-star"></i>
@@ -1166,7 +1287,8 @@
                             </div>
                         </div>
                         <div class="testimonial__author">
-                            <img src="https://pepsilan.com/wp-content/uploads/2022/12/full-bo-anh-dan-ong-trung-nien-viet-nam-dep-nhat-vn-1.jpg" alt="Chú Thành" class="testimonial__avatar">
+                            <img src="https://pepsilan.com/wp-content/uploads/2022/12/full-bo-anh-dan-ong-trung-nien-viet-nam-dep-nhat-vn-1.jpg"
+                                alt="Chú Thành" class="testimonial__avatar">
                             <div class="testimonial__info">
                                 <h4 class="testimonial__name">Chú Thành</h4>
                                 <p class="testimonial__role">Phụ huynh học sinh lớp 11</p>
@@ -1176,7 +1298,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "TutorMis giúp tôi tìm được gia sư Tiếng Pháp xuất sắc. Chỉ sau 3 tháng, tôi đã có thể giao tiếp cơ bản. 
+                                "TutorMis giúp tôi tìm được gia sư Tiếng Pháp xuất sắc. Chỉ sau 3 tháng, tôi đã có thể
+                                giao tiếp cơ bản.
                                 Gia sư rất kiên nhẫn và phương pháp dạy rất thú vị. Khuyến khích mọi người sử dụng!"
                             </p>
                             <div class="testimonial__rating">
@@ -1198,7 +1321,7 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Con trai tôi học kém môn Lý, nhưng nhờ gia sư trên TutorMis, điểm số cải thiện đáng kể. 
+                                "Con trai tôi học kém môn Lý, nhưng nhờ gia sư trên TutorMis, điểm số cải thiện đáng kể.
                                 Gia sư giải thích rất dễ hiểu và tạo động lực học tập cho con. Cảm ơn TutorMis!"
                             </p>
                             <div class="testimonial__rating">
@@ -1220,7 +1343,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Tôi là sinh viên IT, cần ôn lại kiến thức cơ bản. Gia sư trên TutorMis rất am hiểu và dạy rất chi tiết. 
+                                "Tôi là sinh viên IT, cần ôn lại kiến thức cơ bản. Gia sư trên TutorMis rất am hiểu và
+                                dạy rất chi tiết.
                                 Học phí hợp lý và lịch học linh hoạt. Rất hài lòng với trải nghiệm!"
                             </p>
                             <div class="testimonial__rating">
@@ -1242,8 +1366,9 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Gia sư Ngữ văn trên TutorMis giúp con tôi yêu thích môn học này hơn. 
-                                Gia sư không chỉ dạy kiến thức mà còn truyền cảm hứng. Điểm Văn của con tăng từ 6 lên 8.5!"
+                                "Gia sư Ngữ văn trên TutorMis giúp con tôi yêu thích môn học này hơn.
+                                Gia sư không chỉ dạy kiến thức mà còn truyền cảm hứng. Điểm Văn của con tăng từ 6 lên
+                                8.5!"
                             </p>
                             <div class="testimonial__rating">
                                 <i class="fas fa-star"></i>
@@ -1264,7 +1389,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Tôi học gia sư Toán cao cấp để chuẩn bị thi đại học. Gia sư rất giỏi và dạy rất có hệ thống. 
+                                "Tôi học gia sư Toán cao cấp để chuẩn bị thi đại học. Gia sư rất giỏi và dạy rất có hệ
+                                thống.
                                 Nhờ vậy mà tôi tự tin hơn với môn thi. TutorMis là lựa chọn tuyệt vời!"
                             </p>
                             <div class="testimonial__rating">
@@ -1286,7 +1412,7 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "Gia sư Sinh học trên TutorMis giúp tôi hiểu rõ hơn về các quá trình sống. 
+                                "Gia sư Sinh học trên TutorMis giúp tôi hiểu rõ hơn về các quá trình sống.
                                 Gia sư có cách giảng dạy rất sinh động và dễ nhớ. Điểm Sinh của tôi cải thiện đáng kể!"
                             </p>
                             <div class="testimonial__rating">
@@ -1308,7 +1434,8 @@
                     <div class="testimonial__card">
                         <div class="testimonial__content">
                             <p class="testimonial__text">
-                                "TutorMis giúp tôi tìm gia sư Tiếng Trung nhanh chóng. Gia sư là người bản xứ và dạy rất chuyên nghiệp. 
+                                "TutorMis giúp tôi tìm gia sư Tiếng Trung nhanh chóng. Gia sư là người bản xứ và dạy rất
+                                chuyên nghiệp.
                                 Tôi đã có thể nói chuyện cơ bản sau 2 tháng. Dịch vụ rất tốt!"
                             </p>
                             <div class="testimonial__rating">
@@ -1327,7 +1454,7 @@
                             </div>
                         </div>
                     </div>
-            </div>
+                </div>
         </section>
 
         <!-- Contact Section -->
@@ -1335,9 +1462,10 @@
             <div class="container">
                 <div class="section__header">
                     <h2 class="section__title">Liên hệ với chúng tôi</h2>
-                    <p class="section__subtitle">Gửi thông tin của bạn, chúng tôi sẽ phản hồi trong thời gian sớm nhất!</p>
+                    <p class="section__subtitle">Gửi thông tin của bạn, chúng tôi sẽ phản hồi trong thời gian sớm nhất!
+                    </p>
                 </div>
-                
+
                 <div class="contact__layout">
                     <div class="contact__form-wrapper">
                         <form class="contact__form" id="homeContactForm">
@@ -1345,66 +1473,41 @@
                                 <label class="form__label" for="contactName">
                                     <i class="fas fa-user"></i> Họ và tên
                                 </label>
-                                <input 
-                                    type="text" 
-                                    class="form__input" 
-                                    id="contactName" 
-                                    name="name" 
-                                    placeholder="Nhập họ và tên của bạn"
-                                    required
-                                >
+                                <input type="text" class="form__input" id="contactName" name="name"
+                                    placeholder="Nhập họ và tên của bạn" required>
                             </div>
-                            
+
                             <div class="form__group">
-                                <label class="form__label" for="contactEmail">  
+                                <label class="form__label" for="contactEmail">
                                     <i class="fas fa-envelope"></i> Email
                                 </label>
-                                <input 
-                                    type="email" 
-                                    class="form__input" 
-                                    id="contactEmail" 
-                                    name="email" 
-                                    placeholder="email@example.com"
-                                    required
-                                >
+                                <input type="email" class="form__input" id="contactEmail" name="email"
+                                    placeholder="email@example.com" required>
                             </div>
-                            
+
                             <div class="form__group">
                                 <label class="form__label" for="contactPhone">
                                     <i class="fas fa-phone"></i> Số điện thoại
                                 </label>
-                                <input 
-                                    type="tel" 
-                                    class="form__input" 
-                                    id="contactPhone" 
-                                    name="phone" 
-                                    placeholder="0123456789"
-                                    required
-                                    pattern="[0-9]{10,11}"
-                                >
+                                <input type="tel" class="form__input" id="contactPhone" name="phone"
+                                    placeholder="0123456789" required pattern="[0-9]{10,11}">
                             </div>
-                            
+
                             <div class="form__group">
                                 <label class="form__label" for="contactMessage">
                                     <i class="fas fa-comment-dots"></i> Nội dung
                                 </label>
-                                <textarea 
-                                    class="form__textarea" 
-                                    id="contactMessage" 
-                                    name="message" 
-                                    rows="5" 
-                                    placeholder="Nhập nội dung cần liên hệ..."
-                                    required
-                                ></textarea>
+                                <textarea class="form__textarea" id="contactMessage" name="message" rows="5"
+                                    placeholder="Nhập nội dung cần liên hệ..." required></textarea>
                             </div>
-                            
+
                             <button type="submit" class="btn btn--primary btn--large btn--block">
                                 <i class="fas fa-paper-plane"></i>
                                 Gửi thông tin
                             </button>
                         </form>
                     </div>
-                    
+
                     <div class="contact__image">
                         <img src="assets/images/logo/contact-1.png" alt="Hình ảnh liên hệ">
                     </div>
@@ -1432,7 +1535,8 @@
                 <div class="form__group">
                     <label class="form__label">Mật khẩu</label>
                     <div class="form__input-group">
-                        <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu của bạn" required>
+                        <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu của bạn"
+                            required>
                         <button type="button" class="form__input-button" onclick="togglePassword(this)">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -1456,7 +1560,7 @@
                     <span>Hoặc</span>
                 </div>
                 <p class="form__switch">
-                    Chưa có tài khoản? 
+                    Chưa có tài khoản?
                     <a href="#" onclick="switchModal('loginModal', 'registerModal')">Đăng ký ngay</a>
                 </p>
             </form>
@@ -1480,7 +1584,8 @@
                         <label class="role__option">
                             <input type="radio" name="role" value="student" checked>
                             <div class="role__card">
-                                <img src="assets/images/icon/parent.png" alt="Avatar học sinh/phụ huynh" class="role__image">
+                                <img src="assets/images/icon/parent.png" alt="Avatar học sinh/phụ huynh"
+                                    class="role__image">
                                 <span>Học sinh/Phụ huynh</span>
                             </div>
                         </label>
@@ -1503,12 +1608,14 @@
                 </div>
                 <div class="form__group">
                     <label class="form__label">Số điện thoại</label>
-                    <input type="tel" class="form__input" name="phone" placeholder="0123456789" required pattern="[0-9]{10,11}">
+                    <input type="tel" class="form__input" name="phone" placeholder="0123456789" required
+                        pattern="[0-9]{10,11}">
                 </div>
                 <div class="form__group">
                     <label class="form__label">Mật khẩu</label>
                     <div class="form__input-group">
-                        <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu của bạn" required>
+                        <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu của bạn"
+                            required>
                         <button type="button" class="form__input-button" onclick="togglePassword(this)">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -1518,7 +1625,8 @@
                 <div class="form__group">
                     <label class="form__label">Xác nhận mật khẩu</label>
                     <div class="form__input-group">
-                        <input type="password" class="form__input" name="confirmPassword" placeholder="Nhập lại mật khẩu của bạn" required>
+                        <input type="password" class="form__input" name="confirmPassword"
+                            placeholder="Nhập lại mật khẩu của bạn" required>
                         <button type="button" class="form__input-button" onclick="togglePassword(this)">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -1528,7 +1636,9 @@
                     <label class="checkbox">
                         <input type="checkbox" name="terms" required>
                         <span class="checkbox__checkmark"></span>
-                        Tôi đồng ý với <a href="#" id="show-terms" class="form__link">Điều khoản sử dụng</a> và <a href="#" id="show-policy" class="form__link">Chính sách bảo mật</a>
+                        Tôi đồng ý với <a href="pages/terms.html" target="_blank" id="show-terms"
+                            class="form__link">Điều khoản sử dụng</a> và <a href="pages/privacy.html" target="_blank"
+                            id="show-policy" class="form__link">Chính sách bảo mật</a>
                     </label>
                 </div>
                 <button type="submit" class="btn btn--primary btn--full">
@@ -1541,7 +1651,7 @@
                     <span>Hoặc</span>
                 </div>
                 <p class="form__switch">
-                    Đã có tài khoản? 
+                    Đã có tài khoản?
                     <a href="#" onclick="switchModal('registerModal', 'loginModal')">Đăng nhập ngay</a>
                 </p>
             </form>
@@ -1558,7 +1668,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <!-- Step 1: Enter Email -->
             <div class="forgot-password__step" id="forgotStep1">
                 <form class="auth__form" id="forgotPasswordForm">
@@ -1575,19 +1685,21 @@
                     </button>
                 </form>
             </div>
-            
+
             <!-- Step 2: Enter OTP and New Password -->
             <div class="forgot-password__step" id="forgotStep2" style="display: none;">
                 <form class="auth__form" id="resetPasswordForm">
                     <div class="form__group">
                         <label class="form__label">Mã OTP</label>
-                        <input type="text" class="form__input" name="otp" placeholder="Nhập mã OTP 6 chữ số" maxlength="6" pattern="[0-9]{6}" required>
+                        <input type="text" class="form__input" name="otp" placeholder="Nhập mã OTP 6 chữ số"
+                            maxlength="6" pattern="[0-9]{6}" required>
                         <small class="form__help">Mã OTP đã được gửi đến email của bạn</small>
                     </div>
                     <div class="form__group">
                         <label class="form__label">Mật khẩu mới</label>
                         <div class="form__input-group">
-                            <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu mới" required>
+                            <input type="password" class="form__input" name="password" placeholder="Nhập mật khẩu mới"
+                                required>
                             <button type="button" class="form__input-button" onclick="togglePassword(this)">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -1597,7 +1709,8 @@
                     <div class="form__group">
                         <label class="form__label">Xác nhận mật khẩu mới</label>
                         <div class="form__input-group">
-                            <input type="password" class="form__input" name="confirmPassword" placeholder="Nhập lại mật khẩu mới" required>
+                            <input type="password" class="form__input" name="confirmPassword"
+                                placeholder="Nhập lại mật khẩu mới" required>
                             <button type="button" class="form__input-button" onclick="togglePassword(this)">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -1611,12 +1724,12 @@
                     </button>
                 </form>
             </div>
-            
+
             <div class="form__divider">
                 <span>Hoặc</span>
             </div>
             <p class="form__switch" style="margin-bottom: 12px;">
-                Quay lại 
+                Quay lại
                 <a href="#" onclick="switchModal('forgotPasswordModal', 'loginModal')">Đăng nhập</a>
             </p>
         </div>
@@ -1633,29 +1746,39 @@
                 </button>
             </div>
             <div class="modal__body" style="max-height:60vh;overflow:auto;padding:16px;">
-                <p>Chào mừng đến với <span style="font-weight: 700; color: var(--primary-color)">TutorMis</span>. Trước khi sử dụng dịch vụ, vui lòng đọc kỹ các điều khoản dưới đây. Bằng việc đăng ký hoặc sử dụng dịch vụ, bạn đồng ý với các điều khoản này. Nếu bạn không đồng ý với bất kỳ phần nào của Điều khoản, vui lòng ngưng sử dụng Dịch vụ ngay lập tức.</p>
+                <p>Chào mừng đến với <span style="font-weight: 700; color: var(--primary-color)">TutorMis</span>. Trước
+                    khi sử dụng dịch vụ, vui lòng đọc kỹ các điều khoản dưới đây. Bằng việc đăng ký hoặc sử dụng dịch
+                    vụ, bạn đồng ý với các điều khoản này. Nếu bạn không đồng ý với bất kỳ phần nào của Điều khoản, vui
+                    lòng ngưng sử dụng Dịch vụ ngay lập tức.</p>
 
                 <h3>1. Giới thiệu và Phạm vi Dịch vụ</h3>
-                <p>TutorMis cung cấp nền tảng kết nối học viên và gia sư. Chúng tôi không trực tiếp cung cấp dịch vụ dạy học mà đóng vai trò trung gian kết nối và hỗ trợ thanh toán, đánh giá.
-                    Chúng tôi không phải là một tổ chức giáo dục hay nhà cung cấp dịch vụ gia sư. Vai trò của TutorMis được giới hạn trong việc:
-                    <p>(a) Cung cấp Nền tảng như một nơi trung gian để kết nối Học viên và Gia sư.</p>
-                    <p></p>(b) Hỗ trợ các công cụ quản lý lịch học, lớp học và đánh giá.</p>
-                    <p>(c) Đóng vai trò là đại lý thu hộ và xử lý thanh toán cho các Dịch vụ do Gia sư cung cấp.</p>
+                <p>TutorMis cung cấp nền tảng kết nối học viên và gia sư. Chúng tôi không trực tiếp cung cấp dịch vụ dạy
+                    học mà đóng vai trò trung gian kết nối và hỗ trợ thanh toán, đánh giá.
+                    Chúng tôi không phải là một tổ chức giáo dục hay nhà cung cấp dịch vụ gia sư. Vai trò của TutorMis
+                    được giới hạn trong việc:
+                <p>(a) Cung cấp Nền tảng như một nơi trung gian để kết nối Học viên và Gia sư.</p>
+                <p></p>(b) Hỗ trợ các công cụ quản lý lịch học, lớp học và đánh giá.</p>
+                <p>(c) Đóng vai trò là đại lý thu hộ và xử lý thanh toán cho các Dịch vụ do Gia sư cung cấp.</p>
                 </p>
                 <h3>2. Tài khoản người dùng</h3>
-                <p>Người dùng chịu trách nhiệm về tính chính xác thông tin cung cấp. Bạn cam kết không sử dụng tài khoản cho các hành vi lừa đảo, xâm phạm bản quyền hoặc vi phạm pháp luật.</p>
+                <p>Người dùng chịu trách nhiệm về tính chính xác thông tin cung cấp. Bạn cam kết không sử dụng tài khoản
+                    cho các hành vi lừa đảo, xâm phạm bản quyền hoặc vi phạm pháp luật.</p>
 
                 <h3>3. Quy định nội dung</h3>
-                <p>Mọi nội dung tải lên nền tảng (hồ sơ, ảnh, video, mô tả) phải là của bạn hoặc bạn có quyền chia sẻ. Nền tảng có quyền xóa nội dung vi phạm.</p>
+                <p>Mọi nội dung tải lên nền tảng (hồ sơ, ảnh, video, mô tả) phải là của bạn hoặc bạn có quyền chia sẻ.
+                    Nền tảng có quyền xóa nội dung vi phạm.</p>
 
                 <h3>4. Thanh toán và hoàn tiền</h3>
-                <p>Chính sách thanh toán sẽ được áp dụng theo từng gói dịch vụ. Trong trường hợp không hài lòng, chính sách hoàn tiền sẽ được xử lý theo quy định của TutorMis.</p>
+                <p>Chính sách thanh toán sẽ được áp dụng theo từng gói dịch vụ. Trong trường hợp không hài lòng, chính
+                    sách hoàn tiền sẽ được xử lý theo quy định của TutorMis.</p>
 
                 <h3>5. Giới hạn trách nhiệm</h3>
-                <p>TutorMis không chịu trách nhiệm cho hành vi, nội dung hoặc kết quả học tập của gia sư/học viên; chúng tôi cung cấp công cụ kết nối và phản hồi.</p>
+                <p>TutorMis không chịu trách nhiệm cho hành vi, nội dung hoặc kết quả học tập của gia sư/học viên; chúng
+                    tôi cung cấp công cụ kết nối và phản hồi.</p>
 
                 <h3>6. Cập nhật điều khoản</h3>
-                <p>Chúng tôi có thể thay đổi điều khoản tại bất kỳ thời điểm nào. Mọi thay đổi sẽ được thông báo trên trang web; việc tiếp tục sử dụng dịch vụ sau thông báo đồng nghĩa bạn chấp nhận các thay đổi.</p>
+                <p>Chúng tôi có thể thay đổi điều khoản tại bất kỳ thời điểm nào. Mọi thay đổi sẽ được thông báo trên
+                    trang web; việc tiếp tục sử dụng dịch vụ sau thông báo đồng nghĩa bạn chấp nhận các thay đổi.</p>
 
                 <p style="margin-top:12px;"><strong>Phiên bản: </strong>1.0 — Cập nhật: 2025</p>
             </div>
@@ -1675,22 +1798,28 @@
                 </button>
             </div>
             <div class="modal__body" style="max-height:60vh;overflow:auto;padding:16px;">
-                <p>Tại TutorMis, chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu.</p>
+                <p>Tại TutorMis, chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Chính sách này giải thích cách
+                    chúng tôi thu thập, sử dụng và bảo vệ dữ liệu.</p>
 
                 <h3>1. Dữ liệu thu thập</h3>
-                <p>Chúng tôi thu thập thông tin bạn cung cấp khi đăng ký (tên, email, số điện thoại), thông tin giao dịch và các dữ liệu do bạn nhập trên hồ sơ.</p>
+                <p>Chúng tôi thu thập thông tin bạn cung cấp khi đăng ký (tên, email, số điện thoại), thông tin giao
+                    dịch và các dữ liệu do bạn nhập trên hồ sơ.</p>
 
                 <h3>2. Mục đích sử dụng</h3>
-                <p>Dữ liệu được sử dụng để liên hệ, xác thực tài khoản, xử lý thanh toán, cải thiện dịch vụ và tuân thủ pháp luật.</p>
+                <p>Dữ liệu được sử dụng để liên hệ, xác thực tài khoản, xử lý thanh toán, cải thiện dịch vụ và tuân thủ
+                    pháp luật.</p>
 
                 <h3>3. Lưu trữ và bảo mật</h3>
-                <p>Chúng tôi lưu trữ dữ liệu trên máy chủ an toàn và sử dụng biện pháp mã hóa cho thông tin nhạy cảm. Chỉ nhân viên/đối tác được ủy quyền mới truy cập dữ liệu khi cần thiết.</p>
+                <p>Chúng tôi lưu trữ dữ liệu trên máy chủ an toàn và sử dụng biện pháp mã hóa cho thông tin nhạy cảm.
+                    Chỉ nhân viên/đối tác được ủy quyền mới truy cập dữ liệu khi cần thiết.</p>
 
                 <h3>4. Chia sẻ dữ liệu</h3>
-                <p>Chúng tôi có thể chia sẻ thông tin với dịch vụ thanh toán, đối tác cung cấp chức năng (ví dụ: hệ thống email), hoặc khi được yêu cầu theo pháp luật.</p>
+                <p>Chúng tôi có thể chia sẻ thông tin với dịch vụ thanh toán, đối tác cung cấp chức năng (ví dụ: hệ
+                    thống email), hoặc khi được yêu cầu theo pháp luật.</p>
 
                 <h3>5. Quyền của bạn</h3>
-                <p>Bạn có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân. Để thực hiện, vui lòng liên hệ: <a href="mailto:hoangdev21@gmail.com">hoangdev21@gmail.com</a>.</p>
+                <p>Bạn có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân. Để thực hiện, vui lòng liên hệ: <a
+                        href="mailto:hoangdev21@gmail.com">hoangdev21@gmail.com</a>.</p>
 
                 <p style="margin-top:12px;"><strong>Phiên bản: </strong>1.0 — Cập nhật: 2025</p>
             </div>
@@ -1761,8 +1890,8 @@
                     <h4 class="footer__heading">Hỗ trợ</h4>
                     <ul class="footer__links">
                         <li><a href="#">Trung tâm trợ giúp</a></li>
-                            <li><a href="#">Điều khoản sử dụng</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="pages/terms.html">Điều khoản sử dụng</a></li>
+                        <li><a href="pages/privacy.html">Chính sách bảo mật</a></li>
                     </ul>
                 </div>
                 <div class="footer__section">
@@ -1772,11 +1901,16 @@
                         <p><i class="fas fa-phone"></i> 033 7982 569</p>
                         <p><i class="fas fa-map-marker-alt"></i>Hòa Minh, Liên Chiểu, Đà Nẵng</p>
                         <div class="footer__social">
-                            <a href="https://www.facebook.com/hoangmis21" target="_blank"><i class="fab fa-facebook"></i></a>
-                            <a href="https://www.linkedin.com/in/hoangmis21/" target="_blank"><i class="fab fa-linkedin"></i></a>
-                            <a href="https://www.instagram.com/_hoanggmis_/" target="_blank"><i class="fab fa-instagram"></i></a>
-                            <a href="https://www.tiktok.com/@cobietbuondau_" target="_blank"><i class="fab fa-tiktok"></i></a>
-                            <a href="https://hoangdev21.github.io/Portfolio/" target="_blank"><i class="fas fa-briefcase"></i></a>
+                            <a href="https://www.facebook.com/hoangmis21" target="_blank"><i
+                                    class="fab fa-facebook"></i></a>
+                            <a href="https://www.linkedin.com/in/hoangmis21/" target="_blank"><i
+                                    class="fab fa-linkedin"></i></a>
+                            <a href="https://www.instagram.com/_hoanggmis_/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.tiktok.com/@cobietbuondau_" target="_blank"><i
+                                    class="fab fa-tiktok"></i></a>
+                            <a href="https://hoangdev21.github.io/Portfolio/" target="_blank"><i
+                                    class="fas fa-briefcase"></i></a>
                         </div>
                         <p class="footer__note">Make by 🧡 <i>HoangDev21</i></p>
                     </div>
@@ -1796,6 +1930,8 @@
     <script src="assets/js/home-contact.js"></script>
     <script src="assets/js/landing-page.js"></script>
     <script src="assets/js/language.js"></script>
+    <script src="assets/js/footer-universe.js"></script>
+    <script src="assets/js/terms-privacy-handler.js"></script>
     <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.1/dist/dotlottie-wc.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="assets/js/certificates-swiper.js"></script>
@@ -1812,4 +1948,5 @@
         </a>
     </div>
 </body>
+
 </html>

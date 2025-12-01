@@ -867,7 +867,7 @@ body.sidebar-open {
   align-items: center;
   margin-top: var(--header-height);
   position: relative;
-  background-image: url('../images/backgrounds/bg-hero-3.png');
+  background-image: url('../images/backgrounds/bg-hero-4.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1605,7 +1605,7 @@ body.sidebar-open {
 .form__group {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2);
+  gap: 2px;
 }
 
 .form__label {
@@ -1678,98 +1678,7 @@ body.sidebar-open {
 }
 
 /* ===== FOOTER ===== */
-.footer {
-  background: #393a3b;
-  color: var(--gray-300);
-  padding: var(--spacing-16) 0 var(--spacing-8);
-}
-
-.footer__content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-8);
-  margin-bottom: var(--spacing-8);
-}
-
-.footer__title {
-  color: var(--white);
-  font-size: var(--font-size-xl);
-  margin-bottom: var(--spacing-4);
-}
-
-.footer__description {
-  line-height: 1.8;
-  color: var(--gray-400);
-}
-
-.footer__heading {
-  color: var(--white);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  margin-bottom: var(--spacing-4);
-}
-
-.footer__links {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.footer__links a {
-  color: white;
-  transition: var(--transition-fast);
-}
-
-.footer__links a:hover {
-  color: var(--white);
-}
-
-.footer__contact p {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  margin-bottom: var(--spacing-2);
-  color: var(--gray-400);
-}
-
-.footer__contact i {
-  color: var(--primary-color);
-}
-
-.footer__social {
-  display: flex;
-  gap: var(--spacing-4);
-  margin-top: var(--spacing-4);
-}
-
-.footer__social a {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius-full);
-  background: var(--gray-800);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gray-400);
-  transition: var(--transition-fast);
-}
-
-.footer__social a:hover {
-  background: var(--primary-color);
-  color: var(--white);
-}
-
-.footer__bottom {
-  border-top: 1px solid var(--gray-800);
-  padding-top: var(--spacing-8);
-  text-align: center;
-  color: var(--gray-500);
-}
-
-.footer__note {
-  padding-top: 70px;
-  font-size: var(--font-size-sm);
-}
+/* Footer styles moved to footer-universe.css for better organization */
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
